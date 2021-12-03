@@ -1,9 +1,8 @@
 package be.bonamis.advent.year2021;
 
-import static be.bonamis.advent.utils.FileHelper.getIntegers;
 import static be.bonamis.advent.utils.FileHelper.getLines;
-import static be.bonamis.advent.year2021.Day02.Move.Direction.*;
-import static org.junit.jupiter.api.Assertions.*;
+import static be.bonamis.advent.year2021.Day02.Move.Direction.FORWARD;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.List;
 
