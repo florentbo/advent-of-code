@@ -22,5 +22,10 @@ public class ShowResult {
 		final var day03Data = getLines("2021_day03_prod.txt");
 		logger.info("Day03 part 01 result: {}", new Day03(day03Data).solvePart01());
 		logger.info("Day03 part 02 result: {}", new Day03(day03Data).solvePart02());
+
+		final var day04Data = getLines("2021_day04_prod.txt");
+		logger.info("Day04 part 01 result: {}", new Day04(day04Data).solvePart01());
+		logger.info("Day04 part 02 result: {}", new Day04(day04Data).solvePart02());
+
     }
 }
