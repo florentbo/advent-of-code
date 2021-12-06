@@ -27,5 +27,9 @@ public class ShowResult {
 		logger.info("Day04 part 01 result: {}", new Day04(day04Data).solvePart01());
 		logger.info("Day04 part 02 result: {}", new Day04(day04Data).solvePart02());
 
+		final var day05Data = getLines("2021_day05_prod.txt");
+		logger.info("Day05 part 01 result: {}", new Day05(day05Data).solvePart01());
+		logger.info("Day05 part 02 result: {}", new Day05(day05Data).solvePart02());
+
     }
 }

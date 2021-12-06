@@ -32,7 +32,13 @@
             <artifactId>logback-classic</artifactId>
             <version>1.2.6</version>
         </dependency>
-		
+        
+        <dependency>
+            <artifactId>lombok</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <version>1.18.22</version>
+        </dependency>
+        
         <dependency>
 			<groupId>org.junit.jupiter</groupId>
 			<artifactId>junit-jupiter</artifactId>
@@ -40,10 +46,12 @@
 		</dependency>
         
         <dependency>
-            <groupId>org.projectlombok</groupId>
-            <artifactId>lombok</artifactId>
-            <version>1.18.22</version>
+            <groupId>org.assertj</groupId>
+            <artifactId>assertj-core</artifactId>
+            <version>3.11.1</version>
+            <scope>test</scope>
         </dependency>
+        
 	</dependencies>
 
 	<build>
