@@ -3,9 +3,6 @@ package be.bonamis.advent.year2021;
 import static be.bonamis.advent.utils.FileHelper.getIntegers;
 import static be.bonamis.advent.utils.FileHelper.getLines;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -40,6 +37,10 @@ public class ShowResult {
 		final var day07Data = getLines("2021_day07_prod.txt");
 		log.info("Day07 part 01 result: {}", new Day07(day07Data).solvePart01());
 		log.info("Day07 part 02 result: {}", new Day07(day07Data).solvePart02());
+
+		final var day08Data = getLines("2021_day08_prod.txt");
+		log.info("Day08 part 01 result: {}", new Day08(day08Data).solvePart01());
+		log.info("Day08 part 02 result: {}", new Day08(day08Data).solvePart02());
 
     }
 }
