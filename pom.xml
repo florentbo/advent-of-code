@@ -22,15 +22,12 @@
 			</dependency>
 		</dependencies>
 	</dependencyManagement>
- 
- 
- 
 
 	<dependencies>
         <dependency>
             <groupId>ch.qos.logback</groupId>
             <artifactId>logback-classic</artifactId>
-            <version>1.2.7</version>
+            <version>1.2.8</version>
         </dependency>
         
         <dependency>
@@ -43,6 +40,12 @@
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
             <version>31.0.1-jre</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.jgrapht</groupId>
+            <artifactId>jgrapht-core</artifactId>
+            <version>1.5.1</version>
         </dependency>
         
         <dependency>
