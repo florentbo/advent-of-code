@@ -42,5 +42,16 @@ public class ShowResult {
 		log.info("Day08 part 01 result: {}", new Day08(day08Data).solvePart01());
 		log.info("Day08 part 02 result: {}", new Day08(day08Data).solvePart02());
 
+		final var day11Data = getLines("2021_day11_prod.txt");
+		log.info("Day11 part 01 result: {}", new Day11(day11Data).solvePart01());
+		log.info("Day11 part 02 result: {}", new Day11(day11Data).solvePart02());
+
+		final var day13Data = getLines("2021_day13_prod.txt");
+		log.info("Day13 part 01 result: {}", new Day13(day13Data).solvePart01());
+		log.info("Day13 part 02 result: {}", new Day13(day13Data).solvePart02());
+
+		final var day14Data = getLines("2021_day14_prod.txt");
+		log.info("Day14 part 01 result: {}", new Day14(day14Data).solvePart01());
+		log.info("Day14 part 02 result: {}", new Day14(day14Data).solvePart02());
     }
 }
