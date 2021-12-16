@@ -56,5 +56,6 @@ public class ShowResult {
 
 		final var day15Data = getLines("2021_day15_prod.txt");
 		log.info("Day15 part 01 result: {}", new Day15(day15Data).solvePart01());
+		log.info("Day15 part 01 result: {}", new Day15(day15Data).solvePart02());
     }
 }
