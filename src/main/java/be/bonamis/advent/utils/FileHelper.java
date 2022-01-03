@@ -6,13 +6,19 @@ import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 public class FileHelper {
 
 	private FileHelper() {
+	}
+
+	public static IntStream getColumn(int[][] matrix, int column) {
+		return Arrays.stream(matrix).mapToInt(ints -> ints[column]);
 	}
 
 	public static List<String> getLines(String name) {
