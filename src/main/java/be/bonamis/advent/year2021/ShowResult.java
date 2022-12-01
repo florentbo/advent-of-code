@@ -3,6 +3,7 @@ package be.bonamis.advent.year2021;
 import static be.bonamis.advent.utils.FileHelper.getIntegers;
 import static be.bonamis.advent.utils.FileHelper.getLines;
 
+import be.bonamis.advent.year2022.Day01;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -10,11 +11,12 @@ public class ShowResult {
 
 
 	public static void main(String[] args) {
-		final var day01Data = getIntegers("2021_day1_prod.txt");
-		log.info("Day01 part 01 result: {}", new Day01Another(day01Data).solvePart01());
-		log.info("Day01 part 02 result: {}", new Day01Another(day01Data).solvePart02());
+		final var day01Data = getLines("2022_day1_prod.txt");
+		log.info("Day01 part 01 result: {}", new Day01(day01Data).solvePart01());
+		log.info("Day01 part 02 result: {}", new Day01(day01Data).solvePart02());
+		//log.info("Day01 part 02 result: {}", new Day01Another(day01Data).solvePart02());
 
-		final var day02Data = getLines("2021_day02_prod.txt");
+		/*final var day02Data = getLines("2021_day02_prod.txt");
 		log.info("Day02 part 01 result: {}", new Day02(day02Data).solvePart01());
 		log.info("Day01 part 02 result: {}", new Day02(day02Data).solvePart02());
 
@@ -56,6 +58,6 @@ public class ShowResult {
 
 		final var day15Data = getLines("2021_day15_prod.txt");
 		log.info("Day15 part 01 result: {}", new Day15(day15Data).solvePart01());
-		log.info("Day15 part 01 result: {}", new Day15(day15Data).solvePart02());
+		log.info("Day15 part 01 result: {}", new Day15(day15Data).solvePart02());*/
     }
 }

@@ -16,7 +16,7 @@ import java.util.List;
 public class DayDataRetriever {
 
     public static void main(String[] args) throws Exception {
-        String year = "2021";
+        String year = "2022";
         int day = 1;
         NumberFormat formatter = new DecimalFormat("00");
         Document document = new DayDataRetriever().getDocument(year, day);
