@@ -10,6 +10,11 @@ class Day01Test {
 
     @Test
     void solvePart01() {
-        assertThat(new Day01(getLines("2021/01/2021_01_00_code.txt")).solvePart01()).isEqualTo(10);
+        assertThat(new Day01(getLines("2022/01/2022_01_00_code.txt")).solvePart01()).isEqualTo(24000);
+    }
+
+    @Test
+    void solvePart02() {
+        assertThat(new Day01(getLines("2022/01/2022_01_00_code.txt")).solvePart02()).isEqualTo(45000);
     }
 }
