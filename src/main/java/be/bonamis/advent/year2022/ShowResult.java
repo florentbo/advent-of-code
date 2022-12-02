@@ -13,6 +13,8 @@ public class ShowResult {
 		//log.info("Day01 part 02 result: {}", new Day01(getLines("2022_day1_prod.txt")).solvePart02());
 
 		log.info("Day02 part 01 result: {}", new Day02(getLines("2022_day02_prod.txt")).solvePart01());
-		//log.info("Day02 part 02 result: {}", new Day02(getLines("2022_day02_prod.txt")).solvePart02());
+		//13181 not OK
+		//12560 not OK
+		log.info("Day02 part 02 result: {}", new Day02(getLines("2022_day02_prod.txt")).solvePart02());
     }
 }

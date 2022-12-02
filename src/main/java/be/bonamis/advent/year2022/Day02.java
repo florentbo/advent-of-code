@@ -6,8 +6,6 @@ import lombok.ToString;
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 public class Day02 extends DaySolver<String> {
 
@@ -17,23 +15,13 @@ public class Day02 extends DaySolver<String> {
 
     @Override
     public long solvePart01() {
-        List<Round> collect = this.puzzle.stream().map(Round::new).toList();
-        for (Round round : collect) {
-            System.out.println(round.score());
-        }
         return this.puzzle.stream().map(Round::new).map(Round::score).mapToInt(Integer::intValue)
                 .sum();
     }
 
     @Override
     public long solvePart02() {
-        this.puzzle.stream().map(Round::new).forEach(new Consumer<Round>() {
-            @Override
-            public void accept(Round round) {
-
-            }
-        });
-        return 99;
+        return this.puzzle.stream().map(Round::new).map(Round::score2).mapToInt(Integer::intValue).sum();
     }
 
 
@@ -52,17 +40,30 @@ public class Day02 extends DaySolver<String> {
         int score() {
             int opponentPosition = opponentPosition();
             int yoursPosition = yoursPosition();
-            int operation = (opponentPosition - yoursPosition + 4) % 3 - 1;
-            /*System.out.println("opponentPosition: " + opponentPosition);
-            System.out.println("yoursPosition: " + yoursPosition);
-            System.out.println("oper: " + operation);*/
+            int operation = (opponentPosition - yoursPosition + 4) % 3;
 
-            if (operation == -1) {//win
+            if (operation == 0) {//win
                 return yoursPosition + 1 + 6;
             } else if (operation == 1) {
-                return yoursPosition + 1; // loss
+                return yoursPosition + 1 + 3; //draw
             }
-            return yoursPosition + 1 + 3; //draw
+            return yoursPosition + 1; // loss
+        }
+
+        int score2() {
+            int opponentPosition = opponentPosition();
+            int positionToReach = yoursPosition();
+
+            if (positionToReach == 2) {//win
+                return validPosition(opponentPosition + 1) + 7;
+            } else if (positionToReach == 1) {
+                return validPosition(opponentPosition) + 4; //draw
+            }
+            return validPosition(opponentPosition - 1) + 1;  //loss
+        }
+
+        private static int validPosition(int calculatedPosition) {
+            return (calculatedPosition + 3) % 3;
         }
 
         private int opponentPosition() {
@@ -73,28 +74,6 @@ public class Day02 extends DaySolver<String> {
         private int yoursPosition() {
             String[] arrayValue = {"X", "Y", "Z"};
             return Arrays.asList(arrayValue).indexOf(this.you);
-        }
-
-        int score2() {
-            int opponentPosition = opponentPosition();
-            int yoursPosition = yoursPosition();
-            int operation = yoursPosition - opponentPosition;
-            if (operation == 1) {
-                return yoursPosition + 1 + 6;
-            } else if (operation == -1) {
-                return yoursPosition + 1;
-            }
-
-
-            return yoursPosition + 1 + 3;
-        }
-
-        private static int handleB() {
-            return 1;
-        }
-
-        private static int handleC() {
-            return 1;
         }
     }
 }

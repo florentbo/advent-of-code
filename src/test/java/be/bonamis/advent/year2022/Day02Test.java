@@ -15,7 +15,7 @@ class Day02Test {
         assertThat(new Day02(getLines(CODE_TXT)).solvePart01()).isEqualTo(15);
     }
 
-    @Test@Disabled
+    @Test
     void solvePart02() {
         assertThat(new Day02(getLines(CODE_TXT)).solvePart02()).isEqualTo(12);
     }
