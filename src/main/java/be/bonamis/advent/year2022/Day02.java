@@ -40,11 +40,11 @@ public class Day02 extends DaySolver<String> {
         int score() {
             int opponentPosition = opponentPosition();
             int yoursPosition = yoursPosition();
-            int operation = (opponentPosition - yoursPosition + 4) % 3;
+            int operation = validPosition(yoursPosition - opponentPosition);
 
-            if (operation == 0) {//win
+            if (operation == 1) {//win
                 return yoursPosition + 1 + 6;
-            } else if (operation == 1) {
+            } else if (operation == 0) {
                 return yoursPosition + 1 + 3; //draw
             }
             return yoursPosition + 1; // loss
