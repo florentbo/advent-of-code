@@ -57,12 +57,12 @@ public class Day02 extends DaySolver<String> {
             System.out.println("yoursPosition: " + yoursPosition);
             System.out.println("oper: " + operation);*/
 
-            if (operation == -1) {
+            if (operation == -1) {//win
                 return yoursPosition + 1 + 6;
             } else if (operation == 1) {
-                return yoursPosition + 1;
+                return yoursPosition + 1; // loss
             }
-            return yoursPosition + 1 + 3;
+            return yoursPosition + 1 + 3; //draw
         }
 
         private int opponentPosition() {
