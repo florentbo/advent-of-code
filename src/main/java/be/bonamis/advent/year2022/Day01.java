@@ -1,12 +1,16 @@
 package be.bonamis.advent.year2022;
 
 import be.bonamis.advent.DaySolver;
+import be.bonamis.advent.utils.FileHelper;
 import lombok.Getter;
 import lombok.ToString;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
+
+import static java.util.stream.Collectors.*;
 
 public class Day01 extends DaySolver<String> {
 
@@ -16,34 +20,21 @@ public class Day01 extends DaySolver<String> {
 
     @Override
     public long solvePart01() {
-        return getElves().stream()
-                .mapToLong(Elves::getTotal)
-                .max().orElseThrow();
+        return getElves().mapToLong(Elves::getTotal).max().orElseThrow();
     }
 
     @Override
     public long solvePart02() {
-        return getElves().stream()
-                .map(Elves::getTotal)
-                .sorted(Comparator.reverseOrder())
-                .limit(3)
-                .reduce(0L, Long::sum);
+        return getElves().map(Elves::getTotal).sorted(Comparator.reverseOrder()).limit(3).reduce(0L, Long::sum);
     }
 
-    private List<Elves> getElves() {
-        List<Elves> list = new ArrayList<>();
-        List<Integer> calories = new ArrayList<>();
-        for (String line : puzzle) {
-            if (line.isEmpty()) {
-                list.add(new Elves(calories));
-                calories = new ArrayList<>();
-            } else {
-                int calorie = Integer.parseInt(line);
-                calories.add(calorie);
-            }
-        }
-        list.add(new Elves(calories));
-        return list;
+    private Stream<Elves> getElves() {
+        String content = FileHelper.content("2022/01/2022_01_00_code.txt");
+        Stream<Stream<Integer>> streamStream =
+                Arrays.stream(content.split("\n\n"))
+                        .map(s -> Arrays.stream(s.split("\n"))
+                        .map(Integer::parseInt));
+        return streamStream.map(integerStream -> new Elves(integerStream.collect(toList())));
     }
 
     @ToString
