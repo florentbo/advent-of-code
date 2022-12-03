@@ -68,12 +68,13 @@ public class Day02 extends DaySolver<String> {
 
         private int opponentPosition() {
             String[] arrayValue = {"A", "B", "C"};
-            return Arrays.asList(arrayValue).indexOf(this.opponent);
+            return Arrays.binarySearch(arrayValue, this.opponent);
+
         }
 
         private int yoursPosition() {
             String[] arrayValue = {"X", "Y", "Z"};
-            return Arrays.asList(arrayValue).indexOf(this.you);
+            return Arrays.binarySearch(arrayValue, this.you);
         }
     }
 }
