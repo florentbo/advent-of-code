@@ -17,5 +17,8 @@ public class ShowResult {
 
 		log.info("Day03 part 01 result: {}", new Day03(getLines("2022_day03_prod.txt")).solvePart01());
 		log.info("Day03 part 02 result: {}", new Day03(getLines("2022_day03_prod.txt")).solvePart02());
+
+		log.info("Day04 part 01 result: {}", new Day04(getLines("2022_day04_prod.txt")).solvePart01());
+		log.info("Day04 part 02 result: {}", new Day04(getLines("2022_day04_prod.txt")).solvePart02());
     }
 }
