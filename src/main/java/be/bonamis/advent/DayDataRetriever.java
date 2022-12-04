@@ -17,7 +17,7 @@ public class DayDataRetriever {
 
     public static void main(String[] args) throws Exception {
         String year = "2022";
-        int day = 3;
+        int day = 4;
         NumberFormat formatter = new DecimalFormat("00");
         Document document = new DayDataRetriever().getDocument(year, day);
         List<Element> elements = document.select("code");
