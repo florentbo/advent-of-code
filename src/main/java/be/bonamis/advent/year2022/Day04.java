@@ -1,11 +1,12 @@
 package be.bonamis.advent.year2022;
 
 import be.bonamis.advent.DaySolver;
-import lombok.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
+
+import static java.lang.Integer.*;
 
 public class Day04 extends DaySolver<String> {
 
@@ -15,6 +16,7 @@ public class Day04 extends DaySolver<String> {
 
     @Override
     public long solvePart01() {
+        test();
         return this.puzzle.stream().map(Elf::new).filter(Elf::oneRangeFullyContainsTheOther).count();
     }
 
@@ -23,16 +25,10 @@ public class Day04 extends DaySolver<String> {
         return this.puzzle.stream().map(Elf::new).filter(Elf::oneRangeOverLapTheOther).count();
     }
 
-    @Getter
-    @ToString
-    static class Elf {
-        private final Range firstRange;
-        private final Range secondRange;
+    record Elf(Range firstRange, Range secondRange) {
 
         public Elf(String input) {
-            String[] split = input.split(",");
-            this.firstRange = new Range(split[0]);
-            this.secondRange = new Range(split[1]);
+            this(new Range(input.split(",")[0]), new Range(input.split(",")[1]));
         }
 
         boolean oneRangeFullyContainsTheOther() {
@@ -46,16 +42,9 @@ public class Day04 extends DaySolver<String> {
             return !noElementsInCommon;
         }
 
-        @Getter
-        @ToString
-        static class Range {
-            private final int start;
-            private final int end;
-
+        record Range(int start, int end) {
             public Range(String input) {
-                String[] split = input.split("-");
-                this.start = Integer.parseInt(split[0]);
-                this.end = Integer.parseInt(split[1]);
+                this(parseInt(input.split("-")[0]), parseInt(input.split("-")[1]));
             }
 
             Set<Integer> range() {
