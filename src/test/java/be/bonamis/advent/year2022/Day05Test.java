@@ -13,7 +13,6 @@ class Day05Test {
     @Test
     void solvePart01() {
         assertThat(new Day05(getLines(CODE_TXT)).solvePart01String()).isEqualTo("CMZ");
-        //assertThat(new Day05(getLines(CODE_TXT)).solvePart01String()).isEqualTo("MCD");
     }
 
     @Test@Disabled
