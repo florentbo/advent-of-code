@@ -24,15 +24,17 @@ public class Day05 extends DaySolver<String> {
     }
 
     public String solvePart01String() {
+/*
         List<StackInput> stackInputs = List.of(
                 new StackInput(1, "ZN"),
                 new StackInput(2, "MCD"),
                 new StackInput(3, "P")
         );
         int inputlenghth = stackInputs.size() + 2;
+*/
 
 
-        /*List<StackInput> stackInputs = List.of(
+        List<StackInput> stackInputs = List.of(
                 new StackInput(1, "BLDTWCFM"),
                 new StackInput(2, "NBL"),
                 new StackInput(3, "JCHTLV"),
@@ -42,7 +44,9 @@ public class Day05 extends DaySolver<String> {
                 new StackInput(7, "FMSPVGCN"),
                 new StackInput(8, "WQRJFVCZ"),
                 new StackInput(9, "RPMLH")
-        );*/
+        );
+        int inputlenghth = stackInputs.size() + 1;
+
 
 
         Map<Integer, Stack<String>> map = new LinkedHashMap<>();
@@ -60,13 +64,24 @@ public class Day05 extends DaySolver<String> {
         List<Instruction> instructions = this.puzzle.stream().skip(inputlenghth).map(Instruction::fromLine).toList();
         for (Instruction instruction : instructions) {
             System.out.println("instruction: " + instruction);
+            Deque<String> tempPop = new ArrayDeque<>();
             for (int i = 0; i < instruction.numberToMove; i++) {
                 int origin = instruction.origin();
                 Stack<String> old = map.get(origin);
                 String pop = old.pop();
-                map.get(instruction.destination()).push(pop);
-                System.out.println("map after move  " + i + " map " + map);
+                tempPop.push(pop);
+               // map.get(instruction.destination()).push(pop);
             }
+            System.out.println("tempPop: " + tempPop);
+            tempPop.forEach(System.out::println);
+
+            for (String pop : tempPop) {
+                System.out.println("Deque: " + pop);
+                map.get(instruction.destination()).push(pop);
+            }
+
+            //map.get(instruction.destination()).addAll(tempPop);
+            //System.out.println("map after move  map " + map);
         }
         //System.out.println("map after final move " + map);
         String strings = map.values().stream().map(Stack::peek).collect(Collectors.joining(""));
