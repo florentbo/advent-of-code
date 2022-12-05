@@ -17,18 +17,14 @@ public class Day05 extends DaySolver<String> {
     public String solvePart01String() {
         Map<Integer, Deque<String>> map = readInput(this.puzzle);
 
-        this.puzzle.stream().skip(map.size()).forEach(System.out::println);
-
-        System.out.println("map before move 1 " + map);
-
-        List<Instruction> instructions = this.puzzle.stream().skip(map.size() + 2).map(Instruction::fromLine).toList();
+        int blankLineSeparatorIndex = puzzle.indexOf("");
+        List<Instruction> instructions = this.puzzle.stream().skip(blankLineSeparatorIndex + 1).map(Instruction::fromLine).toList();
         for (Instruction instruction : instructions) {
             for (int i = 0; i < instruction.numberToMove; i++) {
                 int origin = instruction.origin();
                 String last = map.get(origin).removeLast();
                 map.get(instruction.destination()).addLast(last);
             }
-            System.out.println("map after move  map " + map);
         }
         return map.values().stream().map(Deque::removeLast).collect(Collectors.joining(""));
     }
@@ -36,9 +32,7 @@ public class Day05 extends DaySolver<String> {
     private Map<Integer, Deque<String>> readInput(List<String> puzzle) {
         int blankLineSeparatorIndex = puzzle.indexOf("");
         int cravesInputWidth = puzzle.get(blankLineSeparatorIndex - 1).length();
-        System.out.println(cravesInputWidth);
         int cravesNumber = (cravesInputWidth + 1) / 4;
-        System.out.println("cravesNumber: " + cravesNumber);
         Map<Integer, Deque<String>> map = new LinkedHashMap<>();
         for (int i = 0; i < cravesNumber; i++) {
             map.put(i + 1, new ArrayDeque<>());
@@ -56,8 +50,6 @@ public class Day05 extends DaySolver<String> {
                 }
             }
         }
-
-
         return map;
     }
 
@@ -71,17 +63,8 @@ public class Day05 extends DaySolver<String> {
         return this.puzzle.size() + 1;
     }
 
-    record StackInput(int number, String data) {
-        List<String> stack() {
-            return Arrays.stream(data.split("")).toList();
-        }
-    }
-
     record Instruction(int numberToMove, int origin, int destination) {
         public static Instruction fromLine(String line) {
-            /*System.out.println("line: " + line);
-            String input = "move 1 from 2 to 1";
-            System.out.println("inpu: " + input);*/
             List<Integer> matches2 = Pattern.compile("\\d+")
                     .matcher(line)
                     .results()
