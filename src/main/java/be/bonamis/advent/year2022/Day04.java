@@ -16,7 +16,6 @@ public class Day04 extends DaySolver<String> {
 
     @Override
     public long solvePart01() {
-        test();
         return this.puzzle.stream().map(Elf::new).filter(Elf::oneRangeFullyContainsTheOther).count();
     }
 

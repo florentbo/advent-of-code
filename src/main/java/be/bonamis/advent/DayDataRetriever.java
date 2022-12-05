@@ -50,8 +50,7 @@ public class DayDataRetriever {
     private static InputStream downloadInput(String puzzleInputUrl) throws IOException {
         HttpURLConnection con = (HttpURLConnection) new URL(puzzleInputUrl).openConnection();
         con.addRequestProperty("Cookie", "session=53616c7465645f5f13359c359100b14c2f8f1f21d361881846c35120b0099955b5a90378d772ae7d3c8efcdd04535e5f9d348932a0d603a813ac0bd59828fe3d");
-        InputStream inputStream = con.getInputStream();
-        return inputStream;
+        return con.getInputStream();
     }
 
     static Document getDocument(String url) throws IOException {
