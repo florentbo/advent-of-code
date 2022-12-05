@@ -1,8 +1,7 @@
 package be.bonamis.advent.year2022;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
-
-import java.util.*;
 
 import static be.bonamis.advent.utils.FileHelper.getLines;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -16,7 +15,7 @@ class Day05Test {
         assertThat(new Day05(getLines(CODE_TXT)).solvePart01String()).isEqualTo("CMZ");
     }
 
-    @Test
+    @Test@Disabled
     void solvePart02() {
         assertThat(new Day05(getLines(CODE_TXT)).solvePart02()).isEqualTo(7);
     }

@@ -24,42 +24,54 @@ public class Day05 extends DaySolver<String> {
     }
 
     public String solvePart01String() {
-
         List<StackInput> stackInputs = List.of(
                 new StackInput(1, "ZN"),
                 new StackInput(2, "MCD"),
                 new StackInput(3, "P")
         );
+        int inputlenghth = stackInputs.size() + 2;
+
+
+        /*List<StackInput> stackInputs = List.of(
+                new StackInput(1, "BLDTWCFM"),
+                new StackInput(2, "NBL"),
+                new StackInput(3, "JCHTLV"),
+                new StackInput(4, "SPJW"),
+                new StackInput(5, "ZSCFTLR"),
+                new StackInput(6, "WDGBHNZ"),
+                new StackInput(7, "FMSPVGCN"),
+                new StackInput(8, "WQRJFVCZ"),
+                new StackInput(9, "RPMLH")
+        );*/
+
+
         Map<Integer, Stack<String>> map = new LinkedHashMap<>();
         for (StackInput stackInput : stackInputs) {
             Stack<String> stack = new Stack<>();
             stack.addAll(stackInput.stack());
             map.put(stackInput.number(), stack);
         }
+        this.puzzle.stream().skip(inputlenghth).forEach(System.out::println);
 
-        this.puzzle.stream().skip(4).forEach(System.out::println);
 
         System.out.println("map before move 1 " + map);
 
 
-
-        List<Instruction> instructions = this.puzzle.stream().skip(5).map(Instruction::fromLine).toList();
+        List<Instruction> instructions = this.puzzle.stream().skip(inputlenghth).map(Instruction::fromLine).toList();
         for (Instruction instruction : instructions) {
             System.out.println("instruction: " + instruction);
             for (int i = 0; i < instruction.numberToMove; i++) {
                 int origin = instruction.origin();
                 Stack<String> old = map.get(origin);
                 String pop = old.pop();
-                System.out.println("old: " + old);
                 map.get(instruction.destination()).push(pop);
                 System.out.println("map after move  " + i + " map " + map);
             }
         }
-        System.out.println("map after final move " + map);
+        //System.out.println("map after final move " + map);
         String strings = map.values().stream().map(Stack::peek).collect(Collectors.joining(""));
 
-        System.out.println("final result " + strings);
-
+        //System.out.println("final result " + strings);
 
 
         return strings;
@@ -83,9 +95,9 @@ public class Day05 extends DaySolver<String> {
 
     record Instruction(int numberToMove, int origin, int destination) {
         public static Instruction fromLine(String line) {
-            System.out.println("line: " + line);
+            /*System.out.println("line: " + line);
             String input = "move 1 from 2 to 1";
-            System.out.println("inpu: " + input);
+            System.out.println("inpu: " + input);*/
             List<Integer> matches2 = Pattern.compile("\\d+")
                     .matcher(line)
                     .results()
