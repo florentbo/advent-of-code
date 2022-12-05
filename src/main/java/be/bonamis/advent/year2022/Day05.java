@@ -1,95 +1,64 @@
 package be.bonamis.advent.year2022;
 
 import be.bonamis.advent.DaySolver;
-import be.bonamis.advent.common.CharGrid;
 
 import java.util.*;
 import java.util.regex.MatchResult;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 public class Day05 extends DaySolver<String> {
 
-    private final CharGrid charGrid;
 
     public Day05(List<String> puzzle) {
         super(puzzle);
-        charGrid = new CharGrid(this.puzzle.stream().map(String::toCharArray).toArray(char[][]::new));
-    }
-
-
-    public static Stream<Character> getColumn2(char[][] matrix, int column) {
-        return Arrays.stream(matrix).map(ints -> ints[column]);
     }
 
     public String solvePart01String() {
-/*
-        List<StackInput> stackInputs = List.of(
-                new StackInput(1, "ZN"),
-                new StackInput(2, "MCD"),
-                new StackInput(3, "P")
-        );
-        int inputlenghth = stackInputs.size() + 2;
-*/
+        Map<Integer, Deque<String>> map = readInput(this.puzzle);
 
-
-        List<StackInput> stackInputs = List.of(
-                new StackInput(1, "BLDTWCFM"),
-                new StackInput(2, "NBL"),
-                new StackInput(3, "JCHTLV"),
-                new StackInput(4, "SPJW"),
-                new StackInput(5, "ZSCFTLR"),
-                new StackInput(6, "WDGBHNZ"),
-                new StackInput(7, "FMSPVGCN"),
-                new StackInput(8, "WQRJFVCZ"),
-                new StackInput(9, "RPMLH")
-        );
-        int inputlenghth = stackInputs.size() + 1;
-
-
-
-        Map<Integer, Stack<String>> map = new LinkedHashMap<>();
-        for (StackInput stackInput : stackInputs) {
-            Stack<String> stack = new Stack<>();
-            stack.addAll(stackInput.stack());
-            map.put(stackInput.number(), stack);
-        }
-        this.puzzle.stream().skip(inputlenghth).forEach(System.out::println);
-
+        this.puzzle.stream().skip(map.size()).forEach(System.out::println);
 
         System.out.println("map before move 1 " + map);
 
-
-        List<Instruction> instructions = this.puzzle.stream().skip(inputlenghth).map(Instruction::fromLine).toList();
+        List<Instruction> instructions = this.puzzle.stream().skip(map.size() + 2).map(Instruction::fromLine).toList();
         for (Instruction instruction : instructions) {
-            System.out.println("instruction: " + instruction);
-            Deque<String> tempPop = new ArrayDeque<>();
             for (int i = 0; i < instruction.numberToMove; i++) {
                 int origin = instruction.origin();
-                Stack<String> old = map.get(origin);
-                String pop = old.pop();
-                tempPop.push(pop);
-               // map.get(instruction.destination()).push(pop);
+                String last = map.get(origin).removeLast();
+                map.get(instruction.destination()).addLast(last);
             }
-            System.out.println("tempPop: " + tempPop);
-            tempPop.forEach(System.out::println);
-
-            for (String pop : tempPop) {
-                System.out.println("Deque: " + pop);
-                map.get(instruction.destination()).push(pop);
-            }
-
-            //map.get(instruction.destination()).addAll(tempPop);
-            //System.out.println("map after move  map " + map);
+            System.out.println("map after move  map " + map);
         }
-        //System.out.println("map after final move " + map);
-        String strings = map.values().stream().map(Stack::peek).collect(Collectors.joining(""));
+        return map.values().stream().map(Deque::removeLast).collect(Collectors.joining(""));
+    }
 
-        //System.out.println("final result " + strings);
+    private Map<Integer, Deque<String>> readInput(List<String> puzzle) {
+        int blankLineSeparatorIndex = puzzle.indexOf("");
+        int cravesInputWidth = puzzle.get(blankLineSeparatorIndex - 1).length();
+        System.out.println(cravesInputWidth);
+        int cravesNumber = (cravesInputWidth + 1) / 4;
+        System.out.println("cravesNumber: " + cravesNumber);
+        Map<Integer, Deque<String>> map = new LinkedHashMap<>();
+        for (int i = 0; i < cravesNumber; i++) {
+            map.put(i + 1, new ArrayDeque<>());
+        }
+
+        for (int i = 0; i < blankLineSeparatorIndex - 1; i++) {
+            String[] line = puzzle.get(i).split("");
+            for (int c = 0; c <= cravesNumber; c++) {
+                int columnNumber = c * 4 + 1;
+                if (line.length > columnNumber) {
+                    String crate = line[columnNumber];
+                    if (!crate.isBlank()) {
+                        map.get(c + 1).addFirst(crate);
+                    }
+                }
+            }
+        }
 
 
-        return strings;
+        return map;
     }
 
     @Override
