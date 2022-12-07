@@ -3,6 +3,8 @@ package be.bonamis.advent.year2022;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
+import java.util.regex.MatchResult;
+import java.util.regex.Pattern;
 
 import static be.bonamis.advent.utils.FileHelper.getLines;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,15 +26,23 @@ class Day07Test {
 
     int findSize(List<String> lines){
         List<Directory> directories = new ArrayList<>();
+        Directory root = new Directory("/");
+        directories.add(root);
         for (String line : lines) {
             String test = "$ cd /\n" +
                     "$ ls";
+
+            List<String> strings = Pattern.compile("\\$ cd \\w")
+                    .matcher(line)
+                    .results()
+                    .map(MatchResult::group).toList();
+            System.out.println(strings);
 
         }
         return 0;
     }
 
-    record Directory(){
+    record Directory(String path){
 
     }
 }
