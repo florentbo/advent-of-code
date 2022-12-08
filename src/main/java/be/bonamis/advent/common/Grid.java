@@ -28,7 +28,7 @@ public class Grid {
         if (p.x >= 0 && p.x < data.length && p.y >= 0 && p.y < data[0].length) {
             return data[p.x][p.y];
         }
-        throw new RuntimeException("Point: " + p + " not found");
+        return null;
     }
 
     public void printArray() {
