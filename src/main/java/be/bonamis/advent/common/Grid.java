@@ -34,7 +34,7 @@ public class Grid {
     public void printArray() {
         for (int[] ints : this.data) {
             for (int number : ints) {
-                System.out.print(number==1? "#": ".");//#####.....
+                System.out.print(number);//#####.....
             }
             System.out.println();
         }
@@ -44,13 +44,13 @@ public class Grid {
         data[point.x][point.y] = i;
     }
 
-	public void consume(Consumer<Point> consumer) {
-		for (int x = 0; x < data.length; x++) {
-			for (int y = 0; y < data[x].length; y++) {
-				consumer.accept(new Point(x,y));
-			}
-		}
-	}
+    public void consume(Consumer<Point> consumer) {
+        for (int x = 0; x < data.length; x++) {
+            for (int y = 0; y < data[x].length; y++) {
+                consumer.accept(new Point(x, y));
+            }
+        }
+    }
 
 
 }
