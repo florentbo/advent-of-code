@@ -1,5 +1,6 @@
 package be.bonamis.advent.year2022;
 
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
@@ -14,12 +15,14 @@ class Day07Test {
     private static final String CODE_TXT = "2022/07/2022_07_01_code.txt";
 
     @Test
+    @Disabled
     void solvePart01() {
         List<String> lines = getLines(CODE_TXT);
         assertThat(findSize(lines)).isEqualTo(95437);
     }
 
     @Test
+    @Disabled
     void solvePart02() {
         assertThat(new Day07(getLines(CODE_TXT)).solvePart02()).isEqualTo(24);
     }
