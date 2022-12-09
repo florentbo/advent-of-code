@@ -1,12 +1,10 @@
 package be.bonamis.advent.year2022;
 
-import be.bonamis.advent.utils.marsrover.FacingDirection;
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
+import be.bonamis.advent.year2022.Day09.Rope.WirePath;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -26,39 +24,76 @@ L 3
     @Test
     void solvePart01() {
         List<String> lines = getLines(CODE_TXT);
-        assertThat(new Day09(lines).solvePart01()).isEqualTo(8);
+        String collect = lines.stream().map(str -> str.replaceAll(" ", "")).collect(Collectors.joining(","));
+        System.out.println(collect);
+        String wirePaths = "R4,U2";
+        Day09.Rope rope = new Day09.Rope();
+        Day09.Rope wireAfterFirstMove = rope.move(WirePath.from(collect));
+        assertThat(new Day09(lines).solvePart01()).isEqualTo(13);
     }
 
     @Test
     void aRoverMoveStepByStep() {
-        Rope wire = new Rope();
+        Day09.Rope rope = new Day09.Rope();
 
-        Rope wireAfterFirstMove = wire.move(Rope.WirePath.of("R4"));
-        Rover movedRover = wireAfterFirstMove.rover;
+        Day09.Rope wireAfterFirstMove = rope.move(WirePath.of("R4"));
+        Rover movedRover = wireAfterFirstMove.head();
         assertThat(movedRover.facingDirection()).isEqualTo(EAST);
         assertThat(movedRover.position()).isEqualTo(new Position(4, 0));
 
-        assertThat(wireAfterFirstMove.positions).containsExactlyInAnyOrder(
-                                                                new Position(1, 0),
-                                                                new Position(2, 0),
-                                                                new Position(3, 0),
-                                                                new Position(4, 0));
+        assertThat(wireAfterFirstMove.positions()).containsExactlyInAnyOrder(
+                new Position(1, 0),
+                new Position(2, 0),
+                new Position(3, 0),
+                new Position(4, 0));
 
-        Rope wireAfterTwoMove = wireAfterFirstMove.move(Rope.WirePath.of("U4"));
-        Rover roverAfterTwoMove = wireAfterTwoMove.rover;
+        Day09.Rope wireAfterTwoMove = wireAfterFirstMove.move(WirePath.of("U4"));
+        Rover roverAfterTwoMove = wireAfterTwoMove.head();
         assertThat(roverAfterTwoMove.facingDirection()).isEqualTo(NORTH);
         assertThat(roverAfterTwoMove.position()).isEqualTo(new Position(4, 4));
 
-        assertThat(wireAfterFirstMove.positions).containsExactlyInAnyOrder(
-                                                                new Position(1, 0),
-                                                                new Position(2, 0),
-                                                                new Position(3, 0),
-                                                                new Position(4, 0),
-                                                                new Position(4, 1),
-                                                                new Position(4, 2),
-                                                                new Position(4, 3),
-                                                                new Position(4, 4)
+        assertThat(wireAfterFirstMove.positions()).containsExactlyInAnyOrder(
+                new Position(1, 0),
+                new Position(2, 0),
+                new Position(3, 0),
+                new Position(4, 0),
+                new Position(4, 1),
+                new Position(4, 2),
+                new Position(4, 3),
+                new Position(4, 4)
         );
+    }
+
+    @Test
+    void aRoverTailISAlwaysBehindHead() {
+        Day09.Rope rope = new Day09.Rope();
+        Day09.Rope wireAfterFirstMove = rope.move(WirePath.of("R2"));
+        assertThat(wireAfterFirstMove.head().position()).isEqualTo(new Position(2, 0));
+        assertThat(wireAfterFirstMove.tail()).isEqualTo(new Position(1, 0));
+    }
+
+    @Test
+    void aRoverTailISAlwaysBehindHead2() {
+        Day09.Rope rope = new Day09.Rope();
+        Day09.Rope wireAfterFirstMove = rope.move(WirePath.of("R4"));
+        assertThat(wireAfterFirstMove.head().position()).isEqualTo(new Position(4, 0));
+        assertThat(wireAfterFirstMove.tail()).isEqualTo(new Position(3, 0));
+    }
+
+    @Test
+    void aRoverTailISAlwaysBehindHead3() {
+        Day09.Rope rope = new Day09.Rope();
+        Day09.Rope wireAfterFirstMove = rope.move(WirePath.from("R4,U1"));
+        assertThat(wireAfterFirstMove.head().position()).isEqualTo(new Position(4, 1));
+        assertThat(wireAfterFirstMove.tail()).isEqualTo(new Position(3, 0));
+    }
+
+    @Test
+    void aRoverTailISAlwaysBehindHead4() {
+        Day09.Rope rope = new Day09.Rope();
+        Day09.Rope wireAfterFirstMove = rope.move(WirePath.from("R4,U2"));
+        assertThat(wireAfterFirstMove.head().position()).isEqualTo(new Position(4, 2));
+        assertThat(wireAfterFirstMove.tail()).isEqualTo(new Position(4, 1));
     }
 
     @Test
@@ -78,49 +113,4 @@ L 3
         return new Rover(NORTH, new Position(0, 0));
     }
 
-    record Rope(Rover rover, List<Position> positions) {
-        public Rope() {
-            this(new Rover(NORTH, new Position(0, 0)), new ArrayList<>());
-        }
-
-        public Rope move(List<WirePath> paths) {
-            Rover previousRoverAfterPivoting = this.rover;
-            for (WirePath path : paths) {
-                previousRoverAfterPivoting = new Rover(path.facingDirection(), previousRoverAfterPivoting.position());
-                for (int i = 0; i < path.length(); i++) {
-                    previousRoverAfterPivoting = previousRoverAfterPivoting.move("f");
-                    positions.add(previousRoverAfterPivoting.position());
-                }
-            }
-            return new Rope(previousRoverAfterPivoting, positions);
-        }
-
-        public Rope move(WirePath... paths) {
-            return move(Arrays.asList(paths));
-        }
-
-        record WirePath(FacingDirection facingDirection, int length) {
-            public static WirePath of(String path) {
-                return new WirePath(getFacingDirection(path.substring(0, 1)), getLength(path.substring(1)));
-            }
-
-            private static int getLength(String substring) {
-                return Integer.parseInt(substring);
-            }
-
-            private static FacingDirection getFacingDirection(String substring) {
-                return switch (substring) {
-                    case "R" -> EAST;
-                    case "U" -> NORTH;
-                    case "L" -> WEST;
-                    case "D" -> SOUTH;
-                    default -> null;
-                };
-            }
-
-            private static List<WirePath> from(String wirePaths) {
-                return Arrays.stream(wirePaths.split(",")).map(WirePath::of).collect(Collectors.toList());
-            }
-        }
-    }
 }
