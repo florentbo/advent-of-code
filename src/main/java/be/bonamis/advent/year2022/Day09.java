@@ -53,7 +53,7 @@ public class Day09 extends DaySolver<String> {
                     int xDistance = Math.abs(previousTail.x() - headNewPosition.x());
                     int yDistance = Math.abs(previousTail.y() - headNewPosition.y());
                     if (xDistance > 1 || yDistance > 1) {
-                        Position lastHeadPosition = this.positions.get(this.positions().size() - 1);
+                        Position lastHeadPosition = newPosition(xDistance, yDistance, previousTail, headNewPosition);
                         this.tailPositions.add(lastHeadPosition);
                         previousTail = lastHeadPosition;
                     }
@@ -61,6 +61,13 @@ public class Day09 extends DaySolver<String> {
                 }
             }
             return new Rope(previousRoverAfterPivoting, previousTail, this.positions, this.tailPositions);
+        }
+
+        private Position newPosition(int xDistance, int yDistance, Position previousTail, Position headNewPosition) {
+            if (xDistance==0 || yDistance==0) {
+                return this.positions.get(this.positions().size() - 1);
+            }
+            return this.positions.get(this.positions().size() - 1);
         }
 
         public Rope move(WirePath... paths) {

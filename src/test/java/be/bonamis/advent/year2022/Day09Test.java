@@ -18,11 +18,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class Day09Test {
 
-    /*
-    R 4
-U 4
-L 3
-     */
     private static final String CODE_TXT = "2022/09/2022_09_05_code.txt";
 
     @Test
@@ -84,28 +79,9 @@ L 3
         return listOfArguments.stream();
     }
 
-    private static Stream<Arguments> part01TestCases() {
-        List<WirePath> from = WirePath.from("R4,U2");
-        return Stream.of(
-                Arguments.of(from, new Position(4, 1))
-        );
-    }
-
     @Test
     void solvePart02() {
         List<String> lines = getLines(CODE_TXT);
         assertThat(new Day09(lines).solvePart02()).isEqualTo(9);
     }
-
-    @Test
-        //A Rover has an initial position and direction it's facing
-    void aRoverHasAnInitialPosition() {
-        Rover rover = initialRover();
-        assertThat(rover.position()).isEqualTo(new Position(0, 0));
-    }
-
-    private Rover initialRover() {
-        return new Rover(NORTH, new Position(0, 0));
-    }
-
 }
