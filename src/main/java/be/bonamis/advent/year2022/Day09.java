@@ -1,20 +1,14 @@
 package be.bonamis.advent.year2022;
 
 import be.bonamis.advent.DaySolver;
-import be.bonamis.advent.common.Grid;
 import be.bonamis.advent.utils.marsrover.FacingDirection;
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
-import cyclops.companion.Streamable;
 
-import java.awt.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
-import java.util.function.Function;
-import java.util.function.IntUnaryOperator;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import static be.bonamis.advent.utils.marsrover.FacingDirection.*;
 
@@ -30,7 +24,9 @@ public class Day09 extends DaySolver<String> {
         Day09.Rope rope = new Day09.Rope();
         Day09.Rope wireAfterFirstMove = rope.move(Rope.WirePath.from(collect));
 
-        return wireAfterFirstMove.tailPositions.size() - 1;
+        List<Position> tailPositions = wireAfterFirstMove.tailPositions;
+        System.out.println(tailPositions);
+        return tailPositions.size();
     }
 
     @Override
