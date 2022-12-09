@@ -24,11 +24,6 @@ L 3
     @Test
     void solvePart01() {
         List<String> lines = getLines(CODE_TXT);
-        String collect = lines.stream().map(str -> str.replaceAll(" ", "")).collect(Collectors.joining(","));
-        System.out.println(collect);
-        String wirePaths = "R4,U2";
-        Day09.Rope rope = new Day09.Rope();
-        Day09.Rope wireAfterFirstMove = rope.move(WirePath.from(collect));
         assertThat(new Day09(lines).solvePart01()).isEqualTo(13);
     }
 
