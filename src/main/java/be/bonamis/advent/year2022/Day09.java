@@ -5,9 +5,7 @@ import be.bonamis.advent.utils.marsrover.FacingDirection;
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import static be.bonamis.advent.utils.marsrover.FacingDirection.*;
@@ -21,12 +19,7 @@ public class Day09 extends DaySolver<String> {
     @Override
     public long solvePart01() {
         String collect = this.puzzle.stream().map(str -> str.replaceAll(" ", "")).collect(Collectors.joining(","));
-        Day09.Rope rope = new Day09.Rope();
-        Day09.Rope wireAfterFirstMove = rope.move(Rope.WirePath.from(collect));
-
-        List<Position> tailPositions = wireAfterFirstMove.tailPositions;
-        System.out.println(tailPositions);
-        return tailPositions.size();
+        return new Rope().move(Rope.WirePath.from(collect)).tailPositions.size();
     }
 
     @Override
@@ -34,13 +27,13 @@ public class Day09 extends DaySolver<String> {
         return this.puzzle.size() + 1;
     }
 
-    record Rope(Rover head, Position tail, List<Position> positions, List<Position> tailPositions) {
+    record Rope(Rover head, Position tail, List<Position> positions, Set<Position> tailPositions) {
         public Rope() {
             this(initRover(), new Position(0, 0), new ArrayList<>(), initTailPositions());
         }
 
-        private static List<Position> initTailPositions() {
-            List<Position> arrayList = new ArrayList<>();
+        private static Set<Position> initTailPositions() {
+            Set<Position> arrayList = new HashSet<>();
             arrayList.add(new Position(0, 0));
             return arrayList;
         }
