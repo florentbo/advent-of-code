@@ -21,7 +21,7 @@ public class DayDataRetriever {
 
     public static void main(String[] args) throws Exception {
         String year = "2022";
-        int day = 9;
+        int day = 10;
         NumberFormat formatter = new DecimalFormat("00");
         retrieveCodes(year, day, formatter);
         retrievePuzzleInput(year, day, formatter);
