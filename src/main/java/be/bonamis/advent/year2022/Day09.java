@@ -45,29 +45,42 @@ public class Day09 extends DaySolver<String> {
         public Rope move(List<WirePath> paths) {
             Rover previousRoverAfterPivoting = this.head;
             Position previousTail = this.tail;
-            for (WirePath path : paths) {
+            for (int ii = 0; ii < paths.size(); ii++) {
+                WirePath path = paths.get(ii);
+                WirePath previousPath = ii > 0 ? paths.get(ii - 1) : null;
                 previousRoverAfterPivoting = new Rover(path.facingDirection(), previousRoverAfterPivoting.position());
                 for (int i = 0; i < path.length(); i++) {
                     previousRoverAfterPivoting = previousRoverAfterPivoting.move("f");
                     Position headNewPosition = previousRoverAfterPivoting.position();
-                    int xDistance = Math.abs(previousTail.x() - headNewPosition.x());
-                    int yDistance = Math.abs(previousTail.y() - headNewPosition.y());
-                    if (xDistance > 1 || yDistance > 1) {
-                        Position lastHeadPosition = newPosition(xDistance, yDistance, previousTail, headNewPosition);
-                        this.tailPositions.add(lastHeadPosition);
-                        previousTail = lastHeadPosition;
-                    }
+                    previousTail = handlingTail(previousTail, path, previousPath, headNewPosition);
                     this.positions.add(headNewPosition);
                 }
             }
             return new Rope(previousRoverAfterPivoting, previousTail, this.positions, this.tailPositions);
         }
 
-        private Position newPosition(int xDistance, int yDistance, Position previousTail, Position headNewPosition) {
-            if (xDistance==0 || yDistance==0) {
-                return this.positions.get(this.positions().size() - 1);
+        private Position handlingTail(Position previousTail, WirePath path, WirePath previousPath, Position headNewPosition) {
+            int xDistance = Math.abs(previousTail.x() - headNewPosition.x());
+            int yDistance = Math.abs(previousTail.y() - headNewPosition.y());
+            if (xDistance > 1 || yDistance > 1) {
+                Position lastHeadPosition = newPosition(xDistance, yDistance, previousTail,
+                        path, previousPath);
+                this.tailPositions.add(lastHeadPosition);
+                previousTail = lastHeadPosition;
             }
-            return this.positions.get(this.positions().size() - 1);
+            return previousTail;
+        }
+
+        private Position newPosition(int xDistance, int yDistance, Position previousTail,
+                                     WirePath path, WirePath previousPath) {
+            Position previous = this.positions.get(this.positions().size() - 1);
+            if (xDistance == 0 || yDistance == 0) {
+                return previous;
+            }
+            Rover beforeFirstDiagMove = new Rover(previousPath.facingDirection(), previousTail);
+            Rover firstDiagMove = beforeFirstDiagMove.move("f");
+            Rover rover2 = new Rover(path.facingDirection(), firstDiagMove.position());
+            return rover2.move("f").position();
         }
 
         public Rope move(WirePath... paths) {

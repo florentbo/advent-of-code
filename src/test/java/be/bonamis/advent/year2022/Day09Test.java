@@ -41,21 +41,6 @@ class Day09Test {
                 new Position(3, 0),
                 new Position(4, 0));
 
-        Day09.Rope wireAfterTwoMove = wireAfterFirstMove.move(WirePath.of("U4"));
-        Rover roverAfterTwoMove = wireAfterTwoMove.head();
-        assertThat(roverAfterTwoMove.facingDirection()).isEqualTo(NORTH);
-        assertThat(roverAfterTwoMove.position()).isEqualTo(new Position(4, 4));
-
-        assertThat(wireAfterFirstMove.positions()).containsExactlyInAnyOrder(
-                new Position(1, 0),
-                new Position(2, 0),
-                new Position(3, 0),
-                new Position(4, 0),
-                new Position(4, 1),
-                new Position(4, 2),
-                new Position(4, 3),
-                new Position(4, 4)
-        );
     }
 
     @ParameterizedTest
