@@ -53,12 +53,12 @@ class Day11Test {
         for (int round = 1; round <= 20; round++) {
             for (MonkeyCounter monkeyCounter : monkeyCounters) {
                 Monkey monkey = monkeyCounter.monkey;
-                List<Integer> startingItems = monkey.startingItems;
-                for (Integer startingItem : startingItems) {
-                    monkeyCounter.counter++;
-                    Pair<Integer, Integer> boredAndReceiver = monkey.boredAndReceiver(startingItem);
+                List<Long> startingItems = monkey.startingItems;
+                for (Long startingItem : startingItems) {
+                    Pair<Long, Integer> boredAndReceiver = monkey.boredAndReceiver(startingItem);
                     monkeys.get(boredAndReceiver.getSecond()).add(boredAndReceiver.getFirst());
                 }
+                monkeyCounter.counter+=startingItems.size();
                 monkey.clean();
             }
         }
@@ -71,13 +71,13 @@ class Day11Test {
         return (long) list.get(list.size() - 1) * list.get(list.size() - 2);
     }
 
-    record Monkey(List<Integer> startingItems, Operation operation, Test test, IfTrue ifTrue, IfFalse ifFalse,
+    record Monkey(List<Long> startingItems, Operation operation, Test test, IfTrue ifTrue, IfFalse ifFalse,
                   long count) {
 
 
         private static Monkey of(List<String> lines, int i) {
             String[] items = data(lines.get(i + 1), "Starting items: ").replaceAll(" ", "").split(",");
-            List<Integer> startingItems = new ArrayList<>(Arrays.stream(items).map(Integer::parseInt).toList());
+            List<Long> startingItems = new ArrayList<>(Arrays.stream(items).map(Long::parseLong).toList());
 
             String[] operationData = data(lines.get(i + 2), "Operation: new = old ").split(" ");
             Operation operation = new Operation(operationData[0], operationData[1]);
@@ -89,16 +89,12 @@ class Day11Test {
             return new Monkey(startingItems, operation, new Test(test), new IfTrue(ifTrue), new IfFalse(ifFalse), 0);
         }
 
-        public static Monkey withCounter(Monkey monkey, int count) {
-            return new Monkey(monkey.startingItems, monkey.operation, monkey.test, monkey.ifTrue, monkey.ifFalse, count);
-        }
-
         private static String data(String input, String s) {
             return input.substring(s.length() + 2);
         }
 
-        public int executeOperation(Integer startingItem) {
-            int number = this.operation.number.equals("old") ? startingItem : Integer.parseInt(this.operation.number);
+        public long executeOperation(Long startingItem) {
+            long number = this.operation.number.equals("old") ? startingItem : Integer.parseInt(this.operation.number);
             return switch (this.operation.operand) {
                 case "+" -> number + startingItem;
                 case "-" -> number - startingItem;
@@ -108,12 +104,11 @@ class Day11Test {
             };
         }
 
-        Pair<Integer, Integer> boredAndReceiver(Integer startingItem) {
-            int newLevel = executeOperation(startingItem);
-            int divisibleBy = test().divisibleBy();
-            int getBored = newLevel / 3;
-            int test = getBored % divisibleBy;
-            //System.out.println(getBored);
+        Pair<Long, Integer> boredAndReceiver(Long startingItem) {
+            long newLevel = executeOperation(startingItem);
+            long divisibleBy = test().divisibleBy();
+            long getBored = newLevel / 3;
+            long test = getBored % divisibleBy;
             int monkeyReceiver;
             if (test == 0) {
                 monkeyReceiver = ifTrue.monkeyReceiver;
@@ -123,17 +118,13 @@ class Day11Test {
             return new Pair<>(getBored, monkeyReceiver);
         }
 
-        public void add(int getBored) {
+        public void add(long getBored) {
             this.startingItems.add(getBored);
         }
 
         public void clean() {
             this.startingItems.clear();
         }
-
-        /*public void inspect() {
-            //this.count;
-        }*/
 
         record Operation(String operand, String number) {
         }
