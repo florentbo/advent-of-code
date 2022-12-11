@@ -4,9 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.jgrapht.alg.util.Pair;
 import org.junit.jupiter.api.Test;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 
 import static be.bonamis.advent.utils.FileHelper.getLines;
@@ -19,7 +17,12 @@ class Day11Test {
 
     public static void main(String[] args) {
         List<String> lines = getLines("2022/11/2022_11_input.txt");
-        //log.info("Day10 part 01 result: {}", new ClockCircuit(lines).run());
+        List<Monkey> monkeys = IntStream.range(0, (lines.size() + 1) / 7).mapToObj(i -> Monkey.of(lines, i * 7))
+                .toList();
+        System.out.println(monkeys);
+
+        long result = getResult(monkeys);
+        log.info("Day11 part 01 result: {}", result);
 
     }
 
@@ -29,24 +32,44 @@ class Day11Test {
         List<Monkey> monkeys = IntStream.range(0, (lines.size() + 1) / 7).mapToObj(i -> Monkey.of(lines, i * 7))
                 .toList();
         System.out.println(monkeys);
+        long result = getResult(monkeys);
+        assertThat(result).isEqualTo(10605);
+    }
 
-        //for (int round = 0; round < 20; round++) {
-            for (Monkey monkey : monkeys) {
+    private static long getResult(List<Monkey> monkeys) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (int i = 0; i < monkeys.size(); i++) {
+            map.put(i, 0);
+        }
+        for (int round = 1; round <= 20; round++) {
+
+            for (int i = 0; i < monkeys.size(); i++) {
+                Monkey monkey = monkeys.get(i);
                 List<Integer> startingItems = monkey.startingItems;
+                int count = 0;
                 for (Integer startingItem : startingItems) {
+                    count++;
                     Pair<Integer, Integer> boredAndReceiver = monkey.boredAndReceiver(startingItem);
                     monkeys.get(boredAndReceiver.getSecond()).add(boredAndReceiver.getFirst());
                 }
                 monkey.clean();
+                int newCount = map.get(i) + count;
+                map.put(i, newCount);
             }
-        //}
+
+        }
+        System.out.println("report: ");
         for (Monkey monkey : monkeys) {
             System.out.println(monkey.startingItems());
         }
-        assertThat(lines.size()).isEqualTo(27);
+        List<Integer> list = map.values().stream().sorted().toList();
+        System.out.println("map: " + list);
+        return (long) list.get(list.size() - 1) * list.get(list.size() - 2);
     }
 
-    record Monkey(List<Integer> startingItems, Operation operation, Test test, IfTrue ifTrue, IfFalse ifFalse) {
+    record Monkey(List<Integer> startingItems, Operation operation, Test test, IfTrue ifTrue, IfFalse ifFalse,
+                  long count) {
+
 
         private static Monkey of(List<String> lines, int i) {
             String[] items = data(lines.get(i + 1), "Starting items: ").replaceAll(" ", "").split(",");
@@ -59,7 +82,11 @@ class Day11Test {
             int ifTrue = Integer.parseInt(data(lines.get(i + 4), "  If true: throw to monkey "));
             int ifFalse = Integer.parseInt(data(lines.get(i + 5), "  If false: throw to monkey "));
 
-            return new Monkey(startingItems, operation, new Test(test), new IfTrue(ifTrue), new IfFalse(ifFalse));
+            return new Monkey(startingItems, operation, new Test(test), new IfTrue(ifTrue), new IfFalse(ifFalse), 0);
+        }
+
+        public static Monkey withCounter(Monkey monkey, int count) {
+            return new Monkey(monkey.startingItems, monkey.operation, monkey.test, monkey.ifTrue, monkey.ifFalse, count);
         }
 
         private static String data(String input, String s) {
@@ -80,8 +107,8 @@ class Day11Test {
         Pair<Integer, Integer> boredAndReceiver(Integer startingItem) {
             int newLevel = executeOperation(startingItem);
             int divisibleBy = test().divisibleBy();
-            int test = newLevel % divisibleBy;
             int getBored = newLevel / 3;
+            int test = getBored % divisibleBy;
             //System.out.println(getBored);
             int monkeyReceiver;
             if (test == 0) {
@@ -99,6 +126,10 @@ class Day11Test {
         public void clean() {
             this.startingItems.clear();
         }
+
+        /*public void inspect() {
+            //this.count;
+        }*/
 
         record Operation(String operand, String number) {
         }
