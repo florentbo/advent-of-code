@@ -30,31 +30,19 @@ class Day11Test {
                 .toList();
         System.out.println(monkeys);
 
-        for (Monkey monkey : monkeys) {
-            //Monkey monkey = monkeys.get(0);
-            List<Integer> startingItems = monkey.startingItems;
-            for (int i = 0; i < startingItems.size(); i++) {
-                Integer startingItem = startingItems.get(i);
-                Pair<Integer, Integer> boredAndReceiver = monkey.boredAndReceiver(startingItem);
-            /*int newLevel = monkey.executeOperation(startingItem);
-            int divisibleBy = monkey.test().divisibleBy();
-            int test = newLevel % divisibleBy;
-            int getBored = newLevel / 3;
-            System.out.println(getBored);
-            int monkeyReceiver;
-            if (test == 0) {
-                monkeyReceiver = monkey.ifTrue.monkeyReceiver;
-            } else {
-                monkeyReceiver = monkey.ifFalse.monkeyReceiver;
-            }*/
-                startingItems.remove(i);
-                monkeys.get(boredAndReceiver.getSecond()).add(boredAndReceiver.getFirst());
+        //for (int round = 0; round < 20; round++) {
+            for (Monkey monkey : monkeys) {
+                List<Integer> startingItems = monkey.startingItems;
+                for (Integer startingItem : startingItems) {
+                    Pair<Integer, Integer> boredAndReceiver = monkey.boredAndReceiver(startingItem);
+                    monkeys.get(boredAndReceiver.getSecond()).add(boredAndReceiver.getFirst());
+                }
+                monkey.clean();
             }
-        }
-        System.out.println(monkeys);
         //}
-
-
+        for (Monkey monkey : monkeys) {
+            System.out.println(monkey.startingItems());
+        }
         assertThat(lines.size()).isEqualTo(27);
     }
 
@@ -106,6 +94,10 @@ class Day11Test {
 
         public void add(int getBored) {
             this.startingItems.add(getBored);
+        }
+
+        public void clean() {
+            this.startingItems.clear();
         }
 
         record Operation(String operand, String number) {
