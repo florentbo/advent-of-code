@@ -23,7 +23,6 @@ class Day11Test {
 
         long result = getResult(monkeys);
         log.info("Day11 part 01 result: {}", result);
-
     }
 
     @Test
@@ -36,33 +35,38 @@ class Day11Test {
         assertThat(result).isEqualTo(10605);
     }
 
-    private static long getResult(List<Monkey> monkeys) {
-        Map<Integer, Integer> map = new HashMap<>();
-        for (int i = 0; i < monkeys.size(); i++) {
-            map.put(i, 0);
-        }
-        for (int round = 1; round <= 20; round++) {
+    static class MonkeyCounter {
+        private final Monkey monkey;
+        long counter = 0;
 
-            for (int i = 0; i < monkeys.size(); i++) {
-                Monkey monkey = monkeys.get(i);
+        MonkeyCounter(Monkey monkey) {
+            this.monkey = monkey;
+        }
+
+        public long getCounter() {
+            return counter;
+        }
+    }
+
+    private static long getResult(List<Monkey> monkeys) {
+        List<MonkeyCounter> monkeyCounters = monkeys.stream().map(MonkeyCounter::new).toList();
+        for (int round = 1; round <= 20; round++) {
+            for (MonkeyCounter monkeyCounter : monkeyCounters) {
+                Monkey monkey = monkeyCounter.monkey;
                 List<Integer> startingItems = monkey.startingItems;
-                int count = 0;
                 for (Integer startingItem : startingItems) {
-                    count++;
+                    monkeyCounter.counter++;
                     Pair<Integer, Integer> boredAndReceiver = monkey.boredAndReceiver(startingItem);
                     monkeys.get(boredAndReceiver.getSecond()).add(boredAndReceiver.getFirst());
                 }
                 monkey.clean();
-                int newCount = map.get(i) + count;
-                map.put(i, newCount);
             }
-
         }
         System.out.println("report: ");
         for (Monkey monkey : monkeys) {
             System.out.println(monkey.startingItems());
         }
-        List<Integer> list = map.values().stream().sorted().toList();
+        List<Long> list = monkeyCounters.stream().map(MonkeyCounter::getCounter).sorted().toList();
         System.out.println("map: " + list);
         return (long) list.get(list.size() - 1) * list.get(list.size() - 2);
     }
