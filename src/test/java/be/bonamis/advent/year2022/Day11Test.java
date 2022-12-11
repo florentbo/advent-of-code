@@ -17,22 +17,22 @@ class Day11Test {
 
     public static void main(String[] args) {
         List<String> lines = getLines("2022/11/2022_11_input.txt");
-        List<Monkey> monkeys = IntStream.range(0, (lines.size() + 1) / 7).mapToObj(i -> Monkey.of(lines, i * 7))
-                .toList();
-        System.out.println(monkeys);
-
-        long result = getResult(monkeys);
+        long result = solvePart01(lines);
         log.info("Day11 part 01 result: {}", result);
     }
 
     @Test
     void solvePart01() {
         List<String> lines = getLines(CODE_TXT);
+        long result = solvePart01(lines);
+        assertThat(result).isEqualTo(10605);
+    }
+
+    private static long solvePart01(List<String> lines) {
         List<Monkey> monkeys = IntStream.range(0, (lines.size() + 1) / 7).mapToObj(i -> Monkey.of(lines, i * 7))
                 .toList();
         System.out.println(monkeys);
-        long result = getResult(monkeys);
-        assertThat(result).isEqualTo(10605);
+        return getResult(monkeys, 20, true);
     }
 
     static class MonkeyCounter {
@@ -48,14 +48,14 @@ class Day11Test {
         }
     }
 
-    private static long getResult(List<Monkey> monkeys) {
+    private static long getResult(List<Monkey> monkeys, int numberOfRound, boolean worryLevelToBeDividedByThree) {
         List<MonkeyCounter> monkeyCounters = monkeys.stream().map(MonkeyCounter::new).toList();
-        for (int round = 1; round <= 20; round++) {
+        for (int round = 1; round <= numberOfRound; round++) {
             for (MonkeyCounter monkeyCounter : monkeyCounters) {
                 Monkey monkey = monkeyCounter.monkey;
                 List<Long> startingItems = monkey.startingItems;
                 for (Long startingItem : startingItems) {
-                    Pair<Long, Integer> boredAndReceiver = monkey.boredAndReceiver(startingItem);
+                    Pair<Long, Integer> boredAndReceiver = monkey.boredAndReceiver(startingItem, worryLevelToBeDividedByThree);
                     monkeys.get(boredAndReceiver.getSecond()).add(boredAndReceiver.getFirst());
                 }
                 monkeyCounter.counter+=startingItems.size();
@@ -100,17 +100,15 @@ class Day11Test {
                 case "-" -> number - startingItem;
                 case "*" -> number * startingItem;
                 case "/" -> number / startingItem;
-                default -> throw new RuntimeException("");
+                default -> throw new RuntimeException("operand not found");
             };
         }
 
-        Pair<Long, Integer> boredAndReceiver(Long startingItem) {
+        Pair<Long, Integer> boredAndReceiver(Long startingItem, boolean worryLevelToBeDividedByThree) {
             long newLevel = executeOperation(startingItem);
-            long divisibleBy = test().divisibleBy();
-            long getBored = newLevel / 3;
-            long test = getBored % divisibleBy;
+            long getBored = worryLevelToBeDividedByThree ? newLevel / 3: newLevel;
             int monkeyReceiver;
-            if (test == 0) {
+            if (getBored % (long) this.test().divisibleBy() == 0) {
                 monkeyReceiver = ifTrue.monkeyReceiver;
             } else {
                 monkeyReceiver = ifFalse.monkeyReceiver;
