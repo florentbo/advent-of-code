@@ -18,8 +18,8 @@ class Day11Test {
 
     public static void main(String[] args) {
         List<String> lines = getLines("2022/11/2022_11_input.txt");
-        long result = solvePart01(lines);
-        log.info("Day11 part 01 result: {}", result);
+        log.info("Day11 part 01 result: {}", solvePart01(lines));
+        log.info("Day11 part 02 result: {}", solvePart02(lines));
     }
 
     @Test
@@ -37,6 +37,11 @@ class Day11Test {
         assertThat(solvePart02(lines, 20)).isEqualTo(103 * 99);
         assertThat(solvePart02(lines, 1000)).isEqualTo(5204 * 5192);
         assertThat(solvePart02(lines, 5000)).isEqualTo(26000 * 26075);
+        assertThat(solvePart02(lines, 10000)).isEqualTo(2713310158L);
+    }
+
+    private static long solvePart02(List<String> lines) {
+        return solvePart02(lines,10000);
     }
 
     private static long solvePart01(List<String> lines) {
@@ -68,13 +73,20 @@ class Day11Test {
 
     private static long getResult(List<Monkey> monkeys, int numberOfRound, boolean worryLevelToBeDividedByThree) {
         List<MonkeyCounter> monkeyCounters = monkeys.stream().map(MonkeyCounter::new).toList();
+
+        //https://www.reddit.com/r/adventofcode/comments/zih7gf/2022_day_11_part_2_what_does_it_mean_find_another/
+        long simplifyingDivisor = 1;
+        for (Monkey monkey : monkeys) {
+            simplifyingDivisor *= monkey.test().divisibleBy;
+        }
+
         for (int round = 1; round <= numberOfRound; round++) {
             for (MonkeyCounter monkeyCounter : monkeyCounters) {
                 Monkey monkey = monkeyCounter.monkey;
                 List<Long> startingItems = monkey.startingItems;
                 for (Long startingItem : startingItems) {
-                    Pair<Long, Integer> boredAndReceiver = monkey.boredAndReceiver(startingItem, worryLevelToBeDividedByThree);
-                    monkeys.get(boredAndReceiver.getSecond()).add(boredAndReceiver.getFirst());
+                    Pair<Long, Long> boredAndReceiver = monkey.boredAndReceiver(startingItem, worryLevelToBeDividedByThree, simplifyingDivisor);
+                    monkeys.get(Math.toIntExact(boredAndReceiver.getSecond())).add(boredAndReceiver.getFirst());
                 }
                 monkeyCounter.counter += startingItems.size();
                 monkey.clean();
@@ -84,7 +96,7 @@ class Day11Test {
         for (Monkey monkey : monkeys) {
             System.out.println(monkey.startingItems());
         }*/
-        System.out.println("unsorted list: " + monkeyCounters.stream().map(MonkeyCounter::getCounter).toList());
+        //System.out.println("unsorted list: " + monkeyCounters.stream().map(MonkeyCounter::getCounter).toList());
         List<Long> list = monkeyCounters.stream().map(MonkeyCounter::getCounter).sorted().toList();
         //System.out.println("sorted list: " + list);
         return (long) list.get(list.size() - 1) * list.get(list.size() - 2);
@@ -123,10 +135,10 @@ class Day11Test {
             };
         }
 
-        Pair<Long, Integer> boredAndReceiver(Long startingItem, boolean worryLevelToBeDividedByThree) {
-            long newLevel = executeOperation(startingItem);
+        Pair<Long, Long> boredAndReceiver(Long startingItem, boolean worryLevelToBeDividedByThree, long simplifyingDivisor) {
+            long newLevel = executeOperation(startingItem) % simplifyingDivisor;
             long getBored = worryLevelToBeDividedByThree ? newLevel / 3 : newLevel;
-            int monkeyReceiver;
+            long monkeyReceiver;
             if (getBored % this.test().divisibleBy() == 0) {
                 monkeyReceiver = ifTrue.monkeyReceiver;
             } else {
@@ -146,13 +158,13 @@ class Day11Test {
         record Operation(String operand, String number) {
         }
 
-        record Test(int divisibleBy) {
+        record Test(long divisibleBy) {
         }
 
-        record IfTrue(int monkeyReceiver) {
+        record IfTrue(long monkeyReceiver) {
         }
 
-        record IfFalse(int monkeyReceiver) {
+        record IfFalse(long monkeyReceiver) {
         }
     }
 }
