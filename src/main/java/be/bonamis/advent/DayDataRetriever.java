@@ -15,19 +15,23 @@ import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.List;
+import java.util.Scanner;
 
 
 public class DayDataRetriever {
 
     public static void main(String[] args) throws Exception {
-        String year = "2022";
-        int day = 10;
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Enter year and month:");
+
+        int year = scanner.nextInt();
+        int day = scanner.nextInt();
         NumberFormat formatter = new DecimalFormat("00");
         retrieveCodes(year, day, formatter);
         retrievePuzzleInput(year, day, formatter);
     }
 
-    private static void retrievePuzzleInput(String year, int day, NumberFormat formatter) throws IOException {
+    private static void retrievePuzzleInput(int year, int day, NumberFormat formatter) throws IOException {
         Path directories = Files.createDirectories(Paths.get("src/main/resources/" + year + "/" + formatter.format(day)));
         String puzzleInputUrl = dayUrl(year, day) + "/input";
         InputStream inputStream = downloadInput(puzzleInputUrl);
@@ -35,7 +39,7 @@ public class DayDataRetriever {
         Files.copy(inputStream, path);
     }
 
-    private static void retrieveCodes(String year, int day, NumberFormat formatter) throws IOException {
+    private static void retrieveCodes(int year, int day, NumberFormat formatter) throws IOException {
         Document document = getDocument(dayUrl(year, day));
         List<Element> elements = document.select("code");
         Path directories = Files.createDirectories(Paths.get("src/test/resources/" + year + "/" + formatter.format(day)));
@@ -62,7 +66,7 @@ public class DayDataRetriever {
                 .parse();
     }
 
-    private static String dayUrl(String year, int day) {
+    private static String dayUrl(int year, int day) {
         return "https://adventofcode.com/" + year + "/day/" + day;
     }
 }
