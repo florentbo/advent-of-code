@@ -19,7 +19,7 @@ public class Day09 extends DaySolver<String> {
     @Override
     public long solvePart01() {
         String collect = this.puzzle.stream().map(str -> str.replaceAll(" ", "")).collect(Collectors.joining(","));
-        return new Rope().move(Rope.WirePath.from(collect)).tailPositions.size();
+        return new HashSet<>(new Rope().move(Rope.WirePath.from(collect)).tailPositions).size();
     }
 
     @Override
@@ -27,13 +27,15 @@ public class Day09 extends DaySolver<String> {
         return this.puzzle.size() + 1;
     }
 
-    record Rope(Rover head, Position tail, List<Position> positions, Set<Position> tailPositions) {
+    record RopeTail(Position position, List<Position> positions){}
+
+    record Rope(Rover head, Position tail, List<Position> positions, List<Position> tailPositions) {
         public Rope() {
             this(initRover(), new Position(0, 0), new ArrayList<>(), initTailPositions());
         }
 
-        private static Set<Position> initTailPositions() {
-            Set<Position> arrayList = new HashSet<>();
+        private static List<Position> initTailPositions() {
+            List<Position> arrayList = new ArrayList<>();
             arrayList.add(new Position(0, 0));
             return arrayList;
         }
@@ -59,7 +61,10 @@ public class Day09 extends DaySolver<String> {
             return new Rope(previousRoverAfterPivoting, previousTail, this.positions, this.tailPositions);
         }
 
-        private Position handlingTail(Position previousTail, WirePath path, WirePath previousPath, Position headNewPosition) {
+        private Position handlingTail(Position previousTail,
+                                      WirePath path,
+                                      WirePath previousPath,
+                                      Position headNewPosition) {
             int xDistance = Math.abs(previousTail.x() - headNewPosition.x());
             int yDistance = Math.abs(previousTail.y() - headNewPosition.y());
             if (xDistance > 1 || yDistance > 1) {
