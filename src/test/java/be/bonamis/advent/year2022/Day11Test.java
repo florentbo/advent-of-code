@@ -2,10 +2,11 @@ package be.bonamis.advent.year2022;
 
 import lombok.extern.slf4j.Slf4j;
 import org.jgrapht.alg.util.Pair;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
 import java.util.*;
-import java.util.stream.IntStream;
+import java.util.stream.*;
 
 import static be.bonamis.advent.utils.FileHelper.getLines;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -22,17 +23,34 @@ class Day11Test {
     }
 
     @Test
+    @Disabled
     void solvePart01() {
         List<String> lines = getLines(CODE_TXT);
         long result = solvePart01(lines);
         assertThat(result).isEqualTo(10605);
     }
 
+    @Test
+    void solvePart02() {
+        List<String> lines = getLines(CODE_TXT);
+        assertThat(solvePart02(lines, 1)).isEqualTo(24);
+        assertThat(solvePart02(lines, 20)).isEqualTo(103 * 99);
+        assertThat(solvePart02(lines, 1000)).isEqualTo(5204 * 5192);
+        assertThat(solvePart02(lines, 5000)).isEqualTo(26000 * 26075);
+    }
+
     private static long solvePart01(List<String> lines) {
         List<Monkey> monkeys = IntStream.range(0, (lines.size() + 1) / 7).mapToObj(i -> Monkey.of(lines, i * 7))
                 .toList();
-        System.out.println(monkeys);
+        //System.out.println(monkeys);
         return getResult(monkeys, 20, true);
+    }
+
+    private static long solvePart02(List<String> lines, int numberOfRound) {
+        List<Monkey> monkeys = IntStream.range(0, (lines.size() + 1) / 7).mapToObj(i -> Monkey.of(lines, i * 7))
+                .toList();
+        //System.out.println(monkeys);
+        return getResult(monkeys, numberOfRound, false);
     }
 
     static class MonkeyCounter {
@@ -58,16 +76,17 @@ class Day11Test {
                     Pair<Long, Integer> boredAndReceiver = monkey.boredAndReceiver(startingItem, worryLevelToBeDividedByThree);
                     monkeys.get(boredAndReceiver.getSecond()).add(boredAndReceiver.getFirst());
                 }
-                monkeyCounter.counter+=startingItems.size();
+                monkeyCounter.counter += startingItems.size();
                 monkey.clean();
             }
         }
-        System.out.println("report: ");
+        /*System.out.println("report: ");
         for (Monkey monkey : monkeys) {
             System.out.println(monkey.startingItems());
-        }
+        }*/
+        System.out.println("unsorted list: " + monkeyCounters.stream().map(MonkeyCounter::getCounter).toList());
         List<Long> list = monkeyCounters.stream().map(MonkeyCounter::getCounter).sorted().toList();
-        System.out.println("map: " + list);
+        //System.out.println("sorted list: " + list);
         return (long) list.get(list.size() - 1) * list.get(list.size() - 2);
     }
 
@@ -106,9 +125,9 @@ class Day11Test {
 
         Pair<Long, Integer> boredAndReceiver(Long startingItem, boolean worryLevelToBeDividedByThree) {
             long newLevel = executeOperation(startingItem);
-            long getBored = worryLevelToBeDividedByThree ? newLevel / 3: newLevel;
+            long getBored = worryLevelToBeDividedByThree ? newLevel / 3 : newLevel;
             int monkeyReceiver;
-            if (getBored % (long) this.test().divisibleBy() == 0) {
+            if (getBored % this.test().divisibleBy() == 0) {
                 monkeyReceiver = ifTrue.monkeyReceiver;
             } else {
                 monkeyReceiver = ifFalse.monkeyReceiver;
