@@ -23,7 +23,6 @@ class Day11Test {
     }
 
     @Test
-    @Disabled
     void solvePart01() {
         List<String> lines = getLines(CODE_TXT);
         long result = solvePart01(lines);
