@@ -1,12 +1,11 @@
 package be.bonamis.advent.year2022;
 
 import be.bonamis.advent.common.CharGrid;
-import be.bonamis.advent.common.Grid;
 import lombok.extern.slf4j.Slf4j;
-import org.jgrapht.alg.interfaces.ShortestPathAlgorithm;
+import org.jgrapht.Graph;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
-import org.jgrapht.graph.DefaultDirectedWeightedGraph;
-import org.jgrapht.graph.DefaultWeightedEdge;
+import org.jgrapht.graph.DefaultEdge;
+import org.jgrapht.graph.SimpleGraph;
 import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
@@ -33,51 +32,56 @@ class Day12Test {
         List<String> lines = getLines(CODE_TXT);
         CharGrid grid = new CharGrid(lines.stream().map(String::toCharArray).toArray(char[][]::new));
 
-        var graph = new DefaultDirectedWeightedGraph<Point, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        //var graph = new DefaultDirectedWeightedGraph<Point, DefaultWeightedEdge>(DefaultWeightedEdge.class);
+        Graph<Point, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
         grid.consume(graph::addVertex);
         grid.consume(point -> addEdge(graph, point, grid));
 
-        ShortestPathAlgorithm<Point, DefaultWeightedEdge> dijkstraShortestPath = new DijkstraShortestPath<>(graph);
 
         final var source = new Point(0, 0);
         final var sink = new Point(2, 5);
 
-        long dist = (long) dijkstraShortestPath.getPathWeight(source, sink);
+        DijkstraShortestPath<Point, DefaultEdge> shortestPath = new DijkstraShortestPath<>(graph);
+        List<Point> vertexList = shortestPath.getPath(source, sink).getVertexList();
+        System.out.println(vertexList);
+        int dist = vertexList.size();
 
         assertThat(dist).isEqualTo(31);
     }
 
-    private void addEdge(DefaultDirectedWeightedGraph<Point, DefaultWeightedEdge> graph, Point point, CharGrid grid) {
-        //var value = grid.get(point);
+    private void addEdge(Graph<Point, DefaultEdge> graph, Point point, CharGrid grid) {
         for (var adjacent : adjacentPoints(point, grid)) {
-            var edge = graph.addEdge(adjacent, point);
-            //graph.setEdgeWeight(edge, value);
+            graph.addEdge(adjacent, point);
         }
     }
 
     private Collection<Point> adjacentPoints(Point point, CharGrid grid) {
         var points = new HashSet<Point>();
 
-        addPoint(points, point.x, point.y - 1, grid);
-        addPoint(points, point.x, point.y + 1, grid);
-        addPoint(points, point.x - 1, point.y, grid);
-        addPoint(points, point.x + 1, point.y, grid);
+        addPoint(points, point.x, point.y - 1, grid, point);
+        addPoint(points, point.x, point.y + 1, grid, point);
+        addPoint(points, point.x - 1, point.y, grid, point);
+        addPoint(points, point.x + 1, point.y, grid, point);
 
         return points;
     }
 
-    private void addPoint(HashSet<Point> points, int x, int y, CharGrid grid) {
+    private void addPoint(Set<Point> points, int x, int y, CharGrid grid, Point origin) {
         final var point = new Point(x, y);
+        char originPointCharacter = grid.get(origin);
         Character character = grid.get(point);
         if (character != null) {
-            points.add(point);
+            if (canGoToThatCell(originPointCharacter, character)) {
+                points.add(point);
+            }
         }
     }
 
-    private static boolean canGoToThatCell(int col, char[] maze, char originPointCharacter) {
-        char character = maze[col];
-        boolean test = (1 >= (character - originPointCharacter));
-        return originPointCharacter == 'S' || character == 'E' || test;
+    private static boolean canGoToThatCell(char originPointCharacter, char character) {
+        int dist = character - originPointCharacter;
+        boolean test = dist == 0 || dist == 1;
+        boolean showResult = originPointCharacter == 'S' || character == 'E' || test;
+        return showResult;
     }
 
 
@@ -92,7 +96,6 @@ class Day12Test {
     private static long solvePart01(List<String> lines) {
         return lines.size();
     }
-
 
 
 }
