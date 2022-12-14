@@ -84,18 +84,18 @@ class Day12Test {
         return originPointCharacter == 'S' || (originPointCharacter == 'z' && character == 'E') || test;
     }
 
-
-
     private static long solvePart01(List<String> lines) {
         CharGrid grid = new CharGrid(lines.stream().map(String::toCharArray).toArray(char[][]::new));
 
-        final var start = grid.stream().filter(point -> grid.get(point) == 'S').findFirst().orElseThrow();
-        final var end = grid.stream().filter(point -> grid.get(point) == 'E').findFirst().orElseThrow();
 
-        Point source = new Point(start.x, start.y);
-        Point dest = new Point(end.x, end.y);
+        final var start = find(grid, 'S');
+        final var end = find(grid, 'E');
 
-        return bfs(grid.getData(), source, dest);
+        return bfs(grid.getData(), start, end);
+    }
+
+    private static Point find(CharGrid grid, char s) {
+        return grid.stream().filter(point -> grid.get(point) == s).findFirst().map(point -> new Point(point.x, point.y)).orElseThrow();
     }
 
 
