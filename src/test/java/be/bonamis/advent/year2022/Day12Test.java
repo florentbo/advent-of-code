@@ -2,16 +2,11 @@ package be.bonamis.advent.year2022;
 
 import be.bonamis.advent.common.CharGrid;
 import lombok.extern.slf4j.Slf4j;
-import org.jgrapht.Graph;
-import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
-import org.jgrapht.graph.DefaultEdge;
-import org.jgrapht.graph.SimpleGraph;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.awt.*;
-import java.util.*;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Queue;
 
 import static be.bonamis.advent.utils.FileHelper.getLines;
 import static org.assertj.core.api.Assertions.assertThat;
@@ -24,79 +19,103 @@ class Day12Test {
     public static void main(String[] args) {
         List<String> lines = getLines("2022/12/2022_12_input.txt");
         log.info("Day11 part 01 result: {}", solvePart01(lines));
-        //log.info("Day11 part 02 result: {}", solvePart02(lines));
     }
 
     @Test
     void solvePart01() {
         List<String> lines = getLines(CODE_TXT);
-
         assertThat(solvePart01(lines)).isEqualTo(31);
     }
 
-    private static void addEdge(Graph<Point, DefaultEdge> graph, Point point, CharGrid grid) {
-        for (var adjacent : adjacentPoints(point, grid)) {
-            graph.addEdge(adjacent, point);
-        }
-    }
+    final static int[][] d = {
+            {0, 1},  //right
+            {1, 0},  //down
+            {0, -1}, //left
+            {-1, 0}  //up
+    };
 
-    private static Collection<Point> adjacentPoints(Point point, CharGrid grid) {
-        var points = new HashSet<Point>();
+    public static int bfs(char[][] maze, Point src, Point dest) {
+        int minDist = Integer.MAX_VALUE;
 
-        addPoint(points, point.x, point.y - 1, grid, point);
-        addPoint(points, point.x, point.y + 1, grid, point);
-        addPoint(points, point.x - 1, point.y, grid, point);
-        addPoint(points, point.x + 1, point.y, grid, point);
-
-        return points;
-    }
-
-    private static void addPoint(Set<Point> points, int x, int y, CharGrid grid, Point origin) {
-        final var point = new Point(x, y);
-        char originPointCharacter = grid.get(origin);
-        Character character = grid.get(point);
-        if (character != null) {
-            if (canGoToThatCell(originPointCharacter, character)) {
-                points.add(point);
+        int h = maze.length;
+        int w = maze[0].length;
+        boolean[][] visited = new boolean[h][w];
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                visited[i][j] = false;
             }
         }
+
+        Queue<Node> q = new LinkedList<>();
+        Node s = new Node(src, 0);
+        q.add(s);
+
+        while (!q.isEmpty()) {
+            Node curr = q.poll();
+            Point pt = curr.pt;
+            char currPointValue = maze[pt.x][pt.y];
+            if (pt.x == dest.x && pt.y == dest.y)
+                return curr.dist;
+            for (int i = 0; i < 4; i++) {
+                int row = pt.x + d[i][0];
+                int col = pt.y + d[i][1];
+                if (isValid(maze, visited, h, w, row, col, currPointValue)) {
+                    visited[row][col] = true;
+                    Node adjCell = new Node(new Point(row, col), curr.dist + 1);
+                    q.add(adjCell);
+                }
+            }
+        }
+        return minDist;
+    }
+
+    private static boolean isValid(char[][] maze, boolean[][] visited, int width, int height, int row, int col, char pt) {
+        return (row >= 0) && (row < width) && (col >= 0) && (col < height) && canGoToThatCell(col, maze[row], pt) && !visited[row][col];
+    }
+
+    private static boolean canGoToThatCell(int col, char[] maze, char originPointCharacter) {
+        char character = maze[col];
+        return canGoToThatCell(originPointCharacter, character);
     }
 
     private static boolean canGoToThatCell(char originPointCharacter, char character) {
         int dist = character - originPointCharacter;
         boolean test = dist == 0 || dist == 1;
-        boolean showResult = originPointCharacter == 'S' || (originPointCharacter == 'z' && character == 'E') || test;
-        return showResult;
+        return originPointCharacter == 'S' || (originPointCharacter == 'z' && character == 'E') || test;
     }
 
-
-    @Test
-    @Disabled
-    void solvePart02() {
-        List<String> lines = getLines(CODE_TXT);
-
-    }
 
 
     private static long solvePart01(List<String> lines) {
         CharGrid grid = new CharGrid(lines.stream().map(String::toCharArray).toArray(char[][]::new));
 
-        //var graph = new DefaultDirectedWeightedGraph<Point, DefaultWeightedEdge>(DefaultWeightedEdge.class);
-        Graph<Point, DefaultEdge> graph = new SimpleGraph<>(DefaultEdge.class);
-        grid.consume(graph::addVertex);
-        grid.consume(point -> addEdge(graph, point, grid));
+        final var start = grid.stream().filter(point -> grid.get(point) == 'S').findFirst().orElseThrow();
+        final var end = grid.stream().filter(point -> grid.get(point) == 'E').findFirst().orElseThrow();
 
+        Point source = new Point(start.x, start.y);
+        Point dest = new Point(end.x, end.y);
 
-        final var source = grid.stream().filter(point -> grid.get(point) == 'S').findFirst().orElseThrow();
-        final var sink = grid.stream().filter(point -> grid.get(point) == 'E').findFirst().orElseThrow();
-
-        DijkstraShortestPath<Point, DefaultEdge> shortestPath = new DijkstraShortestPath<>(graph);
-        List<Point> vertexList = shortestPath.getPath(source, sink).getVertexList();
-        for (int i = 1; i < vertexList.size(); i++) {
-            System.out.println(grid.get(vertexList.get(i-1)) + " - " + grid.get(vertexList.get(i)));
-        }
-        return vertexList.size() - 1;
+        return bfs(grid.getData(), source, dest);
     }
 
 
+    static class Point {
+        int x;
+        int y;
+
+        public Point(int x, int y) {
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    static class Node {
+        Point pt;
+        int dist;
+
+        public Node(Point pt, int dist) {
+            this.pt = pt;
+            this.dist = dist;
+        }
+    }
 }
