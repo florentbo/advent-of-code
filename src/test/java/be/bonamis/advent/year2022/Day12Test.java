@@ -79,9 +79,13 @@ class Day12Test {
     }
 
     private static boolean canGoToThatCell(char originPointCharacter, char character) {
-        int dist = character - originPointCharacter;
-        boolean test = dist == 0 || dist == 1;
-        return originPointCharacter == 'S' || (originPointCharacter == 'z' && character == 'E') || test;
+        if (originPointCharacter == 'S') {
+            originPointCharacter = 'a';
+        }
+        if (character == 'E') {
+            character = 'z';
+        }
+        return character - originPointCharacter <=  1;
     }
 
     private static long solvePart01(List<String> lines) {
