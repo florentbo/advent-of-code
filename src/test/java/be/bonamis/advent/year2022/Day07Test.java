@@ -2,12 +2,11 @@ package be.bonamis.advent.year2022;
 
 import com.github.rutledgepaulv.prune.Tree;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 
-import java.nio.file.Paths;
+import java.nio.file.*;
 import java.util.*;
-import java.util.regex.Pattern;
+import java.util.regex.*;
 
 import static be.bonamis.advent.utils.FileHelper.getLines;
 import static com.github.rutledgepaulv.prune.Tree.node;
@@ -21,7 +20,7 @@ class Day07Test {
     public static void main(String[] args) {
         List<String> lines = getLines("2022/07/2022_07_input.txt");
         log.info("Day07 part 01 result: {}", solvePart01(lines));
-        //log.info("Day07 part 02 result: {}", solvePart02(lines));
+        log.info("Day07 part 02 result: {}", solvePart02(lines));
     }
 
     @Test
@@ -31,6 +30,30 @@ class Day07Test {
     }
 
     private static Long solvePart01(List<String> lines) {
+        List<Long> files = directorySizes(lines);
+        System.out.println(files);
+
+        return files.stream().filter(size -> size < 100000).reduce(0L, Long::sum);
+    }
+
+    @Test
+    void solvePart02() {
+        List<String> lines = getLines(CODE_TXT);
+        assertThat(solvePart02(lines)).isEqualTo(24933642);
+    }
+
+    private static Long solvePart02(List<String> lines) {
+        List<Long> files = directorySizes(lines);
+        System.out.println(files);
+
+        System.out.println(files.get(0));
+        long spaceToCheck = files.get(0) - 40000000;
+        System.out.println(spaceToCheck);
+
+        return files.stream().filter(size -> size > spaceToCheck).min(Long::compareTo).orElseThrow();
+    }
+
+    private static List<Long> directorySizes(List<String> lines) {
         Directory root = new Directory("/");
         Tree.Node<Directory> directoryNode = node(root);
         Tree.Node<Directory> current = directoryNode;
@@ -57,7 +80,7 @@ class Day07Test {
         }
         List<Long> files = new ArrayList<>();
         addTreeFilesSizes(directoryNode, files);
-        return files.stream().filter(size -> size < 100000).reduce(0L, Long::sum);
+        return files;
     }
 
     private static Long treeFileSizes(Tree<Directory> directoryTree) {
@@ -119,11 +142,6 @@ class Day07Test {
                 .findFirst().orElseThrow();
     }
 
-    @Test
-    @Disabled
-    void solvePart02() {
-        assertThat(new Day07(getLines(CODE_TXT)).solvePart02()).isEqualTo(24);
-    }
 
     record Directory(String name, List<File> files) {
 
