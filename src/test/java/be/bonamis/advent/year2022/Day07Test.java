@@ -44,12 +44,7 @@ class Day07Test {
 
     private static Long solvePart02(List<String> lines) {
         List<Long> files = directorySizes(lines);
-        System.out.println(files);
-
-        System.out.println(files.get(0));
         long spaceToCheck = files.get(0) - 40000000;
-        System.out.println(spaceToCheck);
-
         return files.stream().filter(size -> size > spaceToCheck).min(Long::compareTo).orElseThrow();
     }
 
