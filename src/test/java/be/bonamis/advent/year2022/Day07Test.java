@@ -28,50 +28,6 @@ class Day07Test {
     void solvePart01() {
         List<String> lines = getLines(CODE_TXT);
         assertThat(solvePart01(lines)).isEqualTo(95437);
-
-
-        /*
-
-        //System.out.println(directoryNode.getData().name);
-
-        int size = directoryNode.getChildren().size();
-        directoryTree.depthFirstStreamNodes().forEach(new Consumer<Tree.Node<Directory>>() {
-            @Override
-            public void accept(Tree.Node<Directory> directoryNode) {
-                int size = directoryNode.getChildren().size();
-                String name = directoryNode.getData().name;
-                //System.out.println(size);
-                //System.out.println(name);
-                //log.info("name: {} size {}", name, size);
-            }
-        });
-
-        Long reduce = treeFileSizes(directoryTree);
-        System.out.println("size: " + reduce);
-
-
-        System.out.println(isFile("14848514 b.txt"));
-        System.out.println(isListFiles("$ ls"));
-        System.out.println(isChangeDirectory("$ cd /"));
-        System.out.println(isDirectory("dir a"));
-
-       *//* assertThatThrownBy(() -> validateStringFilenameUsingNIO2("b.txt"))
-                .isInstanceOf(InvalidPathException.class)
-                .hasMessageContaining("character not allowed");
-
-*//*
-        System.out.println(getChangedDirectoryName("$ cd /"));
-        System.out.println(getValue("dir (.*)", "dir a"));
-        System.out.println(getFileName("14848514 b.txt"));
-        //System.out.println(getValue("$ ls", "$ ls"));
-        *//*boolean find = matcher3.find();
-        if (find) {
-            String group = matcher3.group(1);
-            System.out.println(group);
-        }*//*
-*/
-
-        //assertThat(findSize(lines)).isEqualTo(95437);
     }
 
     private static Long solvePart01(List<String> lines) {
@@ -81,42 +37,26 @@ class Day07Test {
 
         for (int i = 1, linesSize = lines.size(); i < linesSize; i++) {
             String line = lines.get(i);
-            if (isListFiles(line)) {
-            } else if (isDirectory(line)) {
-
-            } else if (isChangeDirectory(line)) {
-                //System.out.println("change dir: " + line);
+            boolean isListOrDirectoryLine = isListFiles(line) || isDirectory(line);
+            boolean isNotListOrDirectoryLine = !isListOrDirectoryLine;
+            if (isNotListOrDirectoryLine && isChangeDirectory(line)) {
                 String changedDirectoryName = getChangedDirectoryName(line);
                 if (changedDirectoryName.equals("..")) {
                     current = current.getParent().orElseThrow();
                 } else {
                     Directory directory = new Directory(changedDirectoryName);
-                    //TreeNode<Directory> directoryNode = new TreeNode<>(directory);
                     Tree.Node<Directory> directoryNode2 = node(directory);
-
-                    //currentDirectory.addChild(directoryNode);
                     current.addChildNode(directoryNode2);
-                    //System.out.println(directory);
-                    //currentDirectory = directoryNode;
                     current = directoryNode2;
                 }
-            } else if (isFile(line)) {
+            } else if (isNotListOrDirectoryLine && isFile(line)) {
                 String[] fileDetails = line.split(" ");
                 File file = new File(fileDetails[1], Long.parseLong(fileDetails[0]));
                 current.getData().addFile(file);
             }
-
         }
-
-        Tree<Directory> directoryTree = directoryNode.asTree();
-
-
-        System.out.println(directoryTree);
-        List<String> names = new ArrayList<>();
         List<Long> files = new ArrayList<>();
-        printPostorder(directoryNode, names, files);
-        System.out.println(names);
-        System.out.println(files);
+        addTreeFilesSizes(directoryNode, files);
         return files.stream().filter(size -> size < 100000).reduce(0L, Long::sum);
     }
 
@@ -127,14 +67,11 @@ class Day07Test {
                 .reduce(0L, Long::sum);
     }
 
-    private static void printPostorder(Tree.Node<Directory> directoryNode, List<String> names, List<Long> files) {
-        String name = directoryNode.getData().name;
-        log.info("name: {}", name);
-        names.add(name);
+    private static void addTreeFilesSizes(Tree.Node<Directory> directoryNode, List<Long> files) {
         Long reduce = treeFileSizes(directoryNode.asTree());
         files.add(reduce);
         for (Tree.Node<Directory> child : directoryNode.getChildren()) {
-            printPostorder(child, names, files);
+            addTreeFilesSizes(child, files);
         }
     }
 
@@ -198,7 +135,7 @@ class Day07Test {
             this.files.add(file);
         }
 
-        long filesSize(){
+        long filesSize() {
             return this.files.stream().map(File::size).reduce(0L, Long::sum);
         }
 
