@@ -50,7 +50,7 @@ public class Day05 extends DaySolver<String> {
 
     @AllArgsConstructor
     @Getter
-    static class LineSegment {
+    public static class LineSegment {
         private final Point start;
         private final Point end;
 
@@ -120,7 +120,7 @@ public class Day05 extends DaySolver<String> {
         @Getter
         @EqualsAndHashCode
         @ToString
-        static class Point {
+        public static class Point {
             private final int x;
             private final int y;
 
