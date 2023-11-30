@@ -54,17 +54,15 @@ public class Day02 extends DaySolver<String> {
     Set<Set<String>> combinations = Sets.combinations(Sets.newTreeSet(this.puzzle), 2);
     for (Set<String> combination : combinations) {
       List<String> list = Lists.newArrayList(combination);
-      String[] split = list.get(0).split("");
-      String[] split1 = list.get(1).split("");
       List<String> common = new ArrayList<>();
-      for (int i = 0; i < split.length; i++) {
-        String s = split[i];
-        String s1 = split1[i];
+      for (int i = 0; i < list.get(0).split("").length; i++) {
+        String s = list.get(0).split("")[i];
+        String s1 = list.get(1).split("")[i];
         if (s.equals(s1)) {
           common.add(s);
         }
       }
-      if (split.length - common.size() == 1) {
+      if (list.get(0).split("").length - common.size() == 1) {
         String join = String.join("", common);
         log.info("common: {}", join);
         return join;
