@@ -21,11 +21,11 @@ import java.util.Scanner;
 public class DayDataRetriever {
 
     public static void main(String[] args) throws Exception {
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter year and month:");
+        //Scanner scanner = new Scanner(System.in);
+        //.out.println("Enter year and month:");
 
-        int year = scanner.nextInt();
-        int day = scanner.nextInt();
+        int year = 2023;
+        int day = 1;
         NumberFormat formatter = new DecimalFormat("00");
         retrieveCodes(year, day, formatter);
         retrievePuzzleInput(year, day, formatter);
