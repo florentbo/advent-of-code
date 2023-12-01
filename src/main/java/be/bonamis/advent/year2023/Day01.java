@@ -4,6 +4,7 @@ import be.bonamis.advent.DaySolver;
 import be.bonamis.advent.utils.FileHelper;
 
 import java.util.*;
+import java.util.stream.IntStream;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -52,18 +53,15 @@ public class Day01 extends DaySolver<String> {
             //log.info("numbersAndPositions: {}", numbersAndPositions);
             List<Day01Number> numbersAndPositions2 = findDigitAndPositions(s);
             //log.info("numbersAndPositions2: {}", numbersAndPositions2);
-            numbersAndPositions.addAll(numbersAndPositions2);
+            numbersAndPositions2.addAll(numbersAndPositions);
             //log.info("numbersAndPositions: {}", numbersAndPositions);
-            Day01Number smallest = numbersAndPositions.stream().min(Comparator.comparing(Day01Number::position)).orElseThrow();
+            Day01Number smallest = numbersAndPositions2.stream().min(Comparator.comparing(Day01Number::position)).orElseThrow();
             // log.info("smallest: {}", smallest);
-            Day01Number biggest = numbersAndPositions.stream().max(Comparator.comparing(Day01Number::position)).orElseThrow();
+            Day01Number biggest = numbersAndPositions2.stream().max(Comparator.comparing(Day01Number::position)).orElseThrow();
 
-
-            long nextNumber = smallest.number;
-            long nextNumber2 = biggest.number;
-            String text = nextNumber + "" + nextNumber2;
-            return Integer.parseInt(text);
-        }).reduce(0, Integer::sum);
+            String text = smallest.number + "" + biggest.number;
+            return Long.parseLong(text);
+        }).reduce(0L, Long::sum);
     }
 
     record Day01Number(long number, int position) {
@@ -82,16 +80,14 @@ public class Day01 extends DaySolver<String> {
     }
 
     private static List<Day01Number> findNumbersAndPositions(String input) {
-        List<Day01Number> day01Numbers = new ArrayList<>();
         List<String> numbers = Arrays.asList("one", "two", "three", "four", "five", "six", "seven", "eight", "nine");
-        for (String number : numbers) {
-            int index = input.indexOf(number);
-            while (index != -1) {
-                day01Numbers.add(new Day01Number(textToDigit(number), index));
-                index = input.indexOf(number, index + 1);
-            }
-        }
-        return day01Numbers;
+        return numbers.stream()
+                .filter(input::contains)
+                .flatMap(number ->
+                        IntStream.range(0, input.length())
+                                .filter(i -> input.startsWith(number, i))
+                                .mapToObj(i -> new Day01Number(textToDigit(number), i))).toList();
+
     }
 
 
