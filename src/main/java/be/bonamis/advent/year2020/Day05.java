@@ -57,21 +57,19 @@ public class Day05 extends DaySolver<String> {
 
   @Override
   public long solvePart02() {
-    List<Long> ids = this.puzzle.stream().map(Day05::seatId).toList();
+    List<Long> list = this.puzzle.stream().map(Day05::seatId).sorted().toList();
 
-    Map<Long, Boolean> seats = new HashMap<>();
-    for (long i = 0; i <= 1023; i++) {
-      seats.put(i, Boolean.FALSE);
-    }
-    for (long seatID : ids) {
-      seats.put(seatID, Boolean.TRUE);
-    }
-    for (long i = 0; i <= 1023; i++) {
-      if (i > 0 && Boolean.TRUE.equals(!seats.get(i)) && (seats.get(i + 1) && seats.get(i - 1))) {
-        return i;
+    List<Long> gaps = new ArrayList<>();
+
+    for (int i = 0; i < list.size() - 1; i++) {
+      long current = list.get(i);
+      long next = list.get(i + 1);
+      if (next - current > 1) {
+        gaps.add(list.get(i + 1) - 1);
       }
     }
-    return 9999L;
+
+    return gaps.get(0);
   }
 
   public static void main(String[] args) {
