@@ -14,6 +14,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Scanner;
 
@@ -24,8 +25,9 @@ public class DayDataRetriever {
         //Scanner scanner = new Scanner(System.in);
         //.out.println("Enter year and month:");
 
-        int year = 2023;
-        int day = 1;
+        LocalDateTime now = LocalDateTime.now();
+        int year = now.getYear();
+        int day = now.getDayOfMonth();
         NumberFormat formatter = new DecimalFormat("00");
         retrieveCodes(year, day, formatter);
         retrievePuzzleInput(year, day, formatter);
