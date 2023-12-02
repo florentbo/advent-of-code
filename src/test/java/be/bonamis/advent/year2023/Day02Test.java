@@ -17,29 +17,16 @@ class Day02Test {
 
     @Test
     void solvePart01() {
-        String line = "Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green";
-        int all = Day02.lineCheck(line);
-        System.out.println(all);
+        assertThat(Day02.lineCheck("Game 1: 3 blue, 4 red; 1 red, 2 green, 6 blue; 2 green")).isEqualTo(1);
+        assertThat(Day02.lineCheck("Game 28: 6 blue, 5 red, 3 green; 5 blue, 1 green; 1 green, 8 red, 1 blue; 2 blue, 4 green; 4 red, 5 blue")).isEqualTo(28);
 
-        assertThat(all).isEqualTo(1);
+
         String content = FileHelper.content("2023/02/2023_02_03_code.txt");
         List<String> puzzle = Arrays.asList(content.split("\n"));
 
         assertThat(Day02.solve(puzzle)).isEqualTo(8);
-
-
     }
 
-
-    private static Map<String, Integer> convertMultimapToMap(Multimap<String, Integer> multimap) {
-        return multimap.entries()
-                .stream()
-                .collect(Collectors.toMap(
-                        Map.Entry::getKey,
-                        Map.Entry::getValue,
-                        (existing, replacement) -> replacement
-                ));
-    }
 
     @Test
     void solvePart02() {
