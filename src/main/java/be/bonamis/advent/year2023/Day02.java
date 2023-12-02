@@ -2,16 +2,17 @@ package be.bonamis.advent.year2023;
 
 import be.bonamis.advent.DaySolver;
 import be.bonamis.advent.utils.FileHelper;
-import be.bonamis.advent.year2023.GameParser.ColorQuantity;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import static be.bonamis.advent.year2023.Day02.GameParser.parseGameIds;
-import static be.bonamis.advent.year2023.GameParser.parseInput;
 
 @Slf4j
 public class Day02 extends DaySolver<String> {
@@ -20,18 +21,12 @@ public class Day02 extends DaySolver<String> {
         super(puzzle);
     }
 
-    public static int solve(List<String> puzzle) {
-        return puzzle.stream().mapToInt(Day02::lineCheck).sum();
-    }
-
     public static int lineCheck(String line) {
         int i = parseGameIds(line);
-        log.info("parseGameIds {} ", i);
-        log.info("line {} ", line);
+        log.debug("parseGameIds {} ", i);
+        log.debug("line {} ", line);
         List<ColorQuantity> games = parseInput(line);
-        log.info("games {} ", games);
-
-
+        log.debug("games {} ", games);
         return games.stream().allMatch(Day02::check) ? i : 0;
     }
 
@@ -49,14 +44,37 @@ public class Day02 extends DaySolver<String> {
         };
     }
 
+    public static List<ColorQuantity> parseInput(String input) {
+        List<ColorQuantity> colorQuantities = new ArrayList<>();
+        Pattern pattern = Pattern.compile("(\\d+)\\s(\\w+)");
+        Matcher matcher = pattern.matcher(input);
+
+        while (matcher.find()) {
+            int quantity = Integer.parseInt(matcher.group(1));
+            String color = matcher.group(2);
+            colorQuantities.add(new ColorQuantity(color, quantity));
+        }
+
+        return colorQuantities;
+    }
+
     @Override
     public long solvePart01() {
-        return solve(this.puzzle);
+        return this.puzzle.stream().mapToInt(Day02::lineCheck).sum();
     }
 
     @Override
     public long solvePart02() {
-        return this.puzzle.size() + 1;
+        return this.puzzle.stream().map(Day02::toProduce).reduce(0, Integer::sum);
+    }
+
+    private static int toProduce(String line) {
+        List<ColorQuantity> games = parseInput(line);
+        Multimap<String, Integer> colors = ArrayListMultimap.create();
+        for (ColorQuantity game : games) {
+            colors.put(game.color(), game.quantity());
+        }
+        return colors.asMap().values().stream().map(list2 -> list2.stream().max(Integer::compareTo).orElseThrow()).reduce(1, (a, b) -> a * b);
     }
 
     public static void main(String[] args) {
@@ -82,5 +100,8 @@ public class Day02 extends DaySolver<String> {
         }
 
 
+    }
+
+    record ColorQuantity(String color, int quantity) {
     }
 }
