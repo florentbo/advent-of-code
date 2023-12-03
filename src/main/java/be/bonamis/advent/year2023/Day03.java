@@ -5,27 +5,35 @@ import be.bonamis.advent.common.CharGrid;
 import be.bonamis.advent.utils.FileHelper;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 public class Day03 extends DaySolver<String> {
 
+  private final CharGrid grid;
+  private final List<Engine> engines;
+
   public Day03(List<String> puzzle) {
     super(puzzle);
+    grid = new CharGrid(this.puzzle.stream().map(String::toCharArray).toArray(char[][]::new));
+    engines = grid.lines().stream().flatMap(this::engines).toList();
   }
 
   static boolean isSymbol(Character character) {
-    char dot = '.';
-    boolean isNumberOrDot = Character.isDigit(character) || character == dot;
+    boolean isNumberOrDot = Character.isDigit(character) || character == '.';
     return !isNumberOrDot;
   }
 
   static boolean isGearSymbol(Character character) {
-    char dot = '*';
-    return character == dot;
+    return character == '*';
   }
 
   record Engine(List<Point> points) {
@@ -44,10 +52,6 @@ public class Day03 extends DaySolver<String> {
           .toList();
     }
 
-    boolean isNotPartNumber(CharGrid grid) {
-      return !this.isPartNumber(grid);
-    }
-
     public long number(CharGrid grid) {
       return this.points.stream()
           .map(grid::get)
@@ -58,12 +62,51 @@ public class Day03 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
-    return this.puzzle.size();
+    return engines.stream()
+        .filter(engine -> engine.isPartNumber(grid))
+        .map(engine -> engine.number(grid))
+        .reduce(0L, Long::sum);
   }
 
   @Override
   public long solvePart02() {
-    return this.puzzle.size() + 1;
+    Multimap<Point, Engine> map = ArrayListMultimap.create();
+    for (Engine engine : engines) {
+      List<Point> points = engine.gearPoints(grid);
+      points.forEach(point -> map.put(point, engine));
+    }
+
+    return map.asMap().values().stream()
+        .map(
+            engineCollection ->
+                engineCollection.stream()
+                    .map(engine -> engine.number(grid))
+                    .collect(Collectors.toSet()))
+        .filter(set -> set.size() == 2)
+        .map(set -> set.stream().reduce(1L, (a, b) -> a * b))
+        .reduce(0L, Long::sum);
+  }
+
+  private Stream<Engine> engines(List<Point> line) {
+    List<Engine> engines = new ArrayList<>();
+    List<Point> currentSeries = new ArrayList<>();
+    for (Point point : line) {
+      Character character = this.grid.get(point);
+      if (Character.isDigit(character)) {
+        currentSeries.add(point);
+      } else {
+        if (!currentSeries.isEmpty()) {
+          List<Point> points = new ArrayList<>(currentSeries);
+          engines.add(new Engine(points));
+          currentSeries.clear();
+        }
+      }
+    }
+    if (!currentSeries.isEmpty()) {
+      List<Point> points = new ArrayList<>(currentSeries);
+      engines.add(new Engine(points));
+    }
+    return engines.stream();
   }
 
   public static void main(String[] args) {
