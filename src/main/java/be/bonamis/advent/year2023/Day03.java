@@ -23,12 +23,25 @@ public class Day03 extends DaySolver<String> {
     return !isNumberOrDot;
   }
 
+  static boolean isGearSymbol(Character character) {
+    char dot = '*';
+    return character == dot;
+  }
+
   record Engine(List<Point> points) {
     boolean isPartNumber(CharGrid grid) {
       return this.points.stream()
           .flatMap(point -> grid.neighbours(point).stream())
           .filter(o -> !this.points.contains(o))
           .anyMatch(o -> isSymbol(grid.get(o)));
+    }
+
+    List<Point> gearPoints(CharGrid grid) {
+      return this.points.stream()
+          .flatMap(point -> grid.neighbours(point).stream())
+          .filter(o -> !this.points.contains(o))
+          .filter(o -> isGearSymbol(grid.get(o)))
+          .toList();
     }
 
     boolean isNotPartNumber(CharGrid grid) {
