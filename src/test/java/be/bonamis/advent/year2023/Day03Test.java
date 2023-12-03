@@ -39,19 +39,38 @@ class Day03Test {
 
   @Test
   void isSymbol() {
-    Day03 day03 = new Day03(List.of(""));
-    assertThat(day03.isSymbol('*')).isTrue();
-    assertThat(day03.isSymbol('7')).isFalse();
-    assertThat(day03.isSymbol('.')).isFalse();
+    assertThat(Day03.isSymbol('*')).isTrue();
+    assertThat(Day03.isSymbol('7')).isFalse();
+    assertThat(Day03.isSymbol('.')).isFalse();
   }
 
   @Test
-  void solvePart01() {
+  void sum() {
     String content = FileHelper.content("2023/03/2023_03_01_code.txt");
     List<String> puzzle = Arrays.asList(content.split("\n"));
     CharGrid grid = new CharGrid(puzzle.stream().map(String::toCharArray).toArray(char[][]::new));
-    grid.printArray();
-    System.out.println(grid.get(new Point(0, 0)));
+    List<Day03.Engine> engines = new ArrayList<>();
+    List<List<Point>> lines = grid.lines();
+    for (List<Point> line : lines) {
+      List<Day03.Engine> engine = engines(line, grid);
+      engines.addAll(engine);
+    }
+
+    Long sum =
+        engines.stream()
+            .filter(engine -> engine.isPartNumber(grid))
+            .map(engine -> engine.number(grid))
+            .reduce(0L, Long::sum);
+    assertThat(sum).isEqualTo(4361L);
+  }
+
+  @Test
+  void solveLine() {
+    String content = FileHelper.content("2023/03/2023_03_01_code.txt");
+    List<String> puzzle = Arrays.asList(content.split("\n"));
+    CharGrid grid = new CharGrid(puzzle.stream().map(String::toCharArray).toArray(char[][]::new));
+    // grid.printArray();
+    // System.out.println(grid.get(new Point(0, 0)));
 
     List<Day03.Engine> engines = new ArrayList<>();
     List<List<Point>> lines = grid.lines();
@@ -59,19 +78,12 @@ class Day03Test {
 
     List<Point> line = lines.get(0);
     List<Day03.Engine> engines1 = engines(line, grid);
-    log.debug("engines {}", engines1);
+    // log.debug("engines {}", engines1);
 
     Day03.Engine engine = engines1.get(0);
-    log.debug("engine {}", engine);
-
-   /* List<Point> enginePoints = engine.points();
-    enginePoints.stream()
-        .flatMap(point -> grid.neighbours(point).stream())
-        .filter(o -> !enginePoints.contains(o))
-        .forEach(point -> log.debug("Pont {} value {} ", point, grid.get(point)));*/
+    // log.debug("engine {}", engine);
 
     assertThat(engine.isPartNumber(grid)).isTrue();
-
 
     /*line.forEach(
     new Consumer<Point>() {
