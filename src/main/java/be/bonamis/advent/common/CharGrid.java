@@ -35,6 +35,10 @@ public class CharGrid {
     return null;
   }
 
+  public Long number(Point p) {
+    return (long) Character.getNumericValue(get(p));
+  }
+
   public void printArray() {
     System.out.println("start");
     for (char[] ints : this.data) {

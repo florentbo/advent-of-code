@@ -7,7 +7,6 @@ import be.bonamis.advent.utils.FileHelper;
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -30,6 +29,17 @@ public class Day03 extends DaySolver<String> {
           .flatMap(point -> grid.neighbours(point).stream())
           .filter(o -> !this.points.contains(o))
           .anyMatch(o -> isSymbol(grid.get(o)));
+    }
+
+    boolean isNotPartNumber(CharGrid grid) {
+      return !this.isPartNumber(grid);
+    }
+
+    public long number(CharGrid grid) {
+      return this.points.stream()
+          .map(grid::get)
+          .mapToInt(Character::getNumericValue)
+          .reduce(0, (acc, digit) -> acc * 10 + digit);
     }
   }
 
