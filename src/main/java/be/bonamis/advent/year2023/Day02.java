@@ -1,6 +1,7 @@
 package be.bonamis.advent.year2023;
 
 import be.bonamis.advent.DaySolver;
+import be.bonamis.advent.utils.CollectionsHelper;
 import be.bonamis.advent.utils.FileHelper;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
@@ -74,7 +75,7 @@ public class Day02 extends DaySolver<String> {
         for (ColorQuantity game : games) {
             colors.put(game.color(), game.quantity());
         }
-        return colors.asMap().values().stream().map(list2 -> list2.stream().max(Integer::compareTo).orElseThrow()).reduce(1, (a, b) -> a * b);
+        return colors.asMap().values().stream().map(CollectionsHelper::max).reduce(1, (a, b) -> a * b);
     }
 
     public static void main(String[] args) {
