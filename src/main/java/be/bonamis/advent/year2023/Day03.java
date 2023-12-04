@@ -13,9 +13,11 @@ import java.util.stream.Stream;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
+@Getter
 public class Day03 extends DaySolver<String> {
 
   private final CharGrid grid;
