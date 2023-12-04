@@ -28,6 +28,6 @@ class Day04Test {
 
   @Test
   void solvePart02() {
-    assertThat(day03.solvePart02()).isEqualTo(7);
+    assertThat(day03.solvePart02()).isEqualTo(30);
   }
 }
