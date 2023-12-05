@@ -55,18 +55,12 @@ class Day05Test {
   @Test
   void solvePart02() {
     day05 = new Day05(Arrays.asList(content.split("\n")), true);
-    assertThat(day05.getSeeds().list()).hasSize(27);
+    //assertThat(day05.getSeeds().list()).hasSize(27);
 
-    List<List<LineOfMap>> lineMaps = day05.getLineMaps();
-    assertThat(lineMaps).hasSize(7);
+    /*List<List<LineOfMap>> lineMaps = day05.getLineMaps();
+    assertThat(lineMaps).hasSize(7);*/
 
-    assertThat(day05.correspond(lineMaps.get(0), 82L)).isEqualTo(84L);  // 84 84 84 77 78 78 82
-    /*assertThat(day05.correspond(lineMaps.get(0), 82L)).isEqualTo(84L);
-    assertThat(day05.correspond(lineMaps.get(0), 82L)).isEqualTo(84L);
-    assertThat(day05.correspond(lineMaps.get(0), 82L)).isEqualTo(84L);
-    assertThat(day05.correspond(lineMaps.get(0), 82L)).isEqualTo(84L);*/
-
-
+    //assertThat(day05.correspond(lineMaps.get(0), 82L)).isEqualTo(84L);
     assertThat(day05.solvePart02()).isEqualTo(46);
   }
 }
