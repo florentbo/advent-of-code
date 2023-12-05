@@ -58,9 +58,10 @@ public class Day05 extends DaySolver<String> {
   }
 
   private Seeds parseSeeds(String input) {
-    String[] split = input.split(":");
-
-    return new Seeds(Arrays.stream(split[1].trim().split("\\s+")).map(Long::parseLong).toList());
+    List<Long> seeds =
+        Arrays.stream(input.split(":")[1].trim().split("\\s+")).map(Long::parseLong).toList();
+    log.info("seeds: {}", seeds);
+    return new Seeds(seeds);
   }
 
   Long location(List<List<LineOfMap>> lineMaps, Long seed) {
@@ -68,7 +69,7 @@ public class Day05 extends DaySolver<String> {
     for (List<LineOfMap> lineMap : lineMaps) {
       initialSeed = correspond(lineMap, initialSeed);
     }
-    log.info("init: {}", initialSeed);
+    log.debug("init: {}", initialSeed);
     return initialSeed;
   }
 
