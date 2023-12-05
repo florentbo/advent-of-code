@@ -23,11 +23,13 @@ public class Day05 extends DaySolver<String> {
             .filter(x -> this.puzzle.get(x).contains(" map:"))
             .count();
     log.debug("count: {}", count);
+    List<Integer> list = IntStream.range(0, this.puzzle.size())
+            .filter(x -> this.puzzle.get(x).contains(" map:")).boxed().toList();
     IntStream intStream =
         IntStream.range(0, this.puzzle.size())
             .filter(x -> this.puzzle.get(x).contains(" map:"))
-            .limit(count - 1);
-    List<List<LineOfMap>> listList = intStream.mapToObj(i -> lineOfMap(i, i + 1)).toList();
+            .limit(count - 2);
+    List<List<LineOfMap>> listList = IntStream.range(0, list.size()-1).mapToObj(i -> lineOfMap(list.get(i), list.get(i + 1))).toList();
 
     log.debug("list: {}", listList);
   }
