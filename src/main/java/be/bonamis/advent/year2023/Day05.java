@@ -12,36 +12,46 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class Day05 extends DaySolver<String> {
 
+  private static final String MAP = " map:";
   private final Seeds seeds;
+  private final List<List<LineOfMap>> lineMaps;
 
   public Day05(List<String> puzzle) {
     super(puzzle);
     this.seeds = parseSeeds(this.puzzle.get(0));
+    this.lineMaps = lineMaps(puzzle);
+  }
 
+  private List<List<LineOfMap>> lineMaps(List<String> puzzle) {
     long count =
         IntStream.range(0, this.puzzle.size())
-            .filter(x -> this.puzzle.get(x).contains(" map:"))
+            .filter(x -> this.puzzle.get(x).contains(MAP))
             .count();
     log.debug("count: {}", count);
-    List<Integer> list = IntStream.range(0, this.puzzle.size())
-            .filter(x -> this.puzzle.get(x).contains(" map:")).boxed().toList();
-    IntStream intStream =
+    List<Integer> list =
         IntStream.range(0, this.puzzle.size())
-            .filter(x -> this.puzzle.get(x).contains(" map:"))
-            .limit(count - 2);
-    List<List<LineOfMap>> listList = IntStream.range(0, list.size()-1).mapToObj(i -> lineOfMap(list.get(i), list.get(i + 1))).toList();
-
-    log.debug("list: {}", listList);
+            .filter(x -> this.puzzle.get(x).contains(MAP))
+            .boxed()
+            .toList();
+    log.debug("list: {}", list);
+    return IntStream.range(0, list.size())
+        .mapToObj(
+            i -> {
+              Integer start = list.get(i);
+              log.debug("start of the line: {}", start);
+              if (i < list.size() - 1) {
+                return lineOfMap(start, list.get(i + 1));
+              } else {
+                return lineOfMap(start, puzzle.size() + 1);
+              }
+            })
+        .toList();
   }
 
   @Override
   public long solvePart01() {
     log.debug("seeds: {}", this.seeds);
     return this.puzzle.size();
-  }
-
-  public Seeds getSeeds() {
-    return seeds;
   }
 
   private Seeds parseSeeds(String input) {
