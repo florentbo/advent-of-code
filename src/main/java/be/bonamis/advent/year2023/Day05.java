@@ -7,6 +7,7 @@ import java.util.stream.IntStream;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 
 @Slf4j
 @Getter
@@ -16,34 +17,24 @@ public class Day05 extends DaySolver<String> {
   private final Seeds seeds;
   private final List<List<LineOfMap>> lineMaps;
 
-  public Day05(List<String> puzzle, boolean rangeOfSeeds) {
+  public Day05(List<String> puzzle) {
     super(puzzle);
-    this.seeds = parseSeeds(this.puzzle.get(0), rangeOfSeeds);
+    this.seeds = parseSeeds(this.puzzle.get(0));
     this.lineMaps = lineMaps(puzzle);
   }
 
   private List<List<LineOfMap>> lineMaps(List<String> puzzle) {
-    long count =
-        IntStream.range(0, this.puzzle.size())
-            .filter(x -> this.puzzle.get(x).contains(MAP))
-            .count();
-    log.debug("count: {}", count);
     List<Integer> list =
-        IntStream.range(0, this.puzzle.size())
-            .filter(x -> this.puzzle.get(x).contains(MAP))
-            .boxed()
-            .toList();
+        new ArrayList<>(
+            IntStream.range(0, this.puzzle.size())
+                .filter(x -> this.puzzle.get(x).contains(MAP))
+                .boxed()
+                .toList());
+    list.add(puzzle.size() + 1); // end of file line
+
     log.debug("list: {}", list);
-    return IntStream.range(0, list.size())
-        .mapToObj(
-            i -> {
-              Integer start = list.get(i);
-              if (i < list.size() - 1) {
-                return lineOfMap(start, list.get(i + 1));
-              } else {
-                return lineOfMap(start, puzzle.size() + 1);
-              }
-            })
+    return IntStream.range(0, list.size() - 1)
+        .mapToObj(i -> lineOfMap(list.get(i), list.get(i + 1)))
         .toList();
   }
 
@@ -51,35 +42,20 @@ public class Day05 extends DaySolver<String> {
   public long solvePart01() {
     log.debug("seeds: {}", this.seeds);
     return this.seeds.list().stream()
-        .map(seed -> location(this.lineMaps, seed))
-        .min(Long::compare)
+        .mapToLong(seed -> location(this.lineMaps, seed))
+        .min()
         .orElseThrow();
   }
 
-  private Seeds parseSeeds(String input, boolean rangeOfSeeds) {
+  private Seeds parseSeeds(String input) {
     List<Long> originalSeeds =
         Arrays.stream(input.split(":")[1].trim().split("\\s+")).map(Long::parseLong).toList();
     log.info("seeds: {}  size: {}", originalSeeds, originalSeeds.size());
-   /* if (rangeOfSeeds) {
-      List<Long> rangedSeeds = new ArrayList<>();
-      for (int i = 0; i < originalSeeds.size(); i += 2) {
-        Long start = originalSeeds.get(i);
-        Long range = originalSeeds.get(i + 1);
-        log.info("seed 01: {}  seed02: {}", start, range);
-        for (long j = start; j < start + range; j++) {
-          // rangedSeeds.add(j);
-        }
-      }
-      // 194.657.215
-      // 187.012.821
-      log.info("seeds: {}  size: {}", rangedSeeds, rangedSeeds.size());
-      return new Seeds(rangedSeeds);
-    }*/
     return new Seeds(originalSeeds);
   }
 
-  Long location(List<List<LineOfMap>> lineMaps, Long seed) {
-    Long initialSeed = seed;
+  long location(List<List<LineOfMap>> lineMaps, Long seed) {
+    long initialSeed = seed;
     for (List<LineOfMap> lineMap : lineMaps) {
       initialSeed = correspond(lineMap, initialSeed);
     }
@@ -102,29 +78,35 @@ public class Day05 extends DaySolver<String> {
   @Override
   public long solvePart02() {
     List<Long> originalSeeds = this.seeds.list();
-    long min = Long.MAX_VALUE;
 
-    for (int i = 0; i < originalSeeds.size(); i += 2) {
-      Long start = originalSeeds.get(i);
-      Long range = originalSeeds.get(i + 1);
-      log.info("seed 01: {}  seed02: {}", start, range);
-      for (long seed = start; seed < start + range; seed++) {
-        Long location = location(this.lineMaps, seed);
-        if (location < min) {
-          min = location;
-        }
+    return IntStream.range(0, originalSeeds.size())
+        .filter(idx -> idx % 2 == 0)
+        .mapToObj(idx -> Pair.of(originalSeeds.get(idx), originalSeeds.get(idx + 1)))
+        .parallel()
+        .mapToLong(this::findMin)
+        .min()
+        .orElseThrow();
+  }
+
+  private long findMin(Pair<Long, Long> pair) {
+    long min = Long.MAX_VALUE;
+    long start = pair.getLeft();
+    long range = pair.getRight();
+    log.info("seed 01: {}  seed02: {}", start, range);
+    for (long seed = start; seed < start + range; seed++) {
+      long location = location(this.lineMaps, seed);
+      if (location < min) {
+        min = location;
       }
     }
-
-    log.debug("seeds: {}", originalSeeds);
     return min;
   }
 
   public static void main(String[] args) {
     String content = FileHelper.content("2023/05/2023_05_input.txt");
     List<String> puzzle = Arrays.asList(content.split("\n"));
-    log.info("solution part 1: {}", new Day05(puzzle, false).solvePart01());
-    log.info("solution part 2: {}", new Day05(puzzle, true).solvePart02());
+    log.info("solution part 1: {}", new Day05(puzzle).solvePart01());
+    log.info("solution part 2: {}", new Day05(puzzle).solvePart02());
   }
 
   public List<LineOfMap> lineOfMap(int start, int end) {

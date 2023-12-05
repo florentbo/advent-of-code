@@ -13,16 +13,16 @@ import org.junit.jupiter.api.*;
 class Day05Test {
 
   private Day05 day05;
-  private String content;
 
   @BeforeEach
   void setUp() {
-    content = FileHelper.content("2023/05/2023_05_02_code.txt");
+    String content = FileHelper.content("2023/05/2023_05_02_code.txt");
+    day05 = new Day05(Arrays.asList(content.split("\n")));
   }
 
   @Test
   void solvePart01() {
-    day05 = new Day05(Arrays.asList(content.split("\n")), false);
+
     Seeds seeds = day05.getSeeds();
     List<List<LineOfMap>> lineMaps = day05.getLineMaps();
     assertThat(lineMaps).hasSize(7);
@@ -54,13 +54,6 @@ class Day05Test {
 
   @Test
   void solvePart02() {
-    day05 = new Day05(Arrays.asList(content.split("\n")), true);
-    //assertThat(day05.getSeeds().list()).hasSize(27);
-
-    /*List<List<LineOfMap>> lineMaps = day05.getLineMaps();
-    assertThat(lineMaps).hasSize(7);*/
-
-    //assertThat(day05.correspond(lineMaps.get(0), 82L)).isEqualTo(84L);
     assertThat(day05.solvePart02()).isEqualTo(46);
   }
 }
