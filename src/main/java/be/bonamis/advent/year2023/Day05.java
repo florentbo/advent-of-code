@@ -60,19 +60,21 @@ public class Day05 extends DaySolver<String> {
     List<Long> originalSeeds =
         Arrays.stream(input.split(":")[1].trim().split("\\s+")).map(Long::parseLong).toList();
     log.info("seeds: {}  size: {}", originalSeeds, originalSeeds.size());
-    if (rangeOfSeeds) {
+   /* if (rangeOfSeeds) {
       List<Long> rangedSeeds = new ArrayList<>();
       for (int i = 0; i < originalSeeds.size(); i += 2) {
         Long start = originalSeeds.get(i);
         Long range = originalSeeds.get(i + 1);
         log.info("seed 01: {}  seed02: {}", start, range);
         for (long j = start; j < start + range; j++) {
-          rangedSeeds.add(j);
+          // rangedSeeds.add(j);
         }
       }
+      // 194.657.215
+      // 187.012.821
       log.info("seeds: {}  size: {}", rangedSeeds, rangedSeeds.size());
       return new Seeds(rangedSeeds);
-    }
+    }*/
     return new Seeds(originalSeeds);
   }
 
@@ -99,8 +101,23 @@ public class Day05 extends DaySolver<String> {
 
   @Override
   public long solvePart02() {
-    log.debug("seeds: {}", this.seeds);
-    return solvePart01();
+    List<Long> originalSeeds = this.seeds.list();
+    long min = Long.MAX_VALUE;
+
+    for (int i = 0; i < originalSeeds.size(); i += 2) {
+      Long start = originalSeeds.get(i);
+      Long range = originalSeeds.get(i + 1);
+      log.info("seed 01: {}  seed02: {}", start, range);
+      for (long seed = start; seed < start + range; seed++) {
+        Long location = location(this.lineMaps, seed);
+        if (location < min) {
+          min = location;
+        }
+      }
+    }
+
+    log.debug("seeds: {}", originalSeeds);
+    return min;
   }
 
   public static void main(String[] args) {
