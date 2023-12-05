@@ -4,9 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import be.bonamis.advent.utils.FileHelper;
 import java.util.*;
-import java.util.ArrayList;
 
-import be.bonamis.advent.year2023.Day05.LineOfMap;
+import be.bonamis.advent.year2023.Day05.*;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.*;
 
@@ -23,21 +22,21 @@ class Day05Test {
 
   @Test
   void solvePart01() {
-    Day05.Seeds seeds = day05.getSeeds();
-    List<LineOfMap> lineOfMaps01 = day05.lineOfMap(2, 6);
-    List<LineOfMap> lineOfMaps02 = day05.lineOfMap(6, 11);
-    List<LineOfMap> lineOfMaps03 = day05.lineOfMap(11, 11);
-    List<LineOfMap> lineOfMaps04 = day05.lineOfMap(17, 11);
-    List<LineOfMap> lineOfMaps05 = day05.lineOfMap(21, 11);
-    List<LineOfMap> lineOfMaps06 = day05.lineOfMap(26, 11);
-    List<LineOfMap> lineOfMaps07 = day05.lineOfMap(30, 11);
+    Seeds seeds = day05.getSeeds();
+    List<List<LineOfMap>> lineMaps = day05.getLineMaps();
+    assertThat(lineMaps).hasSize(7);
 
-    assertThat(corresp(lineOfMaps01, seeds.list().get(0))).isEqualTo(81L);
-    assertThat(corresp(lineOfMaps01, seeds.list().get(1))).isEqualTo(14L);
-    assertThat(corresp(lineOfMaps01, seeds.list().get(2))).isEqualTo(57L);
-    assertThat(corresp(lineOfMaps01, seeds.list().get(3))).isEqualTo(13L);
+    assertThat(corresp(lineMaps.get(0), seeds.list().get(1))).isEqualTo(14L);
+    assertThat(corresp(lineMaps.get(0), seeds.list().get(2))).isEqualTo(57L);
+    assertThat(corresp(lineMaps.get(0), seeds.list().get(3))).isEqualTo(13L);
 
-    assertThat(corresp(lineOfMaps02, 81L)).isEqualTo(81L);
+    assertThat(corresp(lineMaps.get(0), seeds.list().get(0))).isEqualTo(81L);
+    assertThat(corresp(lineMaps.get(1), 81L)).isEqualTo(81L);//81 81 81 74 78 78 82
+    assertThat(corresp(lineMaps.get(2), 81L)).isEqualTo(81L);//81 81 81 74 78 78 82
+    assertThat(corresp(lineMaps.get(3), 81L)).isEqualTo(74L);//81 81 81 74 78 78 82
+    assertThat(corresp(lineMaps.get(4), 74L)).isEqualTo(78L);//81 81 81 74 78 78 82
+    assertThat(corresp(lineMaps.get(5), 78L)).isEqualTo(78L);//81 81 81 74 78 78 82
+    assertThat(corresp(lineMaps.get(6), 78L)).isEqualTo(82L);//81 81 81 74 78 78 82
   }
 
   private Long corresp(List<LineOfMap> lines, Long l) {
