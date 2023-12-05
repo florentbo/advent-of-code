@@ -26,30 +26,29 @@ class Day05Test {
     List<List<LineOfMap>> lineMaps = day05.getLineMaps();
     assertThat(lineMaps).hasSize(7);
 
-    assertThat(corresp(lineMaps.get(0), seeds.list().get(1))).isEqualTo(14L);
-    assertThat(corresp(lineMaps.get(0), seeds.list().get(2))).isEqualTo(57L);
-    assertThat(corresp(lineMaps.get(0), seeds.list().get(3))).isEqualTo(13L);
+    Long seed02 = seeds.list().get(1);
 
-    assertThat(corresp(lineMaps.get(0), seeds.list().get(0))).isEqualTo(81L);
-    assertThat(corresp(lineMaps.get(1), 81L)).isEqualTo(81L);//81 81 81 74 78 78 82
-    assertThat(corresp(lineMaps.get(2), 81L)).isEqualTo(81L);//81 81 81 74 78 78 82
-    assertThat(corresp(lineMaps.get(3), 81L)).isEqualTo(74L);//81 81 81 74 78 78 82
-    assertThat(corresp(lineMaps.get(4), 74L)).isEqualTo(78L);//81 81 81 74 78 78 82
-    assertThat(corresp(lineMaps.get(5), 78L)).isEqualTo(78L);//81 81 81 74 78 78 82
-    assertThat(corresp(lineMaps.get(6), 78L)).isEqualTo(82L);//81 81 81 74 78 78 82
-  }
+    assertThat(day05.correspond(lineMaps.get(0), seeds.list().get(2))).isEqualTo(57L);
+    assertThat(day05.correspond(lineMaps.get(0), seeds.list().get(3))).isEqualTo(13L);
 
-  private Long corresp(List<LineOfMap> lines, Long l) {
-    return lines.stream()
-        .filter(
-            line -> {
-              long start = line.destination();
-              long end = line.destination() + line.range();
-              return l >= start && l <= end;
-            })
-        .findFirst()
-        .map(line -> l + line.destination() - line.source())
-        .orElse(l);
+    Long seed01 = seeds.list().get(0);
+    assertThat(day05.correspond(lineMaps.get(0), seed01)).isEqualTo(81L);
+    assertThat(day05.correspond(lineMaps.get(1), 81L)).isEqualTo(81L); // 81 81 81 74 78 78 82
+    assertThat(day05.correspond(lineMaps.get(2), 81L)).isEqualTo(81L); // 81 81 81 74 78 78 82
+    assertThat(day05.correspond(lineMaps.get(3), 81L)).isEqualTo(74L); // 81 81 81 74 78 78 82
+    assertThat(day05.correspond(lineMaps.get(4), 74L)).isEqualTo(78L); // 81 81 81 74 78 78 82
+    assertThat(day05.correspond(lineMaps.get(5), 78L)).isEqualTo(78L); // 81 81 81 74 78 78 82
+    assertThat(day05.correspond(lineMaps.get(6), 78L)).isEqualTo(82L); // 81 81 81 74 78 78 82
+
+    assertThat(day05.correspond(lineMaps.get(0), seed02)).isEqualTo(14L);
+    assertThat(day05.correspond(lineMaps.get(1), 14L)).isEqualTo(53L);
+
+    assertThat(day05.location(lineMaps, seed01)).isEqualTo(82L);
+    assertThat(day05.location(lineMaps, seed02)).isEqualTo(43L);
+    assertThat(day05.location(lineMaps, seeds.list().get(2))).isEqualTo(86L);
+    assertThat(day05.location(lineMaps, seeds.list().get(3))).isEqualTo(35L);
+
+    assertThat(day05.solvePart01()).isEqualTo(35);
   }
 
   @Test
