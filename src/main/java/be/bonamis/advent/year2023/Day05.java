@@ -51,13 +51,48 @@ public class Day05 extends DaySolver<String> {
   @Override
   public long solvePart01() {
     log.debug("seeds: {}", this.seeds);
-    return this.puzzle.size();
+    return this.seeds.list().stream()
+        .map(seed -> location(this.lineMaps, seed))
+        .min(Long::compare)
+        .orElseThrow();
   }
 
   private Seeds parseSeeds(String input) {
     String[] split = input.split(":");
 
     return new Seeds(Arrays.stream(split[1].trim().split("\\s+")).map(Long::parseLong).toList());
+  }
+
+  Long location(List<List<LineOfMap>> lineMaps, Long seed) {
+    Long initialSeed = seed;
+    for (List<LineOfMap> lineMap : lineMaps) {
+      initialSeed = correspond(lineMap, initialSeed);
+    }
+    log.info("init: {}", initialSeed);
+    return initialSeed;
+  }
+
+  Long correspond(List<LineOfMap> lines, Long seed) {
+    return lines.stream()
+        .filter(
+            line -> {
+              log.debug("seed: {}", seed);
+              long start = line.source();
+              long end = line.source() + line.range();
+              log.debug("line: {} start: {} end: {}", line, start, end);
+              return (seed >= start && seed <= end)
+              // && (l + line.destination() - line.source() > 0)
+              ;
+            })
+        .findFirst()
+        .map(
+            line -> {
+              log.debug("found: {}", line);
+              long result = seed + line.destination() - line.source();
+              log.debug("result: {}", result);
+              return result;
+            })
+        .orElse(seed);
   }
 
   @Override
@@ -74,16 +109,8 @@ public class Day05 extends DaySolver<String> {
   }
 
   public List<LineOfMap> lineOfMap(int start, int end) {
-    log.debug("start: {}", start);
-    log.debug("end: {}", end);
-
     return IntStream.range(start + 1, end - 1)
-        .mapToObj(
-            x -> {
-              String line = this.puzzle.get(x);
-              log.debug("line: {}", line);
-              return parseLine(line);
-            })
+        .mapToObj(x -> parseLine(this.puzzle.get(x)))
         .toList();
   }
 
