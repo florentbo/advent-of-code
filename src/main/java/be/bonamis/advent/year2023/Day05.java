@@ -16,9 +16,9 @@ public class Day05 extends DaySolver<String> {
   private final Seeds seeds;
   private final List<List<LineOfMap>> lineMaps;
 
-  public Day05(List<String> puzzle) {
+  public Day05(List<String> puzzle, boolean rangeOfSeeds) {
     super(puzzle);
-    this.seeds = parseSeeds(this.puzzle.get(0));
+    this.seeds = parseSeeds(this.puzzle.get(0), rangeOfSeeds);
     this.lineMaps = lineMaps(puzzle);
   }
 
@@ -38,7 +38,6 @@ public class Day05 extends DaySolver<String> {
         .mapToObj(
             i -> {
               Integer start = list.get(i);
-              log.debug("start of the line: {}", start);
               if (i < list.size() - 1) {
                 return lineOfMap(start, list.get(i + 1));
               } else {
@@ -57,11 +56,24 @@ public class Day05 extends DaySolver<String> {
         .orElseThrow();
   }
 
-  private Seeds parseSeeds(String input) {
-    List<Long> seeds =
+  private Seeds parseSeeds(String input, boolean rangeOfSeeds) {
+    List<Long> originalSeeds =
         Arrays.stream(input.split(":")[1].trim().split("\\s+")).map(Long::parseLong).toList();
-    log.info("seeds: {}", seeds);
-    return new Seeds(seeds);
+    log.info("seeds: {}  size: {}", originalSeeds, originalSeeds.size());
+    if (rangeOfSeeds) {
+      List<Long> rangedSeeds = new ArrayList<>();
+      for (int i = 0; i < originalSeeds.size(); i += 2) {
+        Long start = originalSeeds.get(i);
+        Long range = originalSeeds.get(i + 1);
+        log.info("seed 01: {}  seed02: {}", start, range);
+        for (long j = start; j < start + range; j++) {
+          rangedSeeds.add(j);
+        }
+      }
+      log.info("seeds: {}  size: {}", rangedSeeds, rangedSeeds.size());
+      return new Seeds(rangedSeeds);
+    }
+    return new Seeds(originalSeeds);
   }
 
   Long location(List<List<LineOfMap>> lineMaps, Long seed) {
@@ -69,7 +81,6 @@ public class Day05 extends DaySolver<String> {
     for (List<LineOfMap> lineMap : lineMaps) {
       initialSeed = correspond(lineMap, initialSeed);
     }
-    log.debug("init: {}", initialSeed);
     return initialSeed;
   }
 
@@ -77,36 +88,26 @@ public class Day05 extends DaySolver<String> {
     return lines.stream()
         .filter(
             line -> {
-              log.debug("seed: {}", seed);
               long start = line.source();
               long end = line.source() + line.range();
-              log.debug("line: {} start: {} end: {}", line, start, end);
-              return (seed >= start && seed <= end)
-              // && (l + line.destination() - line.source() > 0)
-              ;
+              return (seed >= start && seed <= end);
             })
         .findFirst()
-        .map(
-            line -> {
-              log.debug("found: {}", line);
-              long result = seed + line.destination() - line.source();
-              log.debug("result: {}", result);
-              return result;
-            })
+        .map(line -> seed + line.destination() - line.source())
         .orElse(seed);
   }
 
   @Override
   public long solvePart02() {
-    return this.puzzle.size() + 1;
+    log.debug("seeds: {}", this.seeds);
+    return solvePart01();
   }
 
   public static void main(String[] args) {
     String content = FileHelper.content("2023/05/2023_05_input.txt");
     List<String> puzzle = Arrays.asList(content.split("\n"));
-    Day05 day = new Day05(puzzle);
-    log.info("solution part 1: {}", day.solvePart01());
-    log.info("solution part 2: {}", day.solvePart02());
+    log.info("solution part 1: {}", new Day05(puzzle, false).solvePart01());
+    log.info("solution part 2: {}", new Day05(puzzle, true).solvePart02());
   }
 
   public List<LineOfMap> lineOfMap(int start, int end) {
@@ -122,8 +123,6 @@ public class Day05 extends DaySolver<String> {
     long range = Long.parseLong(s[2]);
     return new LineOfMap(destination, source, range);
   }
-
-  public record LineOfMaps(List<LineOfMap> lineOfMaps) {}
 
   public record LineOfMap(long destination, long source, long range) {}
 
