@@ -4,6 +4,8 @@ import be.bonamis.advent.DaySolver;
 import be.bonamis.advent.utils.FileHelper;
 import java.util.*;
 import java.util.ArrayList;
+import java.util.stream.IntStream;
+import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
 import lombok.Getter;
@@ -38,27 +40,16 @@ public class Day06 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
-    long total = 1;
-    for (int i = 0; i < this.times.size(); i++) {
-      long count = solve(this.times.get(i), this.distances.get(i));
-      log.debug("count: {}", count);
-      total *= count;
-    }
-
-    return total;
+    return IntStream.range(0, this.times.size())
+        .mapToObj(i -> solve(this.times.get(i), this.distances.get(i)))
+        .reduce(1L, (a, b) -> a * b);
   }
 
   private long solve(Long time, Long distance) {
-    long remaining = time;
-    long count = 0;
-    for (long speed = 0; speed < time; speed++) {
-      long remainingTime2 = remaining - speed;
-      long total = speed * remainingTime2;
-      if (total > distance) {
-        count++;
-      }
-    }
-    return count;
+    return LongStream.range(0, time)
+        .mapToObj(s -> s * (time - s))
+        .filter(t -> t > distance)
+        .count();
   }
 
   @Override
