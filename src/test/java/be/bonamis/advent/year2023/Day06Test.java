@@ -14,13 +14,13 @@ class Day06Test {
 
   @BeforeEach
   void setUp() {
-    String content = FileHelper.content("2023/04/2023_04_01_code.txt");
+    String content = FileHelper.content("2023/06/2023_06_00_code.txt");
     day06 = new Day06(Arrays.asList(content.split("\n")));
   }
 
   @Test
   void solvePart01() {
-    assertThat(day06.solvePart01()).isEqualTo(6);
+    assertThat(day06.solvePart01()).isEqualTo(288);
   }
 
   @Test
