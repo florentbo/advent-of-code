@@ -6,7 +6,6 @@ import java.util.*;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,8 +15,8 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class Day07 extends DaySolver<String> {
 
-  private static Map<String, Integer> cardsOrder;
-  private static Map<String, Integer> cardsOrderWithJoker;
+  private final Map<String, Integer> cardsOrder;
+  private final Map<String, Integer> cardsOrderWithJoker;
 
   public Day07(List<String> puzzle) {
     super(puzzle);
@@ -48,7 +47,7 @@ public class Day07 extends DaySolver<String> {
     List<Game> games = new ArrayList<>(this.puzzle.stream().map(this::parse).toList());
     log.debug("games: {}", games);
 
-    games.sort(new GameComparator(false));
+    games.sort(new GameComparator(false, this.cardsOrder, this.cardsOrderWithJoker));
 
     log.debug("games after sorting : {}", games);
 
@@ -57,33 +56,8 @@ public class Day07 extends DaySolver<String> {
         .reduce(0L, Long::sum);
   }
 
-  static boolean isFiveOfAKind(Cards cards) {
-    return cards.inventory().containsValue(5L);
-  }
-
-  static boolean isFourOfAKind(Cards cards) {
-    return cards.inventory().containsValue(4L);
-  }
-
-  static boolean isFullHouse(Cards cards) {
-    return cards.inventory().containsValue(3L) && cards.inventory().containsValue(2L);
-  }
-
-  static boolean isThreeOfAKind(Cards cards) {
-    return cards.inventory().containsValue(3L);
-  }
-
-  static boolean isTwoPair(Cards cards) {
-    return cards.inventory().values().stream().filter(value -> value == 2L).count() == 2;
-  }
-
-  static boolean isOnePair(Cards cards) {
-    return cards.inventory().containsValue(2L);
-  }
-
   private Game parse(String s) {
     String[] game = s.split(" ");
-    // Function<String, Card> card = ss -> new Card(ss, cardsOrder.get(ss.length()).length());
     List<String> cards = parseCards(game[0]);
     return new Game(new Cards(cards), Long.parseLong(game[1]));
   }
@@ -101,21 +75,106 @@ public class Day07 extends DaySolver<String> {
       return new Cards(Arrays.stream(input.split("")).toList());
     }
 
+    HandType handType(boolean playWithJoker) {
+      Map<String, Long> inventory = inventory();
+      if (isFiveOfAKind()) {
+        return HandType.FIVE_OF_A_KIND;
+      }
+      Long jokerCount = inventory.getOrDefault("J", 99L);
+
+      if (isFourOfAKind()) {
+        if (playWithJoker && (jokerCount.equals(1L) || jokerCount.equals(4L))) {
+          return HandType.FIVE_OF_A_KIND;
+        }
+        return HandType.FOUR_OF_A_KIND;
+      }
+
+      if (isFullHouse()) {
+        if (playWithJoker)
+          if (jokerCount.equals(2L) || jokerCount.equals(3L)) {
+            return HandType.FIVE_OF_A_KIND;
+          }
+        return HandType.FULL_HOUSE;
+      }
+
+      if (isThreeOfAKind()) {
+        if (playWithJoker && (jokerCount.equals(1L) || jokerCount.equals(3L))) {
+          return HandType.FOUR_OF_A_KIND;
+        }
+        return HandType.THREE_OF_A_KIND;
+      }
+      if (isTwoPair()) {
+        if (playWithJoker) {
+          if (jokerCount.equals(1L)) {
+            return HandType.FULL_HOUSE;
+          }
+          if (jokerCount.equals(2L)) {
+            return HandType.FOUR_OF_A_KIND;
+          }
+        }
+        return HandType.TWO_PAIRS;
+      }
+
+      if (isOnePair()) {
+        if (playWithJoker) {
+          if (jokerCount.equals(1L)) {
+            return HandType.THREE_OF_A_KIND;
+          }
+          if (jokerCount.equals(2L)) {
+            return HandType.THREE_OF_A_KIND;
+          }
+        }
+        return HandType.ONE_PAIR;
+      }
+
+      return playWithJoker
+          ? jokerCount.equals(1L) ? HandType.ONE_PAIR : HandType.HIGH_CARD
+          : HandType.HIGH_CARD;
+    }
+
+    boolean isFiveOfAKind() {
+      return inventory().containsValue(5L);
+    }
+
+    boolean isFourOfAKind() {
+      return inventory().containsValue(4L);
+    }
+
+    boolean isFullHouse() {
+      return inventory().containsValue(3L) && inventory().containsValue(2L);
+    }
+
+    boolean isThreeOfAKind() {
+      return inventory().containsValue(3L);
+    }
+
+    boolean isTwoPair() {
+      return inventory().values().stream().filter(value -> value == 2L).count() == 2;
+    }
+
+    boolean isOnePair() {
+      return inventory().containsValue(2L);
+    }
+
     public int typeValue(boolean playWithJoker) {
-      HandValueType type = GameComparator.handType(this, playWithJoker);
+      HandType type = handType(playWithJoker);
       return type.getValue();
     }
 
-    public boolean isStrongerThan(Cards other, boolean playWithJoker) {
-      return this.compareTo(other, playWithJoker) > 0;
-    }
+    /*public boolean isStrongerThan(Cards other, boolean playWithJoker) {
+      return this.compareTo(other, playWithJoker, cardsOrder, cardsOrderWithJoker) > 0;
+    }*/
 
     public Map<String, Long> inventory() {
       return this.cards().stream()
           .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     }
 
-    public int compareTo(Cards other, boolean playWithJoker) {
+    public int compareTo(
+        Cards other,
+        boolean playWithJoker,
+        Map<String, Integer> cardsOrder,
+        Map<String, Integer> cardsOrderWithJoker) {
       int type = this.typeValue(playWithJoker);
       int otherType = other.typeValue(playWithJoker);
 
@@ -144,7 +203,7 @@ public class Day07 extends DaySolver<String> {
     List<Game> games = new ArrayList<>(this.puzzle.stream().map(this::parse).toList());
     log.debug("games: {}", games);
 
-    games.sort(new GameComparator(true));
+    games.sort(new GameComparator(true, this.cardsOrder, this.cardsOrderWithJoker));
 
     games.stream().map(Game::cards).forEach(cards -> log.debug("card: {}", cards));
 
@@ -164,68 +223,30 @@ public class Day07 extends DaySolver<String> {
   @AllArgsConstructor
   static class GameComparator implements Comparator<Game> {
     private final boolean playWithJoker;
-
-    static HandValueType handType(Cards cards, boolean playWithJoker) {
-      Map<String, Long> inventory = cards.inventory();
-      if (isFiveOfAKind(cards)) {
-        return HandValueType.FIVE_OF_A_KIND;
-      }
-      Long jokerCount = inventory.getOrDefault("J", 99L);
-
-      if (isFourOfAKind(cards)) {
-        if (playWithJoker && (jokerCount.equals(1L) || jokerCount.equals(4L))) {
-          return HandValueType.FIVE_OF_A_KIND;
-        }
-        return HandValueType.FOUR_OF_A_KIND;
-      }
-
-      if (isFullHouse(cards)) {
-        if (playWithJoker)
-          if (jokerCount.equals(2L) || jokerCount.equals(3L)) {
-            return HandValueType.FIVE_OF_A_KIND;
-          }
-        return HandValueType.FULL_HOUSE;
-      }
-
-      if (isThreeOfAKind(cards)) {
-        if (playWithJoker && (jokerCount.equals(1L) || jokerCount.equals(3L))) {
-          return HandValueType.FOUR_OF_A_KIND;
-        }
-        return HandValueType.THREE_OF_A_KIND;
-      }
-      // 250214875 too high
-      if (isTwoPair(cards)) {
-        if (playWithJoker) {
-          if (jokerCount.equals(1L)) {
-            return HandValueType.FULL_HOUSE;
-          }
-          if (jokerCount.equals(2L)) {
-            return HandValueType.FOUR_OF_A_KIND;
-          }
-        }
-        return HandValueType.TWO_PAIRS;
-      }
-
-      if (isOnePair(cards)) {
-        if (playWithJoker) {
-          if (jokerCount.equals(1L)) {
-            return HandValueType.THREE_OF_A_KIND;
-          }
-          if (jokerCount.equals(2L)) {
-            return HandValueType.THREE_OF_A_KIND;
-          }
-        }
-        return HandValueType.ONE_PAIR;
-      }
-
-      return playWithJoker
-          ? jokerCount.equals(1L) ? HandValueType.ONE_PAIR : HandValueType.HIGH_CARD
-          : HandValueType.HIGH_CARD;
-    }
+    private final Map<String, Integer> cardsOrder;
+    private final Map<String, Integer> cardsOrderWithJoker;
 
     @Override
     public int compare(Game g1, Game g2) {
-      return g1.cards().compareTo(g2.cards(), playWithJoker);
+      return g1.cards().compareTo(g2.cards(), playWithJoker, cardsOrder, cardsOrderWithJoker);
+    }
+  }
+
+  @Getter
+  public enum HandType {
+    FIVE_OF_A_KIND(8),
+    FOUR_OF_A_KIND(7),
+    FULL_HOUSE(6),
+    THREE_OF_A_KIND(3),
+    TWO_PAIRS(2),
+    ONE_PAIR(1),
+    HIGH_CARD(0),
+    ;
+
+    private final int value;
+
+    HandType(int value) {
+      this.value = value;
     }
   }
 }
