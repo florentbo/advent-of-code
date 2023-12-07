@@ -47,7 +47,7 @@ public class Day07 extends DaySolver<String> {
     List<Game> games = new ArrayList<>(this.puzzle.stream().map(this::parse).toList());
     log.debug("games: {}", games);
 
-    games.sort(new GameComparator(false, this.cardsOrder, this.cardsOrderWithJoker));
+    games.sort(new GameComparator(false, this.cardsOrder));
 
     log.debug("games after sorting : {}", games);
 
@@ -156,25 +156,22 @@ public class Day07 extends DaySolver<String> {
       return inventory().containsValue(2L);
     }
 
-    public int typeValue(boolean playWithJoker) {
+    private int typeValue(boolean playWithJoker) {
       HandType type = handType(playWithJoker);
       return type.getValue();
     }
 
-    /*public boolean isStrongerThan(Cards other, boolean playWithJoker) {
-      return this.compareTo(other, playWithJoker, cardsOrder, cardsOrderWithJoker) > 0;
-    }*/
+    public boolean isStrongerThan(
+        Cards other, boolean playWithJoker, Map<String, Integer> cardsOrder) {
+      return this.compareTo(other, playWithJoker, cardsOrder) > 0;
+    }
 
-    public Map<String, Long> inventory() {
+    private Map<String, Long> inventory() {
       return this.cards().stream()
           .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()));
     }
 
-    public int compareTo(
-        Cards other,
-        boolean playWithJoker,
-        Map<String, Integer> cardsOrder,
-        Map<String, Integer> cardsOrderWithJoker) {
+    public int compareTo(Cards other, boolean playWithJoker, Map<String, Integer> cardsOrder) {
       int type = this.typeValue(playWithJoker);
       int otherType = other.typeValue(playWithJoker);
 
@@ -186,8 +183,9 @@ public class Day07 extends DaySolver<String> {
                 .findFirst();
         if (firstDifference.isPresent()) {
           int index = firstDifference.getAsInt();
-          Map<String, Integer> order = playWithJoker ? cardsOrderWithJoker : cardsOrder;
-          return order.get(this.cards.get(index)).compareTo(order.get(other.cards().get(index)));
+          return cardsOrder
+              .get(this.cards.get(index))
+              .compareTo(cardsOrder.get(other.cards().get(index)));
 
         } else {
           return 0;
@@ -203,7 +201,7 @@ public class Day07 extends DaySolver<String> {
     List<Game> games = new ArrayList<>(this.puzzle.stream().map(this::parse).toList());
     log.debug("games: {}", games);
 
-    games.sort(new GameComparator(true, this.cardsOrder, this.cardsOrderWithJoker));
+    games.sort(new GameComparator(true, this.cardsOrderWithJoker));
 
     games.stream().map(Game::cards).forEach(cards -> log.debug("card: {}", cards));
 
@@ -224,15 +222,15 @@ public class Day07 extends DaySolver<String> {
   static class GameComparator implements Comparator<Game> {
     private final boolean playWithJoker;
     private final Map<String, Integer> cardsOrder;
-    private final Map<String, Integer> cardsOrderWithJoker;
 
     @Override
     public int compare(Game g1, Game g2) {
-      return g1.cards().compareTo(g2.cards(), playWithJoker, cardsOrder, cardsOrderWithJoker);
+      return g1.cards().compareTo(g2.cards(), playWithJoker, cardsOrder);
     }
   }
 
   @Getter
+  @AllArgsConstructor
   public enum HandType {
     FIVE_OF_A_KIND(8),
     FOUR_OF_A_KIND(7),
@@ -240,13 +238,8 @@ public class Day07 extends DaySolver<String> {
     THREE_OF_A_KIND(3),
     TWO_PAIRS(2),
     ONE_PAIR(1),
-    HIGH_CARD(0),
-    ;
+    HIGH_CARD(0);
 
     private final int value;
-
-    HandType(int value) {
-      this.value = value;
-    }
   }
 }
