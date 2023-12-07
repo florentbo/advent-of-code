@@ -171,12 +171,14 @@ public class Day07 extends DaySolver<String> {
         return HandValueType.FIVE_OF_A_KIND;
       }
       Long jokerCount = inventory.getOrDefault("J", 99L);
+
       if (isFourOfAKind(cards)) {
-        if (playWithJoker && jokerCount.equals(1L)) {
+        if (playWithJoker && (jokerCount.equals(1L) || jokerCount.equals(4L))) {
           return HandValueType.FIVE_OF_A_KIND;
         }
         return HandValueType.FOUR_OF_A_KIND;
       }
+
       if (isFullHouse(cards)) {
         if (playWithJoker)
           if (jokerCount.equals(2L) || jokerCount.equals(3L)) {
@@ -184,13 +186,14 @@ public class Day07 extends DaySolver<String> {
           }
         return HandValueType.FULL_HOUSE;
       }
+
       if (isThreeOfAKind(cards)) {
-        if (playWithJoker && jokerCount.equals(1L)) {
+        if (playWithJoker && (jokerCount.equals(1L) || jokerCount.equals(3L))) {
           return HandValueType.FOUR_OF_A_KIND;
         }
         return HandValueType.THREE_OF_A_KIND;
       }
-
+      // 250214875 too high
       if (isTwoPair(cards)) {
         if (playWithJoker) {
           if (jokerCount.equals(1L)) {
@@ -204,10 +207,20 @@ public class Day07 extends DaySolver<String> {
       }
 
       if (isOnePair(cards)) {
+        if (playWithJoker) {
+          if (jokerCount.equals(1L)) {
+            return HandValueType.THREE_OF_A_KIND;
+          }
+          if (jokerCount.equals(2L)) {
+            return HandValueType.THREE_OF_A_KIND;
+          }
+        }
         return HandValueType.ONE_PAIR;
       }
 
-      return HandValueType.HIGH_CARD;
+      return playWithJoker
+          ? jokerCount.equals(1L) ? HandValueType.ONE_PAIR : HandValueType.HIGH_CARD
+          : HandValueType.HIGH_CARD;
     }
 
     @Override
