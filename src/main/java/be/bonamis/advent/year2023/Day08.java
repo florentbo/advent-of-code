@@ -80,19 +80,21 @@ public class Day08 extends DaySolver<String> {
     log.info("part2bis: {}", part2bis);
     List<Long> list = start.stream().map(this::findPart2bis).toList();
     log.info("list: {}", list);
-    int[] intArray = list.stream().mapToInt(Long::intValue).toArray();
-    return lcm(intArray);
+
+    BigInteger[] array =
+            list.stream().map(i -> new BigInteger(String.valueOf(i))).toArray(BigInteger[]::new);
+      return lcm(array).longValue();
 
     // return findPart2bis(start);
   }
 
-  int lcm(int[] input) {
-    int result = input[0];
+  BigInteger lcm(BigInteger[] input) {
+    BigInteger result = input[0];
     for (int i = 1; i < input.length; i++) result = lcm(result, input[i]);
     return result;
   }
 
-  public int lcm(int number1, int number2) {
+ /* public int lcm(int number1, int number2) {
     if (number1 == 0 || number2 == 0) {
       return 0;
     }
@@ -105,7 +107,7 @@ public class Day08 extends DaySolver<String> {
       lcm += absHigherNumber;
     }
     return lcm;
-  }
+  }*/
 
   public BigInteger lcm(BigInteger number1, BigInteger number2) {
     BigInteger gcd = number1.gcd(number2);
