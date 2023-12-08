@@ -33,13 +33,13 @@ public class Day08 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
-    String arrival = this.nodes.get(this.nodes.size() - 1).arrival();
+    Node start = this.nodes.stream().filter(n -> n.arrival().equals("AAA")).findFirst().orElseThrow();
+    String arrival = "ZZZ";
     log.debug("arrival: {}", arrival);
     List<String> path = new ArrayList<>();
-    for (int i = 0; i < 100; i++) {
+    for (int i = 0; i < 1000; i++) {
       path.addAll(this.leftRights);
     }
-    Node start = this.nodes.get(0);
     log.debug("start: {}", start);
 
     return searchFinish(path, start, arrival);
