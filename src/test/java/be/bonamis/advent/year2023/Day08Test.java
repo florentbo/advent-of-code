@@ -2,8 +2,7 @@ package be.bonamis.advent.year2023;
 
 import be.bonamis.advent.utils.FileHelper;
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -15,12 +14,6 @@ import static org.assertj.core.api.Assertions.assertThat;
 class Day08Test {
 
   private Day08 day08;
-
-  @BeforeEach
-  void setUp() {
-    // String content = FileHelper.content("2023/08/2023_08_20_code.txt");
-
-  }
 
   @Test
   void solvePart01() {
@@ -58,21 +51,15 @@ XXX = (XXX, XXX)
     assertThat(day08.solvePart02()).isEqualTo(6);
   }
 
-  Day08 day081 = new Day08(List.of(""));
-
   @Test
   void lcm() {
-    List<Integer> list = List.of(3, 4, 6);
-    BigInteger[] array =
-        list.stream().map(i -> new BigInteger(String.valueOf(i))).toArray(BigInteger[]::new);
-    assertThat(day081.lcm(array)).isEqualTo(12);
-  }
+    day08 = new Day08(Arrays.asList("".split("\n")));
+    List<Long> list = List.of(3L, 4L, 6L);
 
-  @Test
-  void testLCM() {
+    assertThat(day08.lcm(list)).isEqualTo(12);
     BigInteger number1 = new BigInteger("12");
     BigInteger number2 = new BigInteger("18");
     BigInteger expectedLCM = new BigInteger("36");
-    assertThat(day081.lcm(number1, number2)).isEqualTo(expectedLCM);
+    assertThat(day08.lcm(number1, number2)).isEqualTo(expectedLCM);
   }
 }
