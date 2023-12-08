@@ -194,9 +194,7 @@ public class Day07 extends DaySolver<String> {
 
   @Override
   public long solvePart02() {
-    List<Game> games = new ArrayList<>(this.puzzle.stream().map(s -> {
-        return parse(s);
-    }).toList());
+    List<Game> games = new ArrayList<>(this.puzzle.stream().map(this::parse).toList());
     log.debug("games: {}", games);
 
     games.sort(new GameComparator(true, this.cardsOrderWithJoker));
