@@ -1,6 +1,6 @@
 package be.bonamis.advent.year2023;
 
-import static be.bonamis.advent.year2023.Day07.*;
+import static be.bonamis.advent.year2023.Day07.Cards.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import be.bonamis.advent.utils.FileHelper;
@@ -31,19 +31,20 @@ class Day07Test {
 
   @Test
   void isStrongerThan() {
-  /*  assertThat(Cards.of("77888").isStrongerThan(Cards.of("77788"), false)).isTrue();
-    assertThat(Cards.of("77778").isStrongerThan(Cards.of("77788"), false)).isTrue();
+    Map<String, Integer> cardsOrder = day07.getCardsOrder();
+    assertThat(of("77888").isStrongerThan(of("77788"), false, cardsOrder)).isTrue();
+    assertThat(of("77778").isStrongerThan(of("77788"), false, cardsOrder)).isTrue();
 
-    assertThat(Cards.of("QQQJA").isStrongerThan(Cards.of("T55J5"), false)).isTrue();
-    assertThat(Cards.of("T55J5").isStrongerThan(Cards.of("KK677"), false)).isTrue();
-    assertThat(Cards.of("KK677").isStrongerThan(Cards.of("KTJJT"), false)).isTrue();
-    assertThat(Cards.of("KTJJT").isStrongerThan(Cards.of("32T3K"), false)).isTrue();
+    assertThat(of("QQQJA").isStrongerThan(of("T55J5"), false, cardsOrder)).isTrue();
+    assertThat(of("T55J5").isStrongerThan(of("KK677"), false, cardsOrder)).isTrue();
+    assertThat(of("KK677").isStrongerThan(of("KTJJT"), false, cardsOrder)).isTrue();
+    assertThat(of("KTJJT").isStrongerThan(of("32T3K"), false, cardsOrder)).isTrue();
 
-    assertThat(Cards.of("KK677").isStrongerThan(Cards.of("KTJJT"), true)).isFalse();*/
+    assertThat(of("KK677").isStrongerThan(of("KTJJT"), true, cardsOrder)).isFalse();
 
-    //assertThat(Cards.of("KTJJT").isStrongerThan(Cards.of("QQQJA"), true)).isTrue();
-   /* assertThat(Cards.of("QQQJA").isStrongerThan(Cards.of("T55J5"), true)).isTrue();
-    assertThat(Cards.of("T55J5").isStrongerThan(Cards.of("KK677"), true)).isTrue();
-    assertThat(Cards.of("KK677").isStrongerThan(Cards.of("32T3K"), true)).isTrue();*/
+    assertThat(of("KTJJT").isStrongerThan(of("QQQJA"), true, cardsOrder)).isTrue();
+    assertThat(of("QQQJA").isStrongerThan(of("T55J5"), true, cardsOrder)).isTrue();
+    assertThat(of("T55J5").isStrongerThan(of("KK677"), true, cardsOrder)).isTrue();
+    assertThat(of("KK677").isStrongerThan(of("32T3K"), true, cardsOrder)).isTrue();
   }
 }

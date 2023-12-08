@@ -52,14 +52,14 @@ public class Day07 extends DaySolver<String> {
     log.debug("games after sorting : {}", games);
 
     return IntStream.range(0, games.size())
-        .mapToLong(index -> games.get(index).bid * (index + 1))
+        .mapToLong(index -> games.get(index).bid * (index + 1L))
         .reduce(0L, Long::sum);
   }
 
   private Game parse(String s) {
     String[] game = s.split(" ");
     List<String> cards = parseCards(game[0]);
-    return new Game(new Cards(cards), Long.parseLong(game[1]));
+    return new Game(new Cards(cards), Integer.parseInt(game[1]));
   }
 
   List<String> parseCards(String input) {
@@ -67,9 +67,13 @@ public class Day07 extends DaySolver<String> {
     return Arrays.stream(split).toList();
   }
 
-  public record Game(Cards cards, Long bid) {}
+  public record Game(Cards cards, int bid) {}
 
   public record Cards(List<String> cards) {
+
+    Integer value(Map<String, Integer> cardsOrder, int index) {
+      return cardsOrder.get(this.cards.get(index));
+    }
 
     public static Cards of(String input) {
       return new Cards(Arrays.stream(input.split("")).toList());
@@ -90,10 +94,9 @@ public class Day07 extends DaySolver<String> {
       }
 
       if (isFullHouse()) {
-        if (playWithJoker)
-          if (jokerCount.equals(2L) || jokerCount.equals(3L)) {
-            return HandType.FIVE_OF_A_KIND;
-          }
+        if (playWithJoker && (jokerCount.equals(2L) || jokerCount.equals(3L))) {
+          return HandType.FIVE_OF_A_KIND;
+        }
         return HandType.FULL_HOUSE;
       }
 
@@ -116,20 +119,14 @@ public class Day07 extends DaySolver<String> {
       }
 
       if (isOnePair()) {
-        if (playWithJoker) {
-          if (jokerCount.equals(1L)) {
-            return HandType.THREE_OF_A_KIND;
-          }
-          if (jokerCount.equals(2L)) {
-            return HandType.THREE_OF_A_KIND;
-          }
+        if (playWithJoker && (jokerCount.equals(1L) || jokerCount.equals(2L))) {
+          return HandType.THREE_OF_A_KIND;
         }
         return HandType.ONE_PAIR;
       }
 
-      return playWithJoker
-          ? jokerCount.equals(1L) ? HandType.ONE_PAIR : HandType.HIGH_CARD
-          : HandType.HIGH_CARD;
+      HandType highCardHandType = jokerCount.equals(1L) ? HandType.ONE_PAIR : HandType.HIGH_CARD;
+      return playWithJoker ? highCardHandType : HandType.HIGH_CARD;
     }
 
     boolean isFiveOfAKind() {
@@ -181,15 +178,14 @@ public class Day07 extends DaySolver<String> {
             IntStream.range(0, this.cards().size())
                 .filter(i -> !this.cards().get(i).equals(other.cards.get(i)))
                 .findFirst();
-        if (firstDifference.isPresent()) {
-          int index = firstDifference.getAsInt();
-          return cardsOrder
-              .get(this.cards.get(index))
-              .compareTo(cardsOrder.get(other.cards().get(index)));
 
-        } else {
-          return 0;
-        }
+        Optional<Integer> optional =
+            firstDifference.isPresent()
+                ? Optional.of(firstDifference.getAsInt())
+                : Optional.empty();
+        return optional
+            .map(index -> value(cardsOrder, index).compareTo(other.value(cardsOrder, index)))
+            .orElse(0);
       }
 
       return type - otherType;
@@ -198,7 +194,9 @@ public class Day07 extends DaySolver<String> {
 
   @Override
   public long solvePart02() {
-    List<Game> games = new ArrayList<>(this.puzzle.stream().map(this::parse).toList());
+    List<Game> games = new ArrayList<>(this.puzzle.stream().map(s -> {
+        return parse(s);
+    }).toList());
     log.debug("games: {}", games);
 
     games.sort(new GameComparator(true, this.cardsOrderWithJoker));
@@ -206,7 +204,7 @@ public class Day07 extends DaySolver<String> {
     games.stream().map(Game::cards).forEach(cards -> log.debug("card: {}", cards));
 
     return IntStream.range(0, games.size())
-        .mapToLong(index -> games.get(index).bid * (index + 1))
+        .mapToLong(index -> games.get(index).bid * (index + 1L))
         .reduce(0L, Long::sum);
   }
 
