@@ -43,11 +43,21 @@ public class Day08 extends DaySolver<String> {
     return searchFinish(start, s -> s.equals("ZZZ"));
   }
 
+  @Override
+  public long solvePart02() {
+    List<Node> start = this.nodes.stream().filter(n -> n.arrival().endsWith("A")).toList();
+    log.info("start: {}", start);
+
+    List<Long> list =
+        start.stream().map(current -> searchFinish(current, s -> s.endsWith("Z"))).toList();
+    log.info("list: {}", list);
+
+    return lcm(list);
+  }
+
   private long searchFinish(Node current, Predicate<String> predicate) {
     int count = 0;
     int result = 0;
-    IntStream.range(0, 30000).mapToObj(this::nextResult);
-
 
     while (result == 0) {
       for (String direction : this.leftRights) {
@@ -67,22 +77,6 @@ public class Day08 extends DaySolver<String> {
     return result;
   }
 
-  private Object nextResult(int i) {
-    return null;
-  }
-
-  @Override
-  public long solvePart02() {
-    List<Node> start = this.nodes.stream().filter(n -> n.arrival().endsWith("A")).toList();
-
-    log.info("start: {}", start);
-    List<Long> list =
-        start.stream().map(current -> searchFinish(current, s -> s.endsWith("Z"))).toList();
-    log.info("list: {}", list);
-
-    return lcm(list);
-  }
-
   Long lcm(List<Long> input) {
     return input.stream()
         .map(BigInteger::valueOf)
@@ -92,8 +86,7 @@ public class Day08 extends DaySolver<String> {
 
   public BigInteger lcm(BigInteger a, BigInteger b) {
     BigInteger gcd = a.gcd(b);
-    BigInteger absProduct = a.multiply(b).abs();
-    return absProduct.divide(gcd);
+    return a.multiply(b).divide(gcd);
   }
 
   public static void main(String[] args) {
