@@ -59,20 +59,20 @@ XXX = (XXX, XXX)
   }
 
   Day08 day081 = new Day08(List.of(""));
+
   @Test
   void lcm() {
-
-    assertThat(day081.lcm(2, 3)).isEqualTo(6);
     List<Integer> list = List.of(3, 4, 6);
-    int[] array = list.stream().mapToInt(i -> i).toArray();
+    BigInteger[] array =
+        list.stream().map(i -> new BigInteger(String.valueOf(i))).toArray(BigInteger[]::new);
     assertThat(day081.lcm(array)).isEqualTo(12);
   }
 
   @Test
-  public void testLCM() {
+  void testLCM() {
     BigInteger number1 = new BigInteger("12");
     BigInteger number2 = new BigInteger("18");
     BigInteger expectedLCM = new BigInteger("36");
-    assertThat(day081.lcm(number1,number2)).isEqualTo(expectedLCM);
+    assertThat(day081.lcm(number1, number2)).isEqualTo(expectedLCM);
   }
 }
