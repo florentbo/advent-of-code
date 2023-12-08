@@ -4,6 +4,7 @@ import be.bonamis.advent.DaySolver;
 import be.bonamis.advent.utils.FileHelper;
 import java.util.*;
 import java.util.ArrayList;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 
 import lombok.Getter;
@@ -33,39 +34,76 @@ public class Day08 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
-    Node start = this.nodes.stream().filter(n -> n.arrival().equals("AAA")).findFirst().orElseThrow();
-    String arrival = "ZZZ";
+    Node start =
+        this.nodes.stream().filter(n -> n.arrival().equals("AAA")).findFirst().orElseThrow();
+    String arrival =
+        this.nodes.stream()
+            .filter(n -> n.arrival().equals("ZZZ"))
+            .findFirst()
+            .map(Node::arrival)
+            .orElseThrow();
     log.debug("arrival: {}", arrival);
-    List<String> path = new ArrayList<>();
-    for (int i = 0; i < 1000; i++) {
-      path.addAll(this.leftRights);
-    }
+
     log.debug("start: {}", start);
 
-    return searchFinish(path, start, arrival);
+    return searchFinish(start, arrival);
   }
 
-  private int searchFinish(List<String> path, Node current, String arrival) {
-    for (int i = 0; i < path.size(); i++) {
-      String direction = path.get(i);
-      String next = direction.equals("R") ? current.right() : current.left();
-      log.debug("next: {}", next);
-      if (next.equals(arrival)) {
-        int result = i + 1;
-        log.debug("found: {} index: {}", arrival, result);
-        return result;
+  private int searchFinish(Node current, String arrival) {
+    int count = 0;
+    int result = 0;
+    while (result == 0) {
+      for (String direction : this.leftRights) {
+        String next = direction.equals("R") ? current.right() : current.left();
+        log.debug("next: {}", next);
+        if (next.equals(arrival)) {
+          result = count + 1;
+          log.debug("found: {} index: {}", arrival, result);
+        }
+        Node nextNode =
+            this.nodes.stream().filter(n -> n.arrival().equals(next)).findFirst().orElseThrow();
+        log.debug("nextNode: {}", nextNode);
+        current = nextNode;
+        count++;
       }
-      Node nextNode =
-          this.nodes.stream().filter(n -> n.arrival().equals(next)).findFirst().orElseThrow();
-      log.debug("nextNode: {}", nextNode);
-      current = nextNode;
     }
-    return 0;
+    return result;
   }
 
   @Override
   public long solvePart02() {
-    return this.puzzle.size() + 1;
+    Predicate<Node> arrivalPredicate = n -> n.arrival().endsWith("Z");
+    List<Node> start = this.nodes.stream().filter(n -> n.arrival().endsWith("A")).toList();
+    List<Node> arrival = this.nodes.stream().filter(arrivalPredicate).toList();
+
+    log.debug("start: {}", start);
+    log.debug("arrival: {}", arrival);
+    return findPart2bis(start, arrival);
+  }
+
+  private int findPart2bis(List<Node> current, List<Node> arrival) {
+    int count = 0;
+    int result = 0;
+    while (result == 0) {
+      for (String direction : this.leftRights) {
+        List<String> next =
+            current.stream().map(n -> direction.equals("R") ? n.right() : n.left()).toList();
+        log.debug("next: {}", next);
+        if (next.stream().allMatch(n -> n.endsWith("Z"))) {
+          result = count + 1;
+          log.debug("found: {} index: {}", arrival, result);
+        }
+        List<Node> nextNode = next.stream().map(this::findNext).toList();
+        log.debug("nextNode: {}", nextNode);
+        current = nextNode;
+        count++;
+      }
+    }
+    return result;
+  }
+
+  private Node findNext(String arrival) {
+    return this.nodes.stream().filter(n -> n.arrival().equals(arrival)).findFirst().orElseThrow();
   }
 
   public static void main(String[] args) {
@@ -73,7 +111,7 @@ public class Day08 extends DaySolver<String> {
     List<String> puzzle = Arrays.asList(content.split("\n"));
     Day08 day = new Day08(puzzle);
     log.info("solution part 1: {}", day.solvePart01());
-    log.info("solution part 2: {}", day.solvePart02());
+    // log.info("solution part 2: {}", day.solvePart02());
   }
 
   public record Node(String arrival, String left, String right) {}
