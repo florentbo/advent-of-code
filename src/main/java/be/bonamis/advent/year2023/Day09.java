@@ -4,6 +4,7 @@ import be.bonamis.advent.DaySolver;
 import be.bonamis.advent.utils.FileHelper;
 
 import java.util.*;
+import java.util.function.BinaryOperator;
 import java.util.function.Predicate;
 import java.util.stream.*;
 
@@ -29,18 +30,15 @@ public class Day09 extends DaySolver<String> {
   }
 
   long solveLine2(String line) {
-    List<Long> list =
-        new ArrayList<>(differences(line).stream().mapToLong(this::first).boxed().toList());
-    log.debug("{}", list);
-    Collections.reverse(list);
-    log.debug("{}", list);
+    List<Long> firstElements = differences(line).stream().mapToLong(this::first).boxed().toList();
 
-    for (int i = 1; i < list.size(); i++) {
-      list.set(i, list.get(i) - list.get(i - 1));
-    }
-    log.debug(" final list {}", list);
+    Long reduce =
+        IntStream.range(0, firstElements.size())
+            .mapToObj(i -> firstElements.get(firstElements.size() - 1 - i))
+            .reduce(0L, (a, b) -> b - a);
+    log.debug("reduce {}", reduce);
 
-    return last(list);
+    return reduce;
   }
 
   long solveLine(String line) {
