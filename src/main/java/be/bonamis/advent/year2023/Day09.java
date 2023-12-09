@@ -32,16 +32,18 @@ public class Day09 extends DaySolver<String> {
     List<List<Long>> list = new ArrayList<>();
     list.add(originalList);
 
-    log.debug("{}", originalList);
+    log.debug("input {}", originalList);
     List<Long> list1 = differences(originalList);
-    Long sum = getSum(list1);
-    while (sum != 0) {
+    boolean allZero = allZero(list1);
+    while (!allZero) {
       list.add(list1);
       list1 = differences(list1);
-      sum = getSum(list1);
+      log.debug("input {}", list1);
+      allZero = allZero(list1);
+      log.debug("allZero {}", allZero);
     }
     list.add(list1);
-    log.debug("{}", list);
+    list.forEach(l -> log.debug("{}", l));
 
     return list.stream().mapToLong(this::last).sum();
   }
@@ -50,8 +52,8 @@ public class Day09 extends DaySolver<String> {
     return list.get(list.size() - 1);
   }
 
-  private Long getSum(List<Long> list1) {
-    return list1.stream().reduce(Long::sum).orElseThrow();
+  private boolean allZero(List<Long> list) {
+    return list.stream().allMatch(Predicate.isEqual(0L));
   }
 
   private List<Long> differences(List<Long> list) {
