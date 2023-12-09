@@ -2,10 +2,11 @@ package be.bonamis.advent.year2023;
 
 import be.bonamis.advent.DaySolver;
 import be.bonamis.advent.utils.FileHelper;
-import java.math.*;
+
 import java.util.*;
 import java.util.function.Predicate;
 import java.util.stream.*;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,32 +25,60 @@ public class Day09 extends DaySolver<String> {
 
   @Override
   public long solvePart02() {
-    return this.puzzle.size() + 1;
+    return this.puzzle.stream().map(this::solveLine2).reduce(0L, Long::sum);
+  }
+
+  long solveLine2(String line) {
+    List<Long> list =
+        new ArrayList<>(differences(line).stream().mapToLong(this::first).boxed().toList());
+    log.debug("{}", list);
+    Collections.reverse(list);
+    log.debug("{}", list);
+
+    for (int i = 1; i < list.size(); i++) {
+      list.set(i, list.get(i) - list.get(i - 1));
+    }
+    log.debug(" final list {}", list);
+
+    return last(list);
   }
 
   long solveLine(String line) {
+    List<List<Long>> list = differences(line);
+    list.forEach(l -> log.debug("{}", l));
+
+    return list.stream().mapToLong(this::last).sum();
+  }
+
+  private List<List<Long>> differences(String line) {
     List<Long> originalList = Arrays.stream(line.split("\\s+")).map(Long::parseLong).toList();
     List<List<Long>> list = new ArrayList<>();
     list.add(originalList);
 
     log.debug("input {}", originalList);
     List<Long> list1 = differences(originalList);
-    boolean allZero = allZero(list1);
-    while (!allZero) {
+    boolean notContainsOnlyZero = notContainsOnlyZero(list1);
+    while (notContainsOnlyZero) {
       list.add(list1);
       list1 = differences(list1);
       log.debug("input {}", list1);
-      allZero = allZero(list1);
-      log.debug("allZero {}", allZero);
+      notContainsOnlyZero = notContainsOnlyZero(list1);
+      log.debug("containsOnlyZero {}", notContainsOnlyZero);
     }
     list.add(list1);
-    list.forEach(l -> log.debug("{}", l));
+    return list;
+  }
 
-    return list.stream().mapToLong(this::last).sum();
+  private boolean notContainsOnlyZero(List<Long> list) {
+    return !allZero(list);
   }
 
   long last(List<Long> list) {
     return list.get(list.size() - 1);
+  }
+
+  long first(List<Long> list) {
+    return list.get(0);
   }
 
   private boolean allZero(List<Long> list) {
