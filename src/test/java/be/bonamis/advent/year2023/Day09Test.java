@@ -1,0 +1,60 @@
+package be.bonamis.advent.year2023;
+
+import static org.assertj.core.api.Assertions.assertThat;
+
+import be.bonamis.advent.utils.FileHelper;
+import java.math.BigInteger;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.IntStream;
+
+import lombok.extern.slf4j.Slf4j;
+import org.junit.jupiter.api.*;
+
+@Slf4j
+class Day09Test {
+
+  private Day09 day09;
+
+  @Test
+  void solvePart01() {
+
+    String text = """
+0 3 6 9 12 15
+1 3 6 10 15 21
+10 13 16 21 30 45
+""";
+    day09 = new Day09(Arrays.asList(text.split("\n")));
+
+    assertThat(day09.solvePart01()).isEqualTo(114);
+  }
+
+  @Test
+  void solveLine() {
+    String text = """
+0 3 6 9 12 15
+1 3 6 10 15 21
+10 13 16 21 30 45
+""";
+    day09 = new Day09(Arrays.asList(text.split("\n")));
+    String line = "10  13  16  21  30  45";
+    long result = day09.solveLine(line);
+    log.debug("{}", result);
+    assertThat(result).isEqualTo(68);
+  }
+
+
+
+  @Test
+  void solvePart02() {
+    String text = """
+0 3 6 9 12 15
+1 3 6 10 15 21
+10 13 16 21 30 45
+""";
+    day09 = new Day09(Arrays.asList(text.split("\n")));
+    assertThat(day09.solvePart02()).isEqualTo(4);
+  }
+}
