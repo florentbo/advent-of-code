@@ -1,14 +1,21 @@
 package be.bonamis.advent.year2023;
 
+import static be.bonamis.advent.utils.marsrover.Rover.Command.FORWARD;
+import static be.bonamis.advent.utils.marsrover.Rover.Direction.*;
 import static org.assertj.core.api.Assertions.*;
 
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import be.bonamis.advent.common.CharGrid;
+import be.bonamis.advent.utils.marsrover.Position;
+import be.bonamis.advent.utils.marsrover.Rover;
+import be.bonamis.advent.utils.marsrover.Rover.Direction;
 import lombok.extern.slf4j.*;
+import org.assertj.core.util.Sets;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
@@ -18,21 +25,17 @@ import org.junit.jupiter.api.*;
 
 @Slf4j
 class Day10Test {
-  private Day10 day10;
-
-  @Test
-  void solvePart01() {
-    String text = """
+  private final String squareLoopText = """
 .....
 .S-7.
 .|.|.
 .L-J.
 .....
 """;
-    day10 = new Day10(Arrays.asList(text.split("\n")));
-    List<String> lines = Arrays.asList(text.split("\n"));
 
-    CharGrid grid = new CharGrid(lines.stream().map(String::toCharArray).toArray(char[][]::new));
+  @Test
+  void solvePart01() {
+    CharGrid grid = grid(squareLoopText);
     final var source = getPoint(grid, 'S');
     log.debug("source {}", source);
     List<Point> neighbours = grid.neighbours(source, false);
@@ -53,6 +56,11 @@ class Day10Test {
     assertThat(result).isEqualTo(4);
   }
 
+  private CharGrid grid(String text) {
+    return new CharGrid(
+        Arrays.asList(text.split("\n")).stream().map(String::toCharArray).toArray(char[][]::new));
+  }
+
   private void addEdge(
       Graph<Point, DefaultEdge> graph, Point point, CharGrid grid, Point source, Point sink) {
     for (Point neighbour : grid.neighbours(point, false)) {
@@ -61,6 +69,23 @@ class Day10Test {
         graph.addEdge(point, neighbour);
       }
     }
+  }
+
+  private Set<Point> allowedDirections(Point point, CharGrid grid, Direction... directions) {
+    return Arrays.stream(directions)
+        .map(
+            direction -> {
+              Position position =
+                  new Rover(NORTH, new Position(point.x, point.y)).move(FORWARD).position();
+              return new Point(position.x(), position.y());
+            })
+        .collect(Collectors.toSet());
+  }
+
+  @Test
+  void allowedDirections() {
+    CharGrid grid = grid(squareLoopText);
+    assertThat(allowedDirections(new Point(1, 1), grid, NORTH)).contains(new Point(1, 2));
   }
 
   private boolean canGo(Point neighbour, CharGrid grid) {
@@ -82,7 +107,7 @@ class Day10Test {
 1 3 6 10 15 21
 10 13 16 21 30 45
 """;
-    day10 = new Day10(Arrays.asList(text.split("\n")));
+    Day10 day10 = new Day10(Arrays.asList(text.split("\n")));
     assertThat(day10.solvePart02()).isEqualTo(4);
   }
 }
