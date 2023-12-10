@@ -20,18 +20,21 @@ public record Rover(Direction facingDirection, Position position) {
               this.position().x() - this.facingDirection().getForwardMoveX(),
               this.position().y() - this.facingDirection().getForwardMoveY()));
     } else {
-      Direction newFacingDirection = null;
-      switch (facingDirection) {
-        case NORTH -> newFacingDirection = Direction.WEST;
-        case SOUTH -> newFacingDirection = Direction.EAST;
-        case WEST -> newFacingDirection = Direction.SOUTH;
-        case EAST -> newFacingDirection = Direction.NORTH;
-      }
+      Direction newFacingDirection = newDirection();
       if (Objects.equals(command, "r")) {
         newFacingDirection = newFacingDirection.inverse();
       }
       return new Rover(newFacingDirection, new Position(this.position().x(), this.position().y()));
     }
+  }
+
+  private Direction newDirection() {
+    return switch (facingDirection) {
+      case NORTH -> Direction.WEST;
+      case SOUTH -> Direction.EAST;
+      case WEST -> Direction.SOUTH;
+      case EAST -> Direction.NORTH;
+    };
   }
 
   @Getter
