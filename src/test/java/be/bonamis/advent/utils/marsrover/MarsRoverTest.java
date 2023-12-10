@@ -24,7 +24,7 @@ class MarsRoverTest {
   @Test
   void aRoverHasAnInitialFacingDirection() {
     Rover rover = initialRover();
-    assertThat(rover.facingDirection()).isEqualTo(NORTH);
+    assertThat(rover.direction()).isEqualTo(NORTH);
   }
 
   private Rover initialRover() {
