@@ -1,6 +1,6 @@
 package be.bonamis.advent.utils.marsrover;
 
-import static be.bonamis.advent.utils.marsrover.FacingDirection.*;
+import static be.bonamis.advent.utils.marsrover.Direction.*;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

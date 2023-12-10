@@ -2,7 +2,7 @@ package be.bonamis.advent.utils.marsrover;
 
 import java.util.Objects;
 
-public record Rover(FacingDirection facingDirection, Position position) {
+public record Rover(Direction facingDirection, Position position) {
   public Rover move(String command) {
 
     if (Objects.equals(command, "f")) {
@@ -18,12 +18,12 @@ public record Rover(FacingDirection facingDirection, Position position) {
               this.position().x() - this.facingDirection().getForwardMoveX(),
               this.position().y() - this.facingDirection().getForwardMoveY()));
     } else {
-      FacingDirection newFacingDirection = null;
+      Direction newFacingDirection = null;
       switch (facingDirection) {
-        case NORTH -> newFacingDirection = FacingDirection.WEST;
-        case SOUTH -> newFacingDirection = FacingDirection.EAST;
-        case WEST -> newFacingDirection = FacingDirection.SOUTH;
-        case EAST -> newFacingDirection = FacingDirection.NORTH;
+        case NORTH -> newFacingDirection = Direction.WEST;
+        case SOUTH -> newFacingDirection = Direction.EAST;
+        case WEST -> newFacingDirection = Direction.SOUTH;
+        case EAST -> newFacingDirection = Direction.NORTH;
       }
       if (Objects.equals(command, "r")) {
         newFacingDirection = newFacingDirection.inverse();

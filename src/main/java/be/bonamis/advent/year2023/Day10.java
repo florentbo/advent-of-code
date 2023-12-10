@@ -1,22 +1,17 @@
 package be.bonamis.advent.year2023;
 
 import be.bonamis.advent.DaySolver;
-import be.bonamis.advent.common.CharGrid;
 import be.bonamis.advent.utils.FileHelper;
 
-import java.awt.*;
-import java.lang.invoke.MethodHandles;
 import java.util.*;
 import java.util.List;
-import java.util.function.*;
-import java.util.stream.*;
 
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import static be.bonamis.advent.utils.marsrover.FacingDirection.NORTH;
+import static be.bonamis.advent.utils.marsrover.Direction.NORTH;
 
 @Slf4j
 @Getter
