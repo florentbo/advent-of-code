@@ -15,7 +15,6 @@ import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
 import be.bonamis.advent.utils.marsrover.Rover.Direction;
 import lombok.extern.slf4j.*;
-import org.assertj.core.util.Sets;
 import org.jgrapht.Graph;
 import org.jgrapht.GraphPath;
 import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
@@ -58,14 +57,14 @@ class Day10Test {
 
   private CharGrid grid(String text) {
     return new CharGrid(
-        Arrays.asList(text.split("\n")).stream().map(String::toCharArray).toArray(char[][]::new));
+        Arrays.stream(text.split("\n")).map(String::toCharArray).toArray(char[][]::new));
   }
 
   private void addEdge(
       Graph<Point, DefaultEdge> graph, Point point, CharGrid grid, Point source, Point sink) {
     for (Point neighbour : grid.neighbours(point, false)) {
       boolean start = point.equals(source) && neighbour.equals(sink);
-      if (!start && canGo(neighbour, grid)) {
+      if (!start && isNotDot(neighbour, grid)) {
         graph.addEdge(point, neighbour);
       }
     }
@@ -75,21 +74,35 @@ class Day10Test {
     return Arrays.stream(directions)
         .map(
             direction -> {
-              Position position =
-                  new Rover(NORTH, new Position(point.x, point.y)).move(FORWARD).position();
+              Position position = position(point, direction.verticalInverse());
               return new Point(position.x(), position.y());
             })
+        .filter(p -> isNotDot(p, grid))
+        .filter(grid.isInTheGrid())
         .collect(Collectors.toSet());
+  }
+
+  private Position position(Point point, Direction direction) {
+    return new Rover(direction, new Position(point.x, point.y)).move(FORWARD).position();
   }
 
   @Test
   void allowedDirections() {
     CharGrid grid = grid(squareLoopText);
-    assertThat(allowedDirections(new Point(1, 1), grid, NORTH)).contains(new Point(1, 2));
+    assertThat(allowedDirections(new Point(1, 2), grid, NORTH)).containsExactly(new Point(1, 1));
+    assertThat(allowedDirections(new Point(1, 2), grid, SOUTH)).containsExactly(new Point(1, 3));
+    assertThat(allowedDirections(new Point(1, 2), grid, WEST)).isEmpty();
+    assertThat(allowedDirections(new Point(1, 2), grid, EAST)).isEmpty();
+
+    assertThat(allowedDirections(new Point(1, 1), grid, EAST)).containsExactly(new Point(2, 1));
+    assertThat(allowedDirections(new Point(3, 1), grid, WEST)).containsExactly(new Point(2, 1));
+
+    assertThat(allowedDirections(new Point(1, 1), grid, EAST, SOUTH))
+        .containsExactlyInAnyOrder(new Point(1, 2), new Point(2, 1));
   }
 
-  private boolean canGo(Point neighbour, CharGrid grid) {
-    return grid.get(neighbour) != '.';
+  private boolean isNotDot(Point point, CharGrid grid) {
+    return grid.get(point) != '.';
   }
 
   private static Point getPoint(CharGrid grid, char c) {

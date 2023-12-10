@@ -76,5 +76,14 @@ public record Rover(Direction direction, Position position) {
         case EAST -> Direction.WEST;
       };
     }
+
+    public Direction verticalInverse() {
+      return switch (this) {
+        case NORTH -> Direction.SOUTH;
+        case SOUTH -> Direction.NORTH;
+        case WEST -> Direction.WEST;
+        case EAST -> Direction.EAST;
+      };
+    }
   }
 }
