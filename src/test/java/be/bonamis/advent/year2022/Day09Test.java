@@ -13,7 +13,7 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static be.bonamis.advent.utils.FileHelper.getLines;
-import static be.bonamis.advent.utils.marsrover.Direction.*;
+import static be.bonamis.advent.utils.marsrover.Rover.Direction.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 class Day09Test {
