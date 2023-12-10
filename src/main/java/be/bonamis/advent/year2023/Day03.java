@@ -41,14 +41,14 @@ public class Day03 extends DaySolver<String> {
   record Engine(List<Point> points) {
     boolean isPartNumber(CharGrid grid) {
       return this.points.stream()
-          .flatMap(point -> grid.neighbours(point).stream())
+          .flatMap(point -> grid.neighbours(point, true).stream())
           .filter(o -> !this.points.contains(o))
           .anyMatch(o -> isSymbol(grid.get(o)));
     }
 
     List<Point> gearPoints(CharGrid grid) {
       return this.points.stream()
-          .flatMap(point -> grid.neighbours(point).stream())
+          .flatMap(point -> grid.neighbours(point, true).stream())
           .filter(o -> !this.points.contains(o))
           .filter(o -> isGearSymbol(grid.get(o)))
           .toList();

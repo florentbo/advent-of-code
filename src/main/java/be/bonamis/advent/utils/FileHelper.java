@@ -3,6 +3,7 @@ package be.bonamis.advent.utils;
 import static java.util.stream.Collectors.toList;
 
 import java.io.IOException;
+import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -54,5 +55,17 @@ public class FileHelper {
 
     private static Path getPath(String name) throws URISyntaxException {
         return Paths.get(ClassLoader.getSystemResource(name).toURI());
+    }
+
+    public static String content() {
+      Class<?> aClass = MethodHandles.lookup().lookupClass();
+      String name = aClass.getSimpleName();
+      int length = "day".length();
+      String dayAsString = name.substring(length, length + 2);
+      String packageName = aClass.getPackage().getName();
+      int packageLength = packageName.length();
+      String year = packageName.substring(packageLength - 4, packageLength);
+
+      return content(String.format("%1$s/%2$s/%1$s_%2$s_input.txt", year, dayAsString));
     }
 }

@@ -74,16 +74,19 @@ public class CharGrid {
     return lines;
   }
 
-  public List<Point> neighbours(Point point) {
+  public List<Point> neighbours(Point point, boolean withDiagonals) {
     List<Point> neighbours = new ArrayList<>();
-    neighbours.add(new Point(point.x - 1, point.y - 1));
     neighbours.add(new Point(point.x - 1, point.y));
-    neighbours.add(new Point(point.x - 1, point.y + 1));
+    neighbours.add(new Point(point.x + 1, point.y));
     neighbours.add(new Point(point.x, point.y - 1));
     neighbours.add(new Point(point.x, point.y + 1));
-    neighbours.add(new Point(point.x + 1, point.y));
-    neighbours.add(new Point(point.x + 1, point.y - 1));
-    neighbours.add(new Point(point.x + 1, point.y + 1));
+
+    if (withDiagonals) {
+      neighbours.add(new Point(point.x - 1, point.y - 1));
+      neighbours.add(new Point(point.x - 1, point.y + 1));
+      neighbours.add(new Point(point.x + 1, point.y - 1));
+      neighbours.add(new Point(point.x + 1, point.y + 1));
+    }
     return neighbours.stream()
         .filter(
             p ->
