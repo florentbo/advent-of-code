@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.stream.Stream;
 
+import be.bonamis.advent.utils.marsrover.Rover.Command;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
@@ -30,12 +31,10 @@ class MarsRoverTest {
     return new Rover(NORTH, new Position(0, 0));
   }
 
-  // lesson 1 record force us to have a contract
-
   @ParameterizedTest
   @MethodSource("provideRovers")
   void isBlank_ShouldReturnTrueForNullOrBlankStrings2(
-      Rover initialRover, String command, Rover expected) {
+      Rover initialRover, Command command, Rover expected) {
     Rover movedRover = initialRover.move(command);
     assertEquals(expected, movedRover);
   }
@@ -43,35 +42,62 @@ class MarsRoverTest {
   private static Stream<Arguments> provideRovers() {
     return Stream.of(
         Arguments.of(
-            new Rover(NORTH, new Position(0, 0)), "f", new Rover(NORTH, new Position(0, 1))),
+            new Rover(NORTH, new Position(0, 0)),
+            Command.FORWARD,
+            new Rover(NORTH, new Position(0, 1))),
         Arguments.of(
-            new Rover(SOUTH, new Position(0, 0)), "f", new Rover(SOUTH, new Position(0, -1))),
+            new Rover(SOUTH, new Position(0, 0)),
+            Command.FORWARD,
+            new Rover(SOUTH, new Position(0, -1))),
         Arguments.of(
-            new Rover(WEST, new Position(0, 0)), "f", new Rover(WEST, new Position(-1, 0))),
-        Arguments.of(new Rover(EAST, new Position(0, 0)), "f", new Rover(EAST, new Position(1, 0))),
+            new Rover(WEST, new Position(0, 0)),
+            Command.FORWARD,
+            new Rover(WEST, new Position(-1, 0))),
         Arguments.of(
-            new Rover(NORTH, new Position(0, 0)), "l", new Rover(WEST, new Position(0, 0))),
+            new Rover(EAST, new Position(0, 0)),
+            Command.FORWARD,
+            new Rover(EAST, new Position(1, 0))),
         Arguments.of(
-            new Rover(WEST, new Position(0, 0)), "l", new Rover(SOUTH, new Position(0, 0))),
+            new Rover(NORTH, new Position(0, 0)),
+            Command.LEFT,
+            new Rover(WEST, new Position(0, 0))),
         Arguments.of(
-            new Rover(SOUTH, new Position(0, 0)), "l", new Rover(EAST, new Position(0, 0))),
+            new Rover(WEST, new Position(0, 0)),
+            Command.LEFT,
+            new Rover(SOUTH, new Position(0, 0))),
         Arguments.of(
-            new Rover(EAST, new Position(0, 0)), "l", new Rover(NORTH, new Position(0, 0))),
+            new Rover(SOUTH, new Position(0, 0)),
+            Command.LEFT,
+            new Rover(EAST, new Position(0, 0))),
         Arguments.of(
-            new Rover(NORTH, new Position(0, 0)), "r", new Rover(EAST, new Position(0, 0))),
+            new Rover(EAST, new Position(0, 0)),
+            Command.LEFT,
+            new Rover(NORTH, new Position(0, 0))),
         Arguments.of(
-            new Rover(EAST, new Position(0, 0)), "r", new Rover(SOUTH, new Position(0, 0))),
+            new Rover(NORTH, new Position(0, 0)),
+            Command.RIGHT,
+            new Rover(EAST, new Position(0, 0))),
         Arguments.of(
-            new Rover(SOUTH, new Position(0, 0)), "r", new Rover(WEST, new Position(0, 0))),
+            new Rover(EAST, new Position(0, 0)),
+            Command.RIGHT,
+            new Rover(SOUTH, new Position(0, 0))),
         Arguments.of(
-            new Rover(WEST, new Position(0, 0)), "r", new Rover(NORTH, new Position(0, 0))),
+            new Rover(SOUTH, new Position(0, 0)),
+            Command.RIGHT,
+            new Rover(WEST, new Position(0, 0))),
         Arguments.of(
-            new Rover(NORTH, new Position(0, 0)), "b", new Rover(NORTH, new Position(0, -1))));
+            new Rover(WEST, new Position(0, 0)),
+            Command.RIGHT,
+            new Rover(NORTH, new Position(0, 0))),
+        Arguments.of(
+            new Rover(NORTH, new Position(0, 0)),
+            Command.BACKWARD,
+            new Rover(NORTH, new Position(0, -1))));
   }
 
   @ParameterizedTest
   @MethodSource("provideRoversFotTwoMoves")
-  void moveTwice(Rover initialRover, String command01, String command02, Rover expected) {
+  void moveTwice(Rover initialRover, Command command01, Command command02, Rover expected) {
     Rover movedRover = initialRover.move(command01);
     Rover movedRoverTwice = movedRover.move(command02);
     assertEquals(expected, movedRoverTwice);
@@ -80,18 +106,39 @@ class MarsRoverTest {
   private static Stream<Arguments> provideRoversFotTwoMoves() {
     return Stream.of(
         Arguments.of(
-            new Rover(NORTH, new Position(0, 0)), "f", "f", new Rover(NORTH, new Position(0, 2))),
+            new Rover(NORTH, new Position(0, 0)),
+            Command.FORWARD,
+            Command.FORWARD,
+            new Rover(NORTH, new Position(0, 2))),
         Arguments.of(
-            new Rover(SOUTH, new Position(0, 0)), "f", "f", new Rover(SOUTH, new Position(0, -2))),
+            new Rover(SOUTH, new Position(0, 0)),
+            Command.FORWARD,
+            Command.FORWARD,
+            new Rover(SOUTH, new Position(0, -2))),
         Arguments.of(
-            new Rover(WEST, new Position(0, 0)), "f", "f", new Rover(WEST, new Position(-2, 0))),
+            new Rover(WEST, new Position(0, 0)),
+            Command.FORWARD,
+            Command.FORWARD,
+            new Rover(WEST, new Position(-2, 0))),
         Arguments.of(
-            new Rover(EAST, new Position(0, 0)), "f", "f", new Rover(EAST, new Position(2, 0))),
+            new Rover(EAST, new Position(0, 0)),
+            Command.FORWARD,
+            Command.FORWARD,
+            new Rover(EAST, new Position(2, 0))),
         Arguments.of(
-            new Rover(NORTH, new Position(0, 0)), "r", "r", new Rover(SOUTH, new Position(0, 0))),
+            new Rover(NORTH, new Position(0, 0)),
+            Command.RIGHT,
+            Command.RIGHT,
+            new Rover(SOUTH, new Position(0, 0))),
         Arguments.of(
-            new Rover(NORTH, new Position(0, 0)), "f", "r", new Rover(EAST, new Position(0, 1))),
+            new Rover(NORTH, new Position(0, 0)),
+            Command.FORWARD,
+            Command.RIGHT,
+            new Rover(EAST, new Position(0, 1))),
         Arguments.of(
-            new Rover(EAST, new Position(5, 7)), "f", "r", new Rover(SOUTH, new Position(6, 7))));
+            new Rover(EAST, new Position(5, 7)),
+            Command.FORWARD,
+            Command.RIGHT,
+            new Rover(SOUTH, new Position(6, 7))));
   }
 }

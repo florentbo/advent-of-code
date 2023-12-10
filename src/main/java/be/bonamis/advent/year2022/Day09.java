@@ -53,7 +53,7 @@ public class Day09 extends DaySolver<String> {
         previousRoverAfterPivoting =
             new Rover(path.facingDirection(), previousRoverAfterPivoting.position());
         for (int i = 0; i < path.length(); i++) {
-          previousRoverAfterPivoting = previousRoverAfterPivoting.move("f");
+          previousRoverAfterPivoting = previousRoverAfterPivoting.move(Rover.Command.FORWARD);
           Position headNewPosition = previousRoverAfterPivoting.position();
           previousTail = handlingTail(previousTail, path, previousPath, headNewPosition);
           this.positions.add(headNewPosition);
@@ -82,9 +82,9 @@ public class Day09 extends DaySolver<String> {
         return previous;
       }
       Rover beforeFirstDiagMove = new Rover(previousPath.facingDirection(), previousTail);
-      Rover firstDiagMove = beforeFirstDiagMove.move("f");
+      Rover firstDiagMove = beforeFirstDiagMove.move(Rover.Command.FORWARD);
       Rover rover2 = new Rover(path.facingDirection(), firstDiagMove.position());
-      return rover2.move("f").position();
+      return rover2.move(Rover.Command.FORWARD).position();
     }
 
     public Rope move(WirePath... paths) {

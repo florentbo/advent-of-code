@@ -5,26 +5,31 @@ import lombok.Getter;
 import java.util.Objects;
 
 public record Rover(Direction facingDirection, Position position) {
-  public Rover move(String command) {
+  public Rover move(Command command) {
 
-    if (Objects.equals(command, "f")) {
-      return new Rover(
-          facingDirection,
-          new Position(
-              this.position().x() + this.facingDirection().getForwardMoveX(),
-              this.position().y() + this.facingDirection().getForwardMoveY()));
-    } else if (Objects.equals(command, "b")) {
-      return new Rover(
-          facingDirection,
-          new Position(
-              this.position().x() - this.facingDirection().getForwardMoveX(),
-              this.position().y() - this.facingDirection().getForwardMoveY()));
-    } else {
-      Direction newFacingDirection = newDirection();
-      if (Objects.equals(command, "r")) {
-        newFacingDirection = newFacingDirection.inverse();
+    switch (command) {
+      case FORWARD -> {
+        return new Rover(
+            facingDirection,
+            new Position(
+                this.position().x() + this.facingDirection().getForwardMoveX(),
+                this.position().y() + this.facingDirection().getForwardMoveY()));
       }
-      return new Rover(newFacingDirection, new Position(this.position().x(), this.position().y()));
+      case BACKWARD -> {
+        return new Rover(
+            facingDirection,
+            new Position(
+                this.position().x() - this.facingDirection().getForwardMoveX(),
+                this.position().y() - this.facingDirection().getForwardMoveY()));
+      }
+      default -> {
+        Direction newFacingDirection = newDirection();
+        if (Objects.equals(command, Command.RIGHT)) {
+          newFacingDirection = newFacingDirection.inverse();
+        }
+        return new Rover(
+            newFacingDirection, new Position(this.position().x(), this.position().y()));
+      }
     }
   }
 
@@ -35,6 +40,17 @@ public record Rover(Direction facingDirection, Position position) {
       case WEST -> Direction.SOUTH;
       case EAST -> Direction.NORTH;
     };
+  }
+
+  @Getter
+  public enum Command {
+    FORWARD,
+
+    BACKWARD,
+
+    LEFT,
+
+    RIGHT
   }
 
   @Getter
