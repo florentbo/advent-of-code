@@ -4,6 +4,7 @@ import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -87,13 +88,11 @@ public class CharGrid {
       neighbours.add(new Point(point.x + 1, point.y - 1));
       neighbours.add(new Point(point.x + 1, point.y + 1));
     }
-    return neighbours.stream()
-        .filter(
-            p ->
-                p.getX() >= 0
-                    && p.getY() >= 0
-                    && p.getX() < this.getHeight()
-                    && p.getY() < this.getWidth())
-        .toList();
+    return neighbours.stream().filter(isInTheGrid()).toList();
+  }
+
+  public Predicate<Point> isInTheGrid() {
+    return p ->
+        p.getX() >= 0 && p.getY() >= 0 && p.getX() < this.getHeight() && p.getY() < this.getWidth();
   }
 }
