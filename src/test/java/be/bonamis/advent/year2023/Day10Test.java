@@ -31,34 +31,40 @@ class Day10Test {
 """;
     day10 = new Day10(Arrays.asList(text.split("\n")));
     List<String> lines = Arrays.asList(text.split("\n"));
+
     CharGrid grid = new CharGrid(lines.stream().map(String::toCharArray).toArray(char[][]::new));
     final var source = getPoint(grid, 'S');
     log.debug("source {}", source);
     List<Point> neighbours = grid.neighbours(source, false);
     assertThat(neighbours).hasSize(4);
-    neighbours.forEach(p -> log.debug("neighbour {} value {}", p, grid.get(p)));
-    final var sink = getPoint(grid, 'J');
-    //Point sink = neighbours.stream().filter(p -> grid.get(p) == 'J').findFirst().orElseThrow();
+    final var sink = neighbours.stream().filter(p -> grid.get(p) != '.').findFirst().orElseThrow();
     log.debug("sink {}", sink);
 
     Graph<Point, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
     grid.consume(graph::addVertex);
-    grid.consume(point -> addEdge(graph, point, grid));
+    grid.consume(point -> addEdge(graph, point, grid, source, sink));
 
     DijkstraShortestPath<Point, DefaultEdge> shortestPath = new DijkstraShortestPath<>(graph);
     GraphPath<Point, DefaultEdge> path = shortestPath.getPath(source, sink);
     List<Point> vertexList = path.getVertexList();
+    int result = vertexList.size() / 2;
+    log.debug("solution size: {}", result);
     vertexList.forEach(p -> log.debug("vertex {}", p));
-
-    // final var sink = getPoint(grid, 'E');
-
-    // assertThat(day10.solvePart01()).isEqualTo(4);
+    assertThat(result).isEqualTo(4);
   }
 
-  private void addEdge(Graph<Point, DefaultEdge> graph, Point point, CharGrid grid) {
+  private void addEdge(
+      Graph<Point, DefaultEdge> graph, Point point, CharGrid grid, Point source, Point sink) {
     for (Point neighbour : grid.neighbours(point, false)) {
-      graph.addEdge(point, neighbour);
+      boolean start = point.equals(source) && neighbour.equals(sink);
+      if (!start && canGo(neighbour, grid)) {
+        graph.addEdge(point, neighbour);
+      }
     }
+  }
+
+  private boolean canGo(Point neighbour, CharGrid grid) {
+    return grid.get(neighbour) != '.';
   }
 
   private static Point getPoint(CharGrid grid, char c) {
