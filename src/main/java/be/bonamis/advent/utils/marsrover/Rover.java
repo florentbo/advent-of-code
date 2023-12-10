@@ -4,23 +4,23 @@ import lombok.Getter;
 
 import java.util.Objects;
 
-public record Rover(Direction facingDirection, Position position) {
+public record Rover(Direction direction, Position position) {
   public Rover move(Command command) {
 
     switch (command) {
       case FORWARD -> {
         return new Rover(
-            facingDirection,
+                direction,
             new Position(
-                this.position().x() + this.facingDirection().getForwardMoveX(),
-                this.position().y() + this.facingDirection().getForwardMoveY()));
+                this.position().x() + this.direction().getForwardMoveX(),
+                this.position().y() + this.direction().getForwardMoveY()));
       }
       case BACKWARD -> {
         return new Rover(
-            facingDirection,
+                direction,
             new Position(
-                this.position().x() - this.facingDirection().getForwardMoveX(),
-                this.position().y() - this.facingDirection().getForwardMoveY()));
+                this.position().x() - this.direction().getForwardMoveX(),
+                this.position().y() - this.direction().getForwardMoveY()));
       }
       default -> {
         Direction newFacingDirection = newDirection();
@@ -34,7 +34,7 @@ public record Rover(Direction facingDirection, Position position) {
   }
 
   private Direction newDirection() {
-    return switch (facingDirection) {
+    return switch (direction) {
       case NORTH -> Direction.WEST;
       case SOUTH -> Direction.EAST;
       case WEST -> Direction.SOUTH;

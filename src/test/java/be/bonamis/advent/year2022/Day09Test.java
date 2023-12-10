@@ -32,7 +32,7 @@ class Day09Test {
 
         Day09.Rope wireAfterFirstMove = rope.move(WirePath.of("R4"));
         Rover movedRover = wireAfterFirstMove.head();
-        assertThat(movedRover.facingDirection()).isEqualTo(EAST);
+        assertThat(movedRover.direction()).isEqualTo(EAST);
         assertThat(movedRover.position()).isEqualTo(new Position(4, 0));
 
         assertThat(wireAfterFirstMove.positions()).containsExactlyInAnyOrder(
