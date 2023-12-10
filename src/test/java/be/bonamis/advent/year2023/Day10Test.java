@@ -63,6 +63,10 @@ class Day10Test {
     }
   }
 
+
+
+
+
   private boolean canGo(Point neighbour, CharGrid grid) {
     return grid.get(neighbour) != '.';
   }

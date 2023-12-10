@@ -1,14 +1,14 @@
 package be.bonamis.advent.year2022;
 
 import be.bonamis.advent.DaySolver;
-import be.bonamis.advent.utils.marsrover.FacingDirection;
+import be.bonamis.advent.utils.marsrover.Direction;
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import static be.bonamis.advent.utils.marsrover.FacingDirection.*;
+import static be.bonamis.advent.utils.marsrover.Direction.*;
 
 public class Day09 extends DaySolver<String> {
 
@@ -92,7 +92,7 @@ public class Day09 extends DaySolver<String> {
       return move(Arrays.asList(paths));
     }
 
-    public record WirePath(FacingDirection facingDirection, int length) {
+    public record WirePath(Direction facingDirection, int length) {
       public static WirePath of(String path) {
         return new WirePath(getFacingDirection(path.substring(0, 1)), getLength(path.substring(1)));
       }
@@ -101,7 +101,7 @@ public class Day09 extends DaySolver<String> {
         return Integer.parseInt(substring);
       }
 
-      private static FacingDirection getFacingDirection(String substring) {
+      private static Direction getFacingDirection(String substring) {
         return switch (substring) {
           case "R" -> EAST;
           case "U" -> NORTH;
