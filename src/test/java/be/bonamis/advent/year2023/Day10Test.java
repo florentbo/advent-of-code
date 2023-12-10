@@ -62,9 +62,10 @@ class Day10Test {
 
   private void addEdge(
       Graph<Point, DefaultEdge> graph, Point point, CharGrid grid, Point source, Point sink) {
-    for (Point neighbour : grid.neighbours(point, false)) {
+    log.debug("adding edge from {} ", point);
+    for (Point neighbour : allowedDirections(point, grid, Direction.values())) {
       boolean start = point.equals(source) && neighbour.equals(sink);
-      if (!start && isNotDot(neighbour, grid)) {
+      if (!start) {
         graph.addEdge(point, neighbour);
       }
     }
@@ -77,8 +78,8 @@ class Day10Test {
               Position position = position(point, direction.verticalInverse());
               return new Point(position.x(), position.y());
             })
-        .filter(p -> isNotDot(p, grid))
         .filter(grid.isInTheGrid())
+        .filter(p -> isNotDot(p, grid))
         .collect(Collectors.toSet());
   }
 
@@ -102,6 +103,7 @@ class Day10Test {
   }
 
   private boolean isNotDot(Point point, CharGrid grid) {
+    log.debug("checking {} is not dot", point);
     return grid.get(point) != '.';
   }
 
