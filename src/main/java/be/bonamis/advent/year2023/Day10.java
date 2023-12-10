@@ -11,7 +11,7 @@ import be.bonamis.advent.utils.marsrover.Rover;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import static be.bonamis.advent.utils.marsrover.Direction.NORTH;
+import static be.bonamis.advent.utils.marsrover.Rover.Direction.NORTH;
 
 @Slf4j
 @Getter
