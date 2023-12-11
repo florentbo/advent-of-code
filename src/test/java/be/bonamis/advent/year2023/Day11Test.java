@@ -12,22 +12,22 @@ import static org.assertj.core.api.Assertions.assertThat;
 @Slf4j
 class Day11Test {
 
-  private final Day11 day11 =
-      new Day11(
-          Arrays.asList(
-              """
-...#......
-.......#..
-#.........
-..........
-......#...
-.#........
-.........#
-..........
-.......#..
-#...#.....
-"""
-                  .split("\n")));
+  private final List<String> input =
+      Arrays.asList(
+          """
+                  ...#......
+                  .......#..
+                  #.........
+                  ..........
+                  ......#...
+                  .#........
+                  .........#
+                  ..........
+                  .......#..
+                  #...#.....
+                  """
+              .split("\n"));
+  private Day11 day11 = new Day11(input, 2);
 
   @Test
   void movedIsOK() {
@@ -48,11 +48,12 @@ class Day11Test {
                             .........7...
                             8....9.......
                             """
-                    .split("\n")));
+                    .split("\n")),
+            2);
     List<Point> notDots = movedActual.notDots();
     movedActual.printPoints(notDots);
 
-    List<Point> movedPoints = day11.movedPoints(2);
+    List<Point> movedPoints = day11.movedPoints();
     assertThat(movedPoints).containsAll(notDots);
 
     Point point01 = movedActual.getGrid().find(1);
@@ -61,7 +62,7 @@ class Day11Test {
 
   @Test
   void distance() {
-    List<Point> movedPoints = day11.movedPoints(2);
+    List<Point> movedPoints = day11.movedPoints();
     assertThat(movedPoints).hasSize(9);
 
     Point point5 = movedPoints.get(2);
@@ -85,6 +86,7 @@ class Day11Test {
 
   @Test
   void solvePart02() {
-    assertThat(day11.solvePart02()).isEqualTo(1030);
+    assertThat(new Day11(input, 10).solvePart02()).isEqualTo(1030);
+    assertThat(new Day11(input, 100).solvePart02()).isEqualTo(8410);
   }
 }

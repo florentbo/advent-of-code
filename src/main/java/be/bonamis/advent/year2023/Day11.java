@@ -18,10 +18,12 @@ import lombok.extern.slf4j.Slf4j;
 public class Day11 extends DaySolver<String> {
 
   private final CharGrid grid;
+  private final int lineSize;
 
-  public Day11(List<String> puzzle) {
+  public Day11(List<String> puzzle, int lineSize) {
     super(puzzle);
-    this.grid = grid(this.puzzle);
+      this.lineSize = lineSize;
+      this.grid = grid(this.puzzle);
   }
 
   void printPoints(List<Point> notDots) {
@@ -32,7 +34,7 @@ public class Day11 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
-    List<Point> points = movedPoints(2);
+    List<Point> points = movedPoints();
 
     return lengthsSum(points);
   }
@@ -47,11 +49,11 @@ public class Day11 extends DaySolver<String> {
 
   @Override
   public long solvePart02() {
-    List<Point> points = movedPoints(10);
+    List<Point> points = movedPoints();
     return lengthsSum(points);
   }
 
-  List<Point> movedPoints(int lineSize) {
+  List<Point> movedPoints() {
     log.debug("\n\nbefore movedPoints");
     List<Point> points = notDots();
     printPoints(points);
@@ -158,7 +160,7 @@ public class Day11 extends DaySolver<String> {
   public static void main(String[] args) {
     String content = FileHelper.content("2023/11/2023_11_input.txt");
     List<String> puzzle = Arrays.asList(content.split("\n"));
-    Day11 day = new Day11(puzzle);
+    Day11 day = new Day11(puzzle, 2);
     log.info("solution part 1: {}", day.solvePart01());
     log.info("solution part 2: {}", day.solvePart02());
   }
