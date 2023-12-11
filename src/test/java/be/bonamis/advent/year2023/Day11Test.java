@@ -30,11 +30,6 @@ class Day11Test {
                   .split("\n")));
 
   @Test
-  void solvePart01() {
-    assertThat(day11.solvePart01()).isEqualTo(374);
-  }
-
-  @Test
   void movedIsOK() {
     Day11 movedActual =
         new Day11(
@@ -57,7 +52,7 @@ class Day11Test {
     List<Point> notDots = movedActual.notDots();
     movedActual.printPoints(notDots);
 
-    List<Point> movedPoints = day11.movedPoints();
+    List<Point> movedPoints = day11.movedPoints(2);
     assertThat(movedPoints).containsAll(notDots);
 
     Point point01 = movedActual.getGrid().find(1);
@@ -66,7 +61,7 @@ class Day11Test {
 
   @Test
   void distance() {
-    List<Point> movedPoints = day11.movedPoints();
+    List<Point> movedPoints = day11.movedPoints(2);
     assertThat(movedPoints).hasSize(9);
 
     Point point5 = movedPoints.get(2);
@@ -81,5 +76,15 @@ class Day11Test {
     Point point7 = movedPoints.get(7);
     log.debug("point 7 {}", point7);
     assertThat(day11.distance(point1, point7)).isEqualTo(15);
+  }
+
+  @Test
+  void solvePart01() {
+    assertThat(day11.solvePart01()).isEqualTo(374);
+  }
+
+  @Test
+  void solvePart02() {
+    assertThat(day11.solvePart02()).isEqualTo(1030);
   }
 }
