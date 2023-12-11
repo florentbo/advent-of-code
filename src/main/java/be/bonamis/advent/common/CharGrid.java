@@ -95,4 +95,8 @@ public class CharGrid {
     return p ->
         p.getX() >= 0 && p.getY() >= 0 && p.getX() < this.getHeight() && p.getY() < this.getWidth();
   }
+
+  public Point find(int i) {
+    return stream().filter(p -> number(p) == i).findFirst().orElseThrow();
+  }
 }

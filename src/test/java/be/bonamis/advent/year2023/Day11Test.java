@@ -36,7 +36,7 @@ class Day11Test {
 
   @Test
   void movedIsOK() {
-    Day11 moved =
+    Day11 movedActual =
         new Day11(
             Arrays.asList(
                 """
@@ -54,10 +54,14 @@ class Day11Test {
                             8....9.......
                             """
                     .split("\n")));
-    List<Point> notDots = moved.notDots();
-    moved.printPoints(notDots);
+    List<Point> notDots = movedActual.notDots();
+    movedActual.printPoints(notDots);
+
     List<Point> movedPoints = day11.movedPoints();
     assertThat(movedPoints).containsAll(notDots);
+
+    Point point01 = movedActual.getGrid().find(1);
+    log.debug("point {}", point01);
   }
 
   @Test

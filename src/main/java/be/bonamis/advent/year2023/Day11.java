@@ -30,7 +30,7 @@ public class Day11 extends DaySolver<String> {
 
   void printPoints(List<Point> notDots) {
     for (Point point : notDots) {
-      log.debug("not dot {} value {}", point, this.grid.get(point));
+      //log.debug("not dot {} value {}", point, this.grid.get(point));
     }
   }
 
@@ -171,7 +171,7 @@ public class Day11 extends DaySolver<String> {
   }
 
   public static void main(String[] args) {
-    String content = FileHelper.content("2023/10/2023_10_input.txt");
+    String content = FileHelper.content("2023/11/2023_11_input.txt");
     List<String> puzzle = Arrays.asList(content.split("\n"));
     Day11 day = new Day11(puzzle);
     log.info("solution part 1: {}", day.solvePart01());
