@@ -36,7 +36,6 @@ class Day11Test {
 
   @Test
   void movedIsOK() {
-
     Day11 moved =
         new Day11(
             Arrays.asList(
@@ -56,9 +55,7 @@ class Day11Test {
                             """
                     .split("\n")));
     List<Point> notDots = moved.notDots();
-    for (Point point : notDots) {
-      log.debug("not dot {}", point);
-    }
+    moved.printPoints(notDots);
     List<Point> movedPoints = day11.movedPoints();
     assertThat(movedPoints).containsAll(notDots);
   }
