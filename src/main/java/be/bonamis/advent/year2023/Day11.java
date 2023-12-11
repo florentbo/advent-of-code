@@ -1,12 +1,8 @@
 package be.bonamis.advent.year2023;
 
-import static be.bonamis.advent.utils.marsrover.Rover.Direction.NORTH;
-
 import be.bonamis.advent.DaySolver;
 import be.bonamis.advent.common.CharGrid;
 import be.bonamis.advent.utils.FileHelper;
-import be.bonamis.advent.utils.marsrover.Position;
-import be.bonamis.advent.utils.marsrover.Rover;
 
 import java.awt.*;
 import java.util.*;
@@ -30,14 +26,18 @@ public class Day11 extends DaySolver<String> {
 
   void printPoints(List<Point> notDots) {
     for (Point point : notDots) {
-      //log.debug("not dot {} value {}", point, this.grid.get(point));
+      log.debug("not dot {} value {}", point, this.grid.get(point));
     }
   }
 
   @Override
   public long solvePart01() {
-    List<Point> points = movedPoints();
+    List<Point> points = movedPoints(2);
 
+    return lengthsSum(points);
+  }
+
+  private Integer lengthsSum(List<Point> points) {
     Set<Point> set = new HashSet<>(points);
     Set<Set<Point>> combinations = Sets.combinations(set, 2);
     log.debug("combinations size {}", combinations.size());
@@ -45,7 +45,13 @@ public class Day11 extends DaySolver<String> {
     return combinations.stream().map(this::distance).reduce(0, Integer::sum);
   }
 
-  List<Point> movedPoints() {
+  @Override
+  public long solvePart02() {
+    List<Point> points = movedPoints(10);
+    return lengthsSum(points);
+  }
+
+  List<Point> movedPoints(int lineSize) {
     log.debug("\n\nbefore movedPoints");
     List<Point> points = notDots();
     printPoints(points);
@@ -56,12 +62,12 @@ public class Day11 extends DaySolver<String> {
     List<Integer> onlyDotsColumns = onlyDotsLines(columns);
     log.debug("onlyDotsLines {}", onlyDotsRows);
     log.debug("onlyDotsColumns {}", onlyDotsColumns);
-    points = moveDown(points, onlyDotsRows);
-    log.debug("move down result after downs{}", points);
-    log.debug("\n\nmove right result before rights");
+    points = moveDown(points, onlyDotsRows, lineSize - 1);
+    log.debug("\n\nmove down result after downs");
     printPoints(points);
-    points = moveRight(points, onlyDotsColumns);
-    log.debug("points after all moves {}", points);
+    points = moveRight(points, onlyDotsColumns, lineSize - 1);
+    log.debug("\n\nmove down result after moveRight");
+    printPoints(points);
     return points;
   }
 
@@ -82,38 +88,22 @@ public class Day11 extends DaySolver<String> {
     return x + y;
   }
 
-  private List<Point> moveDown(List<Point> points, List<Integer> rows) {
-    return points.stream().map(point -> moveDown(point, rows)).toList();
+  private List<Point> moveDown(List<Point> points, List<Integer> rows, int lineSize) {
+    return points.stream().map(point -> moveDown(point, rows, lineSize)).toList();
   }
 
-  private List<Point> moveRight(List<Point> points, List<Integer> columns) {
-    return points.stream().map(point -> moveRight(point, columns)).toList();
+  private List<Point> moveRight(List<Point> points, List<Integer> columns, int lineSize) {
+    return points.stream().map(point -> moveRight(point, columns, lineSize)).toList();
   }
 
-  private List<Point> moveDown(List<Point> points, Integer row) {
-    return points.stream().map(point -> moveDown(point, row)).toList();
-  }
-
-  private Point moveDown(Point point, List<Integer> heights) {
+  private Point moveDown(Point point, List<Integer> heights, int lineSize) {
     int heightToAdd = (int) heights.stream().filter(height -> point.y > height).count();
-    return new Point(point.x, point.y + heightToAdd);
+    return new Point(point.x, point.y + heightToAdd * lineSize);
   }
 
-  private Point moveRight(Point point, List<Integer> wides) {
+  private Point moveRight(Point point, List<Integer> wides, int lineSize) {
     int wideToAdd = (int) wides.stream().filter(wide -> point.x > wide).count();
-    return new Point(point.x + wideToAdd, point.y);
-  }
-
-  private Point moveDown(Point point, Integer height) {
-    return point.y > height ? new Point(point.x, point.y + 1) : point;
-  }
-
-  private List<Point> moveRight(List<Point> points, Integer column) {
-    return points.stream().map(point -> moveRight(point, column)).toList();
-  }
-
-  private Point moveRight(Point point, Integer column) {
-    return point.x > column ? new Point(point.x + 1, point.y) : point;
+    return new Point(point.x + wideToAdd * lineSize, point.y);
   }
 
   private List<Integer> onlyDotsLines(List<List<Point>> lines) {
@@ -163,11 +153,6 @@ public class Day11 extends DaySolver<String> {
       }
     }
     return new CharGrid(swappedGrid);
-  }
-
-  @Override
-  public long solvePart02() {
-    return this.puzzle.size() + 1;
   }
 
   public static void main(String[] args) {
