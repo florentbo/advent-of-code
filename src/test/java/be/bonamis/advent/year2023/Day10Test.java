@@ -176,7 +176,7 @@ class Day10Test {
         .containsExactlyInAnyOrder(new Point(1, 2), new Point(2, 1));
   }
 
-  private static boolean isNotDot(Point point, CharGrid grid) {
+  public static boolean isNotDot(Point point, CharGrid grid) {
     return grid.get(point) != '.';
   }
 
