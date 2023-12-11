@@ -22,8 +22,8 @@ public class Day11 extends DaySolver<String> {
 
   public Day11(List<String> puzzle, int lineSize) {
     super(puzzle);
-      this.lineSize = lineSize;
-      this.grid = grid(this.puzzle);
+    this.lineSize = lineSize;
+    this.grid = grid(this.puzzle);
   }
 
   void printPoints(List<Point> notDots) {
@@ -39,12 +39,12 @@ public class Day11 extends DaySolver<String> {
     return lengthsSum(points);
   }
 
-  private Integer lengthsSum(List<Point> points) {
+  private long lengthsSum(List<Point> points) {
     Set<Point> set = new HashSet<>(points);
     Set<Set<Point>> combinations = Sets.combinations(set, 2);
     log.debug("combinations size {}", combinations.size());
 
-    return combinations.stream().map(this::distance).reduce(0, Integer::sum);
+    return combinations.stream().map(this::distance).reduce(0L, Long::sum);
   }
 
   @Override
@@ -77,7 +77,7 @@ public class Day11 extends DaySolver<String> {
     return this.grid.stream().filter(this::isNotDot).toList();
   }
 
-  int distance(Set<Point> points) {
+  long distance(Set<Point> points) {
     Iterator<Point> iterator = points.iterator();
     Point point5 = iterator.next();
     Point point9 = iterator.next();
@@ -160,8 +160,8 @@ public class Day11 extends DaySolver<String> {
   public static void main(String[] args) {
     String content = FileHelper.content("2023/11/2023_11_input.txt");
     List<String> puzzle = Arrays.asList(content.split("\n"));
-    Day11 day = new Day11(puzzle, 2);
-    log.info("solution part 1: {}", day.solvePart01());
-    log.info("solution part 2: {}", day.solvePart02());
+
+    log.info("solution part 1: {}", new Day11(puzzle, 2).solvePart01());
+    log.info("solution part 2: {}", new Day11(puzzle, 1000000).solvePart02());
   }
 }
