@@ -8,6 +8,7 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import be.bonamis.advent.year2023.Day11;
 import lombok.Getter;
 
 @Getter
@@ -21,6 +22,27 @@ public class CharGrid {
     this.data = input;
     this.height = input.length;
     this.width = input[0].length;
+  }
+
+  public CharGrid(List<String> text) {
+    CharGrid grid = this.grid(text);
+    this.data = grid.getData();
+    this.height = grid.getHeight();
+    this.width = grid.getWidth();
+  }
+
+  private CharGrid grid(List<String> text) {
+    char[][] grid = text.stream().map(String::toCharArray).toArray(char[][]::new);
+
+    // Swap rows and columns during reading
+    char[][] swappedGrid = new char[grid[0].length][grid.length];
+
+    for (int i = 0; i < grid.length; i++) {
+      for (int j = 0; j < grid[0].length; j++) {
+        swappedGrid[j][i] = grid[i][j];
+      }
+    }
+    return new CharGrid(swappedGrid);
   }
 
   public Stream<Point> stream() {
@@ -98,5 +120,21 @@ public class CharGrid {
 
   public Point find(int i) {
     return stream().filter(p -> number(p) == i).findFirst().orElseThrow();
+  }
+
+  public List<List<Point>> rows() {
+    return IntStream.range(0, getHeight()).mapToObj(this::row).toList();
+  }
+
+  public List<Point> row(int h) {
+    return IntStream.range(0, getWidth()).mapToObj(w -> new Point(w, h)).toList();
+  }
+
+  public List<List<Point>> columns() {
+    return IntStream.range(0, getWidth()).mapToObj(this::column).toList();
+  }
+
+  public List<Point> column(int w) {
+    return IntStream.range(0, getHeight()).mapToObj(h -> new Point(w, h)).toList();
   }
 }

@@ -23,7 +23,7 @@ public class Day11 extends DaySolver<String> {
   public Day11(List<String> puzzle, int lineSize) {
     super(puzzle);
     this.lineSize = lineSize;
-    this.grid = grid(this.puzzle);
+    this.grid = new CharGrid(this.puzzle);
   }
 
   void printPoints(List<Point> notDots) {
@@ -57,8 +57,8 @@ public class Day11 extends DaySolver<String> {
     log.debug("\n\nbefore movedPoints");
     List<Point> points = notDots();
     printPoints(points);
-    List<List<Point>> rows = rows();
-    List<List<Point>> columns = columns();
+    List<List<Point>> rows = grid.rows();
+    List<List<Point>> columns = grid.columns();
 
     List<Integer> onlyDotsRows = onlyDotsLines(rows);
     List<Integer> onlyDotsColumns = onlyDotsLines(columns);
@@ -115,22 +115,6 @@ public class Day11 extends DaySolver<String> {
         .toList();
   }
 
-  private List<List<Point>> rows() {
-    return IntStream.range(0, this.grid.getHeight()).mapToObj(this::row).toList();
-  }
-
-  private List<Point> row(int h) {
-    return IntStream.range(0, this.grid.getWidth()).mapToObj(w -> new Point(w, h)).toList();
-  }
-
-  private List<List<Point>> columns() {
-    return IntStream.range(0, this.grid.getWidth()).mapToObj(this::column).toList();
-  }
-
-  private List<Point> column(int w) {
-    return IntStream.range(0, this.grid.getHeight()).mapToObj(h -> new Point(w, h)).toList();
-  }
-
   private boolean containsOnlyDots(List<Point> points) {
     return points.stream().allMatch(this::isDot);
   }
@@ -141,20 +125,6 @@ public class Day11 extends DaySolver<String> {
 
   boolean isNotDot(Point point) {
     return !isDot(point);
-  }
-
-  private static CharGrid grid(List<String> text) {
-    char[][] grid = text.stream().map(String::toCharArray).toArray(char[][]::new);
-
-    // Swap rows and columns during reading
-    char[][] swappedGrid = new char[grid[0].length][grid.length];
-
-    for (int i = 0; i < grid.length; i++) {
-      for (int j = 0; j < grid[0].length; j++) {
-        swappedGrid[j][i] = grid[i][j];
-      }
-    }
-    return new CharGrid(swappedGrid);
   }
 
   public static void main(String[] args) {
