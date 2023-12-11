@@ -28,6 +28,12 @@ public class Day11 extends DaySolver<String> {
     this.grid = grid(this.puzzle);
   }
 
+  void printPoints(List<Point> notDots) {
+    for (Point point : notDots) {
+      log.debug("not dot {} value {}", point, this.grid.get(point));
+    }
+  }
+
   @Override
   public long solvePart01() {
     List<Point> points = movedPoints();
@@ -40,25 +46,21 @@ public class Day11 extends DaySolver<String> {
   }
 
   List<Point> movedPoints() {
+    log.debug("\n\nbefore movedPoints");
     List<Point> points = notDots();
-    log.debug("{}", points.size());
-    log.debug("{}", points);
+    printPoints(points);
     List<List<Point>> rows = rows();
     List<List<Point>> columns = columns();
 
     List<Integer> onlyDotsRows = onlyDotsLines(rows);
-    log.debug("onlyDotsLines {}", onlyDotsRows);
-    for (Integer onlyDotsRow : onlyDotsRows) {
-      points = moveDown(points, onlyDotsRow);
-    }
-
-    log.debug("move down result after downs{}", points);
     List<Integer> onlyDotsColumns = onlyDotsLines(columns);
+    log.debug("onlyDotsLines {}", onlyDotsRows);
     log.debug("onlyDotsColumns {}", onlyDotsColumns);
-    for (Integer onlyDotsColumn : onlyDotsColumns) {
-      points = moveRight(points, onlyDotsColumn);
-      log.debug("move down result after moveRight {}", points);
-    }
+    points = moveDown(points, onlyDotsRows);
+    log.debug("move down result after downs{}", points);
+    log.debug("\n\nmove right result before rights");
+    printPoints(points);
+    points = moveRight(points, onlyDotsColumns);
     log.debug("points after all moves {}", points);
     return points;
   }
@@ -80,8 +82,26 @@ public class Day11 extends DaySolver<String> {
     return x + y;
   }
 
+  private List<Point> moveDown(List<Point> points, List<Integer> rows) {
+    return points.stream().map(point -> moveDown(point, rows)).toList();
+  }
+
+  private List<Point> moveRight(List<Point> points, List<Integer> columns) {
+    return points.stream().map(point -> moveRight(point, columns)).toList();
+  }
+
   private List<Point> moveDown(List<Point> points, Integer row) {
     return points.stream().map(point -> moveDown(point, row)).toList();
+  }
+
+  private Point moveDown(Point point, List<Integer> heights) {
+    int heightToAdd = (int) heights.stream().filter(height -> point.y > height).count();
+    return new Point(point.x, point.y + heightToAdd);
+  }
+
+  private Point moveRight(Point point, List<Integer> wides) {
+    int wideToAdd = (int) wides.stream().filter(wide -> point.x > wide).count();
+    return new Point(point.x + wideToAdd, point.y);
   }
 
   private Point moveDown(Point point, Integer height) {
