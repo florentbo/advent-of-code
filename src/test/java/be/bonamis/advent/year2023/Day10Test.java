@@ -7,10 +7,10 @@ import static org.assertj.core.api.Assertions.*;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.stream.*;
 
 import be.bonamis.advent.common.CharGrid;
+import be.bonamis.advent.utils.FileHelper;
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
 import be.bonamis.advent.utils.marsrover.Rover.Direction;
@@ -35,47 +35,98 @@ class Day10Test {
   @Test
   void solvePart01() {
     CharGrid grid = grid(squareLoopText);
+
+    int result = solvePart01(grid);
+    assertThat(result).isEqualTo(4);
+  }
+
+  @Test
+  void solvePart01Example2() {
+    String text = """
+  ..F7.
+  .FJ|.
+  SJ.L7
+  |F--J
+  LJ...
+  """;
+    CharGrid grid = grid(text);
+
+    int result = solvePart01(grid);
+    assertThat(result).isEqualTo(8);
+  }
+
+  public static void main(String[] args) {
+    String content = FileHelper.content("2023/10/2023_10_input.txt");
+    CharGrid grid = grid(content);
+
+    int result = solvePart01(grid);
+    log.info("solution part 1: {}", result);
+  }
+
+  private static int solvePart01(CharGrid grid) {
     final var source = getPoint(grid, 'S');
     log.debug("source {}", source);
     List<Point> neighbours = grid.neighbours(source, false);
-    assertThat(neighbours).hasSize(4);
-    final var sink = neighbours.stream().filter(p -> grid.get(p) != '.').findFirst().orElseThrow();
-    log.debug("sink {}", sink);
+    Stream<Point> sinks = neighbours.stream().filter(p -> grid.get(p) != '.');
+
+    List<Integer> results = sinks.map(sink -> result(grid, sink, source)).toList();
+    log.debug("results {}", results);
+    return results.get(0);
+  }
+
+  private static int result(CharGrid grid, Point sink, Point source) {
+    log.debug("sink {} value {}", sink, grid.get(sink));
 
     Graph<Point, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
     grid.consume(graph::addVertex);
     grid.consume(point -> addEdge(graph, point, grid, source, sink));
 
-    DijkstraShortestPath<Point, DefaultEdge> shortestPath = new DijkstraShortestPath<>(graph);
-    GraphPath<Point, DefaultEdge> path = shortestPath.getPath(source, sink);
-    List<Point> vertexList = path.getVertexList();
+    List<Point> vertexList = vertexList(sink, source, graph);
     int result = vertexList.size() / 2;
     log.debug("solution size: {}", result);
-    vertexList.forEach(p -> log.debug("vertex {}", p));
-    assertThat(result).isEqualTo(4);
+    return result;
   }
 
-  private CharGrid grid(String text) {
-    return new CharGrid(
-        Arrays.stream(text.split("\n")).map(String::toCharArray).toArray(char[][]::new));
+  private static List<Point> vertexList(Point sink, Point source, Graph<Point, DefaultEdge> graph) {
+    DijkstraShortestPath<Point, DefaultEdge> shortestPath = new DijkstraShortestPath<>(graph);
+    GraphPath<Point, DefaultEdge> path = shortestPath.getPath(source, sink);
+    return path.getVertexList();
   }
 
-  private void addEdge(
+  private static CharGrid grid(String text) {
+    char[][] grid = Arrays.stream(text.split("\n")).map(String::toCharArray).toArray(char[][]::new);
+
+    // Swap rows and columns during reading
+    char[][] swappedGrid = new char[grid[0].length][grid.length];
+
+    for (int i = 0; i < grid.length; i++) {
+      for (int j = 0; j < grid[0].length; j++) {
+        swappedGrid[j][i] = grid[i][j];
+      }
+    }
+    return new CharGrid(swappedGrid);
+  }
+
+  static void addEdge(
       Graph<Point, DefaultEdge> graph, Point point, CharGrid grid, Point source, Point sink) {
-    log.debug("adding edge from {} ", point);
-    for (Point neighbour : allowedDirections(point, grid, Direction.values())) {
-      boolean start = point.equals(source) && neighbour.equals(sink);
-      if (!start) {
-        graph.addEdge(point, neighbour);
+    if (isNotDot(point, grid)) {
+      Set<Direction> allowedDirections = allowedDirections(grid.get(point));
+      Direction[] directions = allowedDirections.toArray(new Direction[0]);
+      for (Point neighbour : allowedPoints(point, grid, directions)) {
+        boolean start = point.equals(source) && neighbour.equals(sink);
+        if (!start) {
+          graph.addEdge(point, neighbour);
+        }
       }
     }
   }
 
-  private Set<Point> allowedDirections(Point point, CharGrid grid, Direction... directions) {
+  static Set<Point> allowedPoints(Point point, CharGrid grid, Direction... directions) {
     return Arrays.stream(directions)
         .map(
             direction -> {
               Position position = position(point, direction.verticalInverse());
+              // log.debug("position {} -> {}", point, position);
               return new Point(position.x(), position.y());
             })
         .filter(grid.isInTheGrid())
@@ -83,27 +134,49 @@ class Day10Test {
         .collect(Collectors.toSet());
   }
 
-  private Position position(Point point, Direction direction) {
+  /*
+    | is a vertical pipe connecting north and south.
+  - is a horizontal pipe connecting east and west.
+  L is a 90-degree bend connecting north and east.
+  J is a 90-degree bend connecting north and west.
+  7 is a 90-degree bend connecting south and west.
+  F is a 90-degree bend connecting south and east.
+     */
+
+  static Set<Direction> allowedDirections(Character value) {
+    // log.debug("checking allowed directions for {}", value);
+    return switch (value) {
+      case '|' -> Set.of(NORTH, SOUTH);
+      case '-' -> Set.of(EAST, WEST);
+      case 'L' -> Set.of(NORTH, EAST);
+      case 'J' -> Set.of(NORTH, WEST);
+      case '7' -> Set.of(SOUTH, WEST);
+      case 'F' -> Set.of(SOUTH, EAST);
+      case 'S' -> Arrays.stream(values()).collect(Collectors.toSet());
+      default -> throw new NoSuchElementException();
+    };
+  }
+
+  private static Position position(Point point, Direction direction) {
     return new Rover(direction, new Position(point.x, point.y)).move(FORWARD).position();
   }
 
   @Test
-  void allowedDirections() {
+  void allowedPoints() {
     CharGrid grid = grid(squareLoopText);
-    assertThat(allowedDirections(new Point(1, 2), grid, NORTH)).containsExactly(new Point(1, 1));
-    assertThat(allowedDirections(new Point(1, 2), grid, SOUTH)).containsExactly(new Point(1, 3));
-    assertThat(allowedDirections(new Point(1, 2), grid, WEST)).isEmpty();
-    assertThat(allowedDirections(new Point(1, 2), grid, EAST)).isEmpty();
+    assertThat(allowedPoints(new Point(1, 2), grid, NORTH)).containsExactly(new Point(1, 1));
+    assertThat(allowedPoints(new Point(1, 2), grid, SOUTH)).containsExactly(new Point(1, 3));
+    assertThat(allowedPoints(new Point(1, 2), grid, WEST)).isEmpty();
+    assertThat(allowedPoints(new Point(1, 2), grid, EAST)).isEmpty();
 
-    assertThat(allowedDirections(new Point(1, 1), grid, EAST)).containsExactly(new Point(2, 1));
-    assertThat(allowedDirections(new Point(3, 1), grid, WEST)).containsExactly(new Point(2, 1));
+    assertThat(allowedPoints(new Point(1, 1), grid, EAST)).containsExactly(new Point(2, 1));
+    assertThat(allowedPoints(new Point(3, 1), grid, WEST)).containsExactly(new Point(2, 1));
 
-    assertThat(allowedDirections(new Point(1, 1), grid, EAST, SOUTH))
+    assertThat(allowedPoints(new Point(1, 1), grid, EAST, SOUTH))
         .containsExactlyInAnyOrder(new Point(1, 2), new Point(2, 1));
   }
 
-  private boolean isNotDot(Point point, CharGrid grid) {
-    log.debug("checking {} is not dot", point);
+  private static boolean isNotDot(Point point, CharGrid grid) {
     return grid.get(point) != '.';
   }
 
