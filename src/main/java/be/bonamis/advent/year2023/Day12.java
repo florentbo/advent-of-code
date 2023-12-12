@@ -3,7 +3,8 @@ package be.bonamis.advent.year2023;
 import be.bonamis.advent.DaySolver;
 import be.bonamis.advent.utils.FileHelper;
 import java.util.*;
-import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -61,6 +62,18 @@ public class Day12 extends DaySolver<String> {
         .map(this::damageCount)
         .filter(count -> count.equals(damages))
         .count();
+  }
+
+  String unfold(String row) {
+    String[] split = row.split("\\s+");
+    String conditionsInput = split[0];
+    String damagesInput = split[1];
+
+    return repeat(conditionsInput, "?") + " " + repeat(damagesInput, ",");
+  }
+
+  private String repeat(String input, String delimiter) {
+    return IntStream.range(0, 5).mapToObj(i -> input).collect(Collectors.joining(delimiter));
   }
 
   @Override

@@ -36,13 +36,19 @@ class Day12Test {
 
   @Test
   void solveRow() {
-      assertThat(day12.solveRow("???.### 1,1,3")).isEqualTo(1);
-      assertThat(day12.solveRow(input.get(0))).isEqualTo(1);
-      assertThat(day12.solveRow(input.get(1))).isEqualTo(4);
-      assertThat(day12.solveRow(input.get(2))).isEqualTo(1);
-      assertThat(day12.solveRow(input.get(3))).isEqualTo(1);
-      assertThat(day12.solveRow(input.get(4))).isEqualTo(4);
-      assertThat(day12.solveRow(input.get(5))).isEqualTo(10);
+    assertThat(day12.solveRow("???.### 1,1,3")).isEqualTo(1);
+    assertThat(day12.solveRow(input.get(0))).isEqualTo(1);
+    assertThat(day12.solveRow(input.get(1))).isEqualTo(4);
+    assertThat(day12.solveRow(input.get(2))).isEqualTo(1);
+    assertThat(day12.solveRow(input.get(3))).isEqualTo(1);
+    assertThat(day12.solveRow(input.get(4))).isEqualTo(4);
+    assertThat(day12.solveRow(input.get(5))).isEqualTo(10);
+  }
+
+  @Test
+  void name() {
+    assertThat(day12.unfold("???.### 1,1,3"))
+        .isEqualTo("???.###????.###????.###????.###????.### 1,1,3,1,1,3,1,1,3,1,1,3,1,1,3");
   }
 
   @Test
