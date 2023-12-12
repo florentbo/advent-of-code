@@ -8,7 +8,6 @@ import java.util.function.Predicate;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
-import be.bonamis.advent.year2023.Day11;
 import lombok.Getter;
 
 @Getter
