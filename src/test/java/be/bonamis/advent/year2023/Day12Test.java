@@ -37,16 +37,22 @@ class Day12Test {
   @Test
   void solveRow() {
     assertThat(day12.solveRow("???.### 1,1,3")).isEqualTo(1);
-    assertThat(day12.solveRow(input.get(0))).isEqualTo(1);
-    assertThat(day12.solveRow(input.get(1))).isEqualTo(4);
+    String row00 = input.get(0);
+    String row01 = input.get(1);
+
+    assertThat(day12.solveRow(row00)).isEqualTo(1);
+    assertThat(day12.solveRow(row01)).isEqualTo(4);
     assertThat(day12.solveRow(input.get(2))).isEqualTo(1);
     assertThat(day12.solveRow(input.get(3))).isEqualTo(1);
     assertThat(day12.solveRow(input.get(4))).isEqualTo(4);
     assertThat(day12.solveRow(input.get(5))).isEqualTo(10);
+
+    assertThat(day12.solveRow2(day12.unfold(row00))).isEqualTo(1);
+    //assertThat(day12.solveRow2(day12.unfold(row01))).isEqualTo(16384);
   }
 
   @Test
-  void name() {
+  void unfold() {
     assertThat(day12.unfold("???.### 1,1,3"))
         .isEqualTo("???.###????.###????.###????.###????.### 1,1,3,1,1,3,1,1,3,1,1,3,1,1,3");
   }
