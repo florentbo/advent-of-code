@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.*;
 import java.util.List;
+
+import be.bonamis.advent.utils.FileHelper;
 import lombok.extern.slf4j.*;
 import org.junit.jupiter.api.*;
 
@@ -60,6 +62,16 @@ class Day12Test {
   void unfold() {
     assertThat(day12.unfold("???.### 1,1,3"))
         .isEqualTo("???.###????.###????.###????.###????.### 1,1,3,1,1,3,1,1,3,1,1,3,1,1,3");
+  }
+
+  @Test
+  void runnable() {
+    String content = FileHelper.content("2023/12/2023_12_input.txt");
+    List<String> puzzle = Arrays.asList(content.split("\n"));
+    Day12 day = new Day12(puzzle);
+    log.info("solution part 1: {}", day.solvePart01());
+    log.info("solution part 1: {}", day.solvePart02());
+
   }
 
   @Test

@@ -158,6 +158,6 @@ public class Day12 extends DaySolver<String> {
     List<String> puzzle = Arrays.asList(content.split("\n"));
     Day12 day = new Day12(puzzle);
     log.info("solution part 1: {}", day.solvePart01());
-    log.info("solution part 2: {}", day.solvePart02());
+    //log.info("solution part 2: {}", day.solvePart02());
   }
 }
