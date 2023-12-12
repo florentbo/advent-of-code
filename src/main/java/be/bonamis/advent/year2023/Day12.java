@@ -84,26 +84,27 @@ public class Day12 extends DaySolver<String> {
       List<Integer> damages,
       int[] count) {
     List<Integer> damagedCount = damageCount(currentCombination);
-    IntPredicate intPredicate = i -> damagedCount.get(i) > damages.get(i);
     int foundDamagesSize = damagedCount.size();
-    IntPredicate intPredicate2 = i -> foundDamagesSize > damages.size();
+    int damageToFoundSize = damages.size();
+
+    IntPredicate sizePredicate = i -> damagedCount.size() > damages.size();
+    IntPredicate intPredicate = i -> damagedCount.get(i) > damages.get(i);
+    IntPredicate intPredicate2 = i -> foundDamagesSize > damageToFoundSize;
     IntPredicate intPredicate3 =
         i -> {
           int index1 = i - 1;
-          log.debug("stream index {} calculated index {} damagedCount: {} damages: {}", i, index1, damagedCount, damages);
-          boolean test = (i > 0 && foundDamagesSize > 1)
-                  && (!Objects.equals(damagedCount.get(index1), damages.get(index1)));
-          if (test) {
+          // log.debug("stream index {} calculated index {} damagedCount: {} damages: {}", i,
+          // index1, damagedCount, damages);
+          /*if (test) {
             log.debug("+++++++ test is true");
-          }
-          return test;
+          }*/
+          return (i > 0 && foundDamagesSize > 1)
+              && (!Objects.equals(damagedCount.get(index1), damages.get(index1)));
         };
 
     boolean anyMatch =
         IntStream.range(0, foundDamagesSize)
-            .anyMatch(intPredicate2.or(intPredicate)
-                    .or(intPredicate3)
-            );
+            .anyMatch(sizePredicate.or(intPredicate3.or(intPredicate).or(intPredicate2)));
     if (anyMatch) {
       return;
     }
