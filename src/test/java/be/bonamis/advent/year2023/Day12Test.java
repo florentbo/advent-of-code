@@ -75,7 +75,6 @@ class Day12Test {
   }
 
   @Test
-  //@Disabled("need to find something more efficient")
   void solvePart02() {
     assertThat(day12.solvePart02()).isEqualTo(525152);
   }
