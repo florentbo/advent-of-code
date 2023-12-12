@@ -72,7 +72,7 @@ public class Day12 extends DaySolver<String> {
     log.debug("damages: {}", damages);
 
     log.debug("conditionsInput: {}", conditionsInput);
-    //int count = 0;
+    // int count = 0;
     int[] count = {0};
     generateHelper(0, conditionsInput, "", damages, count);
     /*List<String> conditions = generateCombinations(conditionsInput);
@@ -85,9 +85,13 @@ public class Day12 extends DaySolver<String> {
   }
 
   private void generateHelper(
-          int index, String conditionsInput, String currentCombination, List<Integer> damages, int[] count) {
+      int index,
+      String conditionsInput,
+      String currentCombination,
+      List<Integer> damages,
+      int[] count) {
     if (index == conditionsInput.length()) {
-      //System.out.println(currentCombination);
+      // System.out.println(currentCombination);
       List<Integer> damagedCount = damageCount(currentCombination);
       if (damagedCount.equals(damages)) {
         count[0]++;
@@ -119,7 +123,10 @@ public class Day12 extends DaySolver<String> {
 
   @Override
   public long solvePart02() {
-    return this.puzzle.parallelStream().map(this::solveRow2).reduce(0L, Long::sum);
+    return this.puzzle.parallelStream()
+        .map(this::unfold)
+        .map(this::solveRow2)
+        .reduce(0L, Long::sum);
   }
 
   public static void main(String[] args) {
