@@ -106,11 +106,11 @@ public class Day12 extends DaySolver<String> {
         IntStream.range(0, foundDamagesSize)
             .anyMatch(sizePredicate.or(intPredicate3.or(intPredicate).or(intPredicate2)));
     log.debug(
-            "currentCombination: {}, damagedCount: {} damages: {} anyMatch: {}",
-            currentCombination,
-            damagedCount,
-            damages,
-            anyMatch);
+        "currentCombination: {}, damagedCount: {} damages: {} anyMatch: {}",
+        currentCombination,
+        damagedCount,
+        damages,
+        anyMatch);
     if (anyMatch) {
       return;
     }
@@ -146,10 +146,11 @@ public class Day12 extends DaySolver<String> {
 
   @Override
   public long solvePart02() {
-    return this.puzzle.parallelStream()
-        .map(this::unfold)
-        .map(this::solveRow2)
-        .reduce(0L, Long::sum);
+    return this.puzzle.parallelStream().map(this::solvePart02Row).reduce(0L, Long::sum);
+  }
+
+  long solvePart02Row(String row) {
+    return solveRow2(unfold(row));
   }
 
   public static void main(String[] args) {
