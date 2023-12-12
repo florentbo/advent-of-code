@@ -105,12 +105,12 @@ public class Day12 extends DaySolver<String> {
     boolean anyMatch =
         IntStream.range(0, foundDamagesSize)
             .anyMatch(sizePredicate.or(intPredicate3.or(intPredicate).or(intPredicate2)));
-    log.debug(
+    /*log.debug(
         "currentCombination: {}, damagedCount: {} damages: {} anyMatch: {}",
         currentCombination,
         damagedCount,
         damages,
-        anyMatch);
+        anyMatch);*/
     if (anyMatch) {
       return;
     }
