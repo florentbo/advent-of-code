@@ -52,8 +52,8 @@ class Day12Test {
   @Test
   void solvePart02Row() {
     assertThat(day12.solvePart02Row(input.get(0))).isEqualTo(1);
-    //assertThat(day12.solvePart02Row(input.get(1))).isEqualTo(16384);
-    //assertThat(day12.solvePart02Row(input.get(2))).isEqualTo(1);
+    assertThat(day12.solvePart02Row(input.get(1))).isEqualTo(16384);
+    assertThat(day12.solvePart02Row(input.get(2))).isEqualTo(1);
   }
 
   @Test
@@ -62,9 +62,9 @@ class Day12Test {
         .isEqualTo("???.###????.###????.###????.###????.### 1,1,3,1,1,3,1,1,3,1,1,3,1,1,3");
   }
 
- /* @Test
-  @Disabled("need to find something more efficient")
+  @Test
+  //@Disabled("need to find something more efficient")
   void solvePart02() {
     assertThat(day12.solvePart02()).isEqualTo(525152);
-  }*/
+  }
 }
