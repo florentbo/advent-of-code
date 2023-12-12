@@ -21,8 +21,7 @@ public class Day12 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
-
-    return this.puzzle.stream().map(this::solveRow).reduce(0L, Long::sum);
+    return this.puzzle.parallelStream().map(this::solveRow).reduce(0L, Long::sum);
   }
 
   List<Integer> damageCount(String input) {
@@ -58,10 +57,52 @@ public class Day12 extends DaySolver<String> {
     List<Integer> damages = Arrays.stream(damagesInput.split(",")).map(Integer::parseInt).toList();
     log.debug("damages: {}", damages);
 
-    return conditions.stream()
+    return conditions.parallelStream()
         .map(this::damageCount)
         .filter(count -> count.equals(damages))
         .count();
+  }
+
+  long solveRow2(String row) {
+    String[] split = row.split("\\s+");
+    String conditionsInput = split[0];
+    String damagesInput = split[1];
+    log.debug("damagesInput: {}", damagesInput);
+    List<Integer> damages = Arrays.stream(damagesInput.split(",")).map(Integer::parseInt).toList();
+    log.debug("damages: {}", damages);
+
+    log.debug("conditionsInput: {}", conditionsInput);
+    //int count = 0;
+    int[] count = {0};
+    generateHelper(0, conditionsInput, "", damages, count);
+    /*List<String> conditions = generateCombinations(conditionsInput);
+
+    return conditions.parallelStream()
+        .map(this::damageCount)
+        .filter(count -> count.equals(damages))
+        .count();*/
+    return count[0];
+  }
+
+  private void generateHelper(
+          int index, String conditionsInput, String currentCombination, List<Integer> damages, int[] count) {
+    if (index == conditionsInput.length()) {
+      //System.out.println(currentCombination);
+      List<Integer> damagedCount = damageCount(currentCombination);
+      if (damagedCount.equals(damages)) {
+        count[0]++;
+      }
+      return;
+    }
+
+    char currentChar = conditionsInput.charAt(index);
+
+    if (currentChar == '?') {
+      generateHelper(index + 1, conditionsInput, currentCombination + '.', damages, count);
+      generateHelper(index + 1, conditionsInput, currentCombination + '#', damages, count);
+    } else {
+      generateHelper(index + 1, conditionsInput, currentCombination + currentChar, damages, count);
+    }
   }
 
   String unfold(String row) {
