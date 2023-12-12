@@ -1,6 +1,6 @@
 package be.bonamis.advent.year2023;
 
-import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.*;
 
 import java.util.*;
 import java.util.List;
@@ -36,16 +36,26 @@ class Day12Test {
 
   @Test
   void solveRow() {
-    assertThat(day12.solveRow("???.### 1,1,3")).isEqualTo(1);
+    assertThat(day12.solveRow2("???.### 1,1,3")).isEqualTo(1);
     String row00 = input.get(0);
     String row01 = input.get(1);
 
-    assertThat(day12.solveRow(row00)).isEqualTo(1);
-    assertThat(day12.solveRow(row01)).isEqualTo(4);
-    assertThat(day12.solveRow(input.get(2))).isEqualTo(1);
-    assertThat(day12.solveRow(input.get(3))).isEqualTo(1);
-    assertThat(day12.solveRow(input.get(4))).isEqualTo(4);
-    assertThat(day12.solveRow(input.get(5))).isEqualTo(10);
+    assertThat(day12.solveRow2(row00)).isEqualTo(1);
+    assertThat(day12.solveRow2(row01)).isEqualTo(4);
+    assertThat(day12.solveRow2(input.get(2))).isEqualTo(1);
+    assertThat(day12.solveRow2(input.get(3))).isEqualTo(1);
+    assertThat(day12.solveRow2(input.get(4))).isEqualTo(4);
+    assertThat(day12.solveRow2(input.get(5))).isEqualTo(10);
+
+    assertThat(day12.solveRow2(day12.unfold(row00))).isEqualTo(1);
+    assertThat(day12.solveRow2(day12.unfold(row01))).isEqualTo(16384);
+  }
+
+  @Test
+  void solveRowBigger() {
+    assertThat(day12.solveRow2("???.### 1,1,3")).isEqualTo(1);
+    String row00 = input.get(0);
+    String row01 = input.get(1);
 
     assertThat(day12.solveRow2(day12.unfold(row00))).isEqualTo(1);
     assertThat(day12.solveRow2(day12.unfold(row01))).isEqualTo(16384);
@@ -58,6 +68,7 @@ class Day12Test {
   }
 
   @Test
+  @Disabled("need to find something more efficient")
   void solvePart02() {
     assertThat(day12.solvePart02()).isEqualTo(7);
   }

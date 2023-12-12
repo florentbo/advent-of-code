@@ -3,6 +3,7 @@ package be.bonamis.advent.year2023;
 import be.bonamis.advent.DaySolver;
 import be.bonamis.advent.utils.FileHelper;
 import java.util.*;
+import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -21,7 +22,7 @@ public class Day12 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
-    return this.puzzle.parallelStream().map(this::solveRow).reduce(0L, Long::sum);
+    return this.puzzle.parallelStream().map(this::solveRow2).reduce(0L, Long::sum);
   }
 
   List<Integer> damageCount(String input) {
@@ -46,13 +47,12 @@ public class Day12 extends DaySolver<String> {
     return count;
   }
 
-  long solveRow(String row) {
+  /*long solveRow(String row) {
     String[] split = row.split("\\s+");
     String conditionsInput = split[0];
     String damagesInput = split[1];
     log.debug("conditionsInput: {}", conditionsInput);
     List<String> conditions = generateCombinations(conditionsInput);
-
     log.debug("damagesInput: {}", damagesInput);
     List<Integer> damages = Arrays.stream(damagesInput.split(",")).map(Integer::parseInt).toList();
     log.debug("damages: {}", damages);
@@ -61,7 +61,7 @@ public class Day12 extends DaySolver<String> {
         .map(this::damageCount)
         .filter(count -> count.equals(damages))
         .count();
-  }
+  }*/
 
   long solveRow2(String row) {
     String[] split = row.split("\\s+");
@@ -72,15 +72,8 @@ public class Day12 extends DaySolver<String> {
     log.debug("damages: {}", damages);
 
     log.debug("conditionsInput: {}", conditionsInput);
-    // int count = 0;
     int[] count = {0};
     generateHelper(0, conditionsInput, "", damages, count);
-    /*List<String> conditions = generateCombinations(conditionsInput);
-
-    return conditions.parallelStream()
-        .map(this::damageCount)
-        .filter(count -> count.equals(damages))
-        .count();*/
     return count[0];
   }
 
@@ -90,9 +83,38 @@ public class Day12 extends DaySolver<String> {
       String currentCombination,
       List<Integer> damages,
       int[] count) {
+    List<Integer> damagedCount = damageCount(currentCombination);
+    IntPredicate intPredicate = i -> damagedCount.get(i) > damages.get(i);
+    int foundDamagesSize = damagedCount.size();
+    IntPredicate intPredicate2 = i -> foundDamagesSize > damages.size();
+    IntPredicate intPredicate3 =
+        i -> {
+          int index1 = i - 1;
+          log.debug("stream index {} calculated index {} damagedCount: {} damages: {}", i, index1, damagedCount, damages);
+          boolean test = (i > 0 && foundDamagesSize > 1)
+                  && (!Objects.equals(damagedCount.get(index1), damages.get(index1)));
+          if (test) {
+            log.debug("+++++++ test is true");
+          }
+          return test;
+        };
+
+    boolean anyMatch =
+        IntStream.range(0, foundDamagesSize)
+            .anyMatch(intPredicate2.or(intPredicate)
+                    .or(intPredicate3)
+            );
+    if (anyMatch) {
+      return;
+    }
+    log.debug(
+        "currentCombination: {}, damagedCount: {} damages: {} anyMatch: {}",
+        currentCombination,
+        damagedCount,
+        damages,
+        anyMatch);
+
     if (index == conditionsInput.length()) {
-      // System.out.println(currentCombination);
-      List<Integer> damagedCount = damageCount(currentCombination);
       if (damagedCount.equals(damages)) {
         count[0]++;
       }
