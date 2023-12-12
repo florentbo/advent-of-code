@@ -10,8 +10,6 @@ import java.util.stream.IntStream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
-import static be.bonamis.advent.year2023.StringCombinations.generateCombinations;
-
 @Slf4j
 @Getter
 public class Day12 extends DaySolver<String> {
@@ -47,22 +45,6 @@ public class Day12 extends DaySolver<String> {
     return count;
   }
 
-  /*long solveRow(String row) {
-    String[] split = row.split("\\s+");
-    String conditionsInput = split[0];
-    String damagesInput = split[1];
-    log.debug("conditionsInput: {}", conditionsInput);
-    List<String> conditions = generateCombinations(conditionsInput);
-    log.debug("damagesInput: {}", damagesInput);
-    List<Integer> damages = Arrays.stream(damagesInput.split(",")).map(Integer::parseInt).toList();
-    log.debug("damages: {}", damages);
-
-    return conditions.parallelStream()
-        .map(this::damageCount)
-        .filter(count -> count.equals(damages))
-        .count();
-  }*/
-
   long solveRow2(String row) {
     String[] split = row.split("\\s+");
     String conditionsInput = split[0];
@@ -85,24 +67,18 @@ public class Day12 extends DaySolver<String> {
       int[] count) {
     List<Integer> damagedCount = damageCount(currentCombination);
     int foundDamagesSize = damagedCount.size();
-    int damageToFoundSize = damages.size();
 
     IntPredicate sizePredicate = i -> damagedCount.size() > damages.size();
     IntPredicate intPredicate3 =
-            i -> (i > 0 && foundDamagesSize > 1)
-                    && (!Objects.equals(damagedCount.get(i - 1), damages.get(i - 1)));
+        i ->
+            (i > 0 && foundDamagesSize > 1)
+                && (!Objects.equals(damagedCount.get(i - 1), damages.get(i - 1)));
     IntPredicate intPredicate = i -> damagedCount.get(i) > damages.get(i);
-    IntPredicate intPredicate2 = i -> foundDamagesSize > damageToFoundSize;
 
     boolean anyMatch =
         IntStream.range(0, foundDamagesSize)
-            .anyMatch(sizePredicate.or(intPredicate3.or(intPredicate).or(intPredicate2)));
-    /*log.debug(
-        "currentCombination: {}, damagedCount: {} damages: {} anyMatch: {}",
-        currentCombination,
-        damagedCount,
-        damages,
-        anyMatch);*/
+            .anyMatch(sizePredicate.or(intPredicate3.or(intPredicate)));
+
     if (anyMatch) {
       return;
     }
@@ -138,7 +114,15 @@ public class Day12 extends DaySolver<String> {
 
   @Override
   public long solvePart02() {
-    return this.puzzle.parallelStream().map(this::solvePart02Row).reduce(0L, Long::sum);
+
+    return this.puzzle.parallelStream()
+        .map(this::clean)
+        .map(this::solvePart02Row)
+        .reduce(0L, Long::sum);
+  }
+
+  private String clean(String input) {
+    return input.replaceAll("\\.{2,}", ".");
   }
 
   long solvePart02Row(String row) {
@@ -150,6 +134,6 @@ public class Day12 extends DaySolver<String> {
     List<String> puzzle = Arrays.asList(content.split("\n"));
     Day12 day = new Day12(puzzle);
     log.info("solution part 1: {}", day.solvePart01());
-    //log.info("solution part 2: {}", day.solvePart02());
+    // log.info("solution part 2: {}", day.solvePart02());
   }
 }
