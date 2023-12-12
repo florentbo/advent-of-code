@@ -88,19 +88,11 @@ public class Day12 extends DaySolver<String> {
     int damageToFoundSize = damages.size();
 
     IntPredicate sizePredicate = i -> damagedCount.size() > damages.size();
+    IntPredicate intPredicate3 =
+            i -> (i > 0 && foundDamagesSize > 1)
+                    && (!Objects.equals(damagedCount.get(i - 1), damages.get(i - 1)));
     IntPredicate intPredicate = i -> damagedCount.get(i) > damages.get(i);
     IntPredicate intPredicate2 = i -> foundDamagesSize > damageToFoundSize;
-    IntPredicate intPredicate3 =
-        i -> {
-          int index1 = i - 1;
-          // log.debug("stream index {} calculated index {} damagedCount: {} damages: {}", i,
-          // index1, damagedCount, damages);
-          /*if (test) {
-            log.debug("+++++++ test is true");
-          }*/
-          return (i > 0 && foundDamagesSize > 1)
-              && (!Objects.equals(damagedCount.get(index1), damages.get(index1)));
-        };
 
     boolean anyMatch =
         IntStream.range(0, foundDamagesSize)
