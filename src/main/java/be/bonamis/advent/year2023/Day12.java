@@ -119,7 +119,7 @@ public class Day12 extends DaySolver<String> {
 
   @Override
   public long solvePart02() {
-    return this.puzzle.size() + 1;
+    return this.puzzle.parallelStream().map(this::solveRow2).reduce(0L, Long::sum);
   }
 
   public static void main(String[] args) {

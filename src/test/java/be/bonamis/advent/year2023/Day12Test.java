@@ -48,7 +48,7 @@ class Day12Test {
     assertThat(day12.solveRow(input.get(5))).isEqualTo(10);
 
     assertThat(day12.solveRow2(day12.unfold(row00))).isEqualTo(1);
-    //assertThat(day12.solveRow2(day12.unfold(row01))).isEqualTo(16384);
+    assertThat(day12.solveRow2(day12.unfold(row01))).isEqualTo(16384);
   }
 
   @Test
