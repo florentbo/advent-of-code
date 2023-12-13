@@ -11,11 +11,7 @@ import org.junit.jupiter.api.*;
 class Day13Test {
 
   private final List<String> input =
-
-
-
-
-                   Arrays.asList(
+      Arrays.asList(
           """
 #.##..##.
 ..#.##.#.
@@ -40,7 +36,7 @@ class Day13Test {
 
   @Test
   void solvePart01() {
-    assertThat(day13.solvePart01()).isEqualTo(15);
+    assertThat(day13.solvePart01()).isEqualTo(405);
   }
 
   @Test
