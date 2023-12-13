@@ -27,18 +27,8 @@ public class Day13 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
-
-    // CharGrid charGrid = this.grids.get(1);
-    // int linesHandling = linesHandling(charGrid);
-
     int lines = this.grids.stream().map(this::linesHandling).reduce(Integer::sum).orElseThrow();
     int columns = this.grids.stream().map(this::columnHandling).reduce(Integer::sum).orElseThrow();
-
-    /*for (CharGrid charGrid : this.grids) {
-      int columnedHandling = columnHandling(charGrid);
-
-      int linesHandling = linesHandling(charGrid);
-    }*/
 
     return lines * 100L + columns;
   }
@@ -54,30 +44,23 @@ public class Day13 extends DaySolver<String> {
   private int commonElementsResult(List<String> columns, int width) {
     Map<String, List<Integer>> commonElement = findCommonElementsAndIndices(columns);
 
-    List<Integer> middle =
-        commonElement.values().stream()
-            .filter(list -> (list.get(1) - list.get(0) == 1))
-            .findFirst()
-            .orElseThrow();
+    return commonElement.values().stream()
+        .filter(list -> (list.get(1) - list.get(0) == 1))
+        .findFirst()
+        .map(list -> toResult(list, columns, width))
+        .orElse(0);
+  }
+
+  private int toResult(List<Integer> middle, List<String> columns, int width) {
     int middleLeft = middle.get(0);
     int middleRight = middle.get(1);
     int end = width - middleRight - 1;
     int min = Math.min(middleLeft, end);
 
-    /* log.debug("middle: {}", middle);
+    log.debug("middle: {}", middle);
     log.debug("width: {}", width);
     log.debug("end: {}", end);
-    log.debug("min: {}", min);*/
-
-    /* IntStream.range(0, min)
-        .mapToObj(index -> columns.get(middleLeft + 2 + index))
-        .toList()
-        .forEach(log::debug);
-
-    IntStream.range(0, min)
-        .mapToObj(index -> columns.get(middleLeft - 1 - index))
-        .toList()
-        .forEach(log::debug);*/
+    log.debug("min: {}", min);
 
     boolean allMatch =
         IntStream.range(0, min)
@@ -89,12 +72,10 @@ public class Day13 extends DaySolver<String> {
                       && rightIndex < columns.size()
                       && columns.get(rightIndex).equals(columns.get(leftIndex));
                 });
-    // log.debug("allMatch: {}", allMatch);
+    log.debug("allMatch: {}", allMatch);
 
     int result = allMatch ? middleRight : 0;
     log.debug("result: {}", result);
-
-    // commonElement.forEach((key, value) -> log.debug("key: {}, value: {}", key, value));
     return result;
   }
 
@@ -153,18 +134,13 @@ public class Day13 extends DaySolver<String> {
   CharGrid createGrid(int start, int end) {
     List<String> collect = IntStream.range(start, end - 1).mapToObj(this.puzzle::get).toList();
     CharGrid grid = new CharGrid(collect.stream().map(String::toCharArray).toArray(char[][]::new));
-    /*for (List<Point> line : grid.lines()) {
-      Stream<Character> characterStream = line.stream().map(grid::get);
-      String collect1 = characterStream.map(String::valueOf).collect(Collectors.joining());
-      // log.debug("collect1: {}", collect1);
-    }*/
     log.debug("created grid: {}", grid);
     return grid;
   }
 
   @Override
   public long solvePart02() {
-    return this.puzzle.size() + 1;
+    return this.puzzle.size() + 1L;
   }
 
   public static void main(String[] args) {
@@ -172,6 +148,5 @@ public class Day13 extends DaySolver<String> {
     List<String> puzzle = Arrays.asList(content.split("\n"));
     Day13 day = new Day13(puzzle);
     log.info("solution part 1: {}", day.solvePart01());
-    // log.info("solution part 2: {}", day.solvePart02());
   }
 }
