@@ -7,7 +7,6 @@ import be.bonamis.advent.utils.FileHelper;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
-import java.util.function.IntPredicate;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -19,12 +18,61 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class Day13 extends DaySolver<String> {
 
+  private List<CharGrid> grids;
+
   public Day13(List<String> puzzle) {
     super(puzzle);
   }
 
   @Override
   public long solvePart01() {
+    grids();
+    CharGrid grid = this.grids.get(0);
+    //linesHandling(grid);
+
+    List<List<Point>> columns = grid.columns();
+    List<Point> column = columns.get(0);
+    log.debug("columns: {}", column);
+    List<String> collect = columns.stream().map(points -> toLine(points, grid)).toList();
+    log.debug("collect: {}", collect);
+    findCommonElementsAndIndices(collect).forEach((key, value) -> log.debug("key: {}, value: {}", key, value));
+
+
+    /*for (List<Point> line : lines) {
+      Stream<Character> characterStream = line.stream().map(grid::get);
+      String collect1 = characterStream.map(String::valueOf).collect(Collectors.joining());
+      log.debug("collect1: {}", collect1);
+    }*/
+
+    return this.puzzle.size();
+  }
+
+  private void linesHandling(CharGrid grid) {
+    List<List<Point>> lines = grid.lines();
+    List<String> collect = lines.stream().map(points -> toLine(points, grid)).toList();
+    log.debug("collect: {}", collect);
+    findCommonElementsAndIndices(collect).forEach((key, value) -> log.debug("key: {}, value: {}", key, value));
+  }
+
+  Map<String, List<Integer>> findCommonElementsAndIndices(List<String> list) {
+    Map<String, List<Integer>> elementIndicesMap = new HashMap<>();
+
+    for (int i = 0; i < list.size(); i++) {
+      String element = list.get(i);
+      elementIndicesMap.computeIfAbsent(element, k -> new ArrayList<>()).add(i);
+    }
+
+    elementIndicesMap.entrySet().removeIf(entry -> entry.getValue().size() < 2);
+
+    return elementIndicesMap;
+  }
+
+  private String toLine(List<Point> line, CharGrid grid) {
+    Stream<Character> characterStream = line.stream().map(grid::get);
+    return characterStream.map(String::valueOf).collect(Collectors.joining());
+  }
+
+  private void grids() {
     List<Integer> emptyLines =
         IntStream.range(0, this.puzzle.size())
             .filter(index -> this.puzzle.get(index).isEmpty())
@@ -38,13 +86,12 @@ public class Day13 extends DaySolver<String> {
     numbers.add(this.puzzle.size() + 1);
     log.debug("numbers: {}", numbers);
 
-    List<CharGrid> grids =
+    grids =
         IntStream.range(1, numbers.size())
             .mapToObj(i -> createGrid(numbers.get(i - 1), numbers.get(i)))
             .toList();
 
     log.debug("grids: {}", grids);
-    return this.puzzle.size();
   }
 
   CharGrid createGrid(int start, int end) {
@@ -53,7 +100,7 @@ public class Day13 extends DaySolver<String> {
     for (List<Point> line : grid.lines()) {
       Stream<Character> characterStream = line.stream().map(grid::get);
       String collect1 = characterStream.map(String::valueOf).collect(Collectors.joining());
-      log.debug("collect1: {}", collect1);
+      // log.debug("collect1: {}", collect1);
     }
 
     return grid;
