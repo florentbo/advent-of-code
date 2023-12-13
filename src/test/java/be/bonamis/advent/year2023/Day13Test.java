@@ -33,7 +33,7 @@ class Day13Test {
 
                   """
               .split("\n"));
-  private final Day13 day13 = new Day13(input);
+  private final Day13 day13 = new Day13(input, false);
 
   @Test
   void solvePart01() {
@@ -68,7 +68,7 @@ class Day13Test {
 #####....########
 ##..##..##..#####
 """;
-    Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")));
+    Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")), false);
     assertThat(day13.columnHandling(day13WithEdgeCase.getGrids().get(0))).isEqualTo(15);
   }
 
@@ -84,7 +84,7 @@ class Day13Test {
     ..##..###
     #....#..#
     """;
-    Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")));
+    Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")), false);
     assertThat(day13.linesHandling(day13WithEdgeCase.getGrids().get(0))).isEqualTo(4);
   }
 
@@ -109,7 +109,7 @@ class Day13Test {
 ####....##.#.#.
 ..##..#########
 ..##..#########""";
-    Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")));
+    Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")), false);
     assertThat(day13.linesHandling(day13WithEdgeCase.getGrids().get(0))).isEqualTo(16);
   }
 
@@ -155,7 +155,7 @@ class Day13Test {
 ..##..##.
 #.#.##.#.
 """
-                    .split("\n")));
+                    .split("\n")), false);
     assertThat(day13.linesHandling(day13Smudge.getGrids().get(0))).isZero();
 
     //this is the first pattern with a dot in the 0,0 position
@@ -171,7 +171,7 @@ class Day13Test {
 ..##..##.
 #.#.##.#.
 """
-                    .split("\n")));
+                    .split("\n")), false);
     assertThat(day13.linesHandling(day13Smudge02.getGrids().get(0))).isEqualTo(3);
   }
 }
