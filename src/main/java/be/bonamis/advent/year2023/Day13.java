@@ -22,36 +22,87 @@ public class Day13 extends DaySolver<String> {
 
   public Day13(List<String> puzzle) {
     super(puzzle);
+    gridsInit();
   }
 
   @Override
   public long solvePart01() {
-    grids();
-    CharGrid grid = this.grids.get(0);
-    //linesHandling(grid);
 
-    List<List<Point>> columns = grid.columns();
-    List<Point> column = columns.get(0);
-    log.debug("columns: {}", column);
-    List<String> collect = columns.stream().map(points -> toLine(points, grid)).toList();
-    log.debug("collect: {}", collect);
-    findCommonElementsAndIndices(collect).forEach((key, value) -> log.debug("key: {}, value: {}", key, value));
+    // CharGrid charGrid = this.grids.get(1);
+    // int linesHandling = linesHandling(charGrid);
 
+    int lines = this.grids.stream().map(this::linesHandling).reduce(Integer::sum).orElseThrow();
+    int columns = this.grids.stream().map(this::columnHandling).reduce(Integer::sum).orElseThrow();
 
-    /*for (List<Point> line : lines) {
-      Stream<Character> characterStream = line.stream().map(grid::get);
-      String collect1 = characterStream.map(String::valueOf).collect(Collectors.joining());
-      log.debug("collect1: {}", collect1);
+    /*for (CharGrid charGrid : this.grids) {
+      int columnedHandling = columnHandling(charGrid);
+
+      int linesHandling = linesHandling(charGrid);
     }*/
 
-    return this.puzzle.size();
+    return lines * 100L + columns;
   }
 
-  private void linesHandling(CharGrid grid) {
+  private int columnHandling(CharGrid grid) {
+    log.debug("columnHandling");
+    List<List<Point>> gridColumns = grid.columns();
+    List<String> columns = gridColumns.stream().map(points -> toColumn(points, grid)).toList();
+
+    return commonElementsResult(columns, grid.getWidth());
+  }
+
+  private int commonElementsResult(List<String> columns, int width) {
+    Map<String, List<Integer>> commonElement = findCommonElementsAndIndices(columns);
+
+    List<Integer> middle =
+        commonElement.values().stream()
+            .filter(list -> (list.get(1) - list.get(0) == 1))
+            .findFirst()
+            .orElseThrow();
+    int middleLeft = middle.get(0);
+    int middleRight = middle.get(1);
+    int end = width - middleRight - 1;
+    int min = Math.min(middleLeft, end);
+
+    /* log.debug("middle: {}", middle);
+    log.debug("width: {}", width);
+    log.debug("end: {}", end);
+    log.debug("min: {}", min);*/
+
+    /* IntStream.range(0, min)
+        .mapToObj(index -> columns.get(middleLeft + 2 + index))
+        .toList()
+        .forEach(log::debug);
+
+    IntStream.range(0, min)
+        .mapToObj(index -> columns.get(middleLeft - 1 - index))
+        .toList()
+        .forEach(log::debug);*/
+
+    boolean allMatch =
+        IntStream.range(0, min)
+            .allMatch(
+                index -> {
+                  int rightIndex = middleLeft + 2 + index;
+                  int leftIndex = middleLeft - 1 - index;
+                  return rightIndex >= 0
+                      && rightIndex < columns.size()
+                      && columns.get(rightIndex).equals(columns.get(leftIndex));
+                });
+    // log.debug("allMatch: {}", allMatch);
+
+    int result = allMatch ? middleRight : 0;
+    log.debug("result: {}", result);
+
+    // commonElement.forEach((key, value) -> log.debug("key: {}, value: {}", key, value));
+    return result;
+  }
+
+  private int linesHandling(CharGrid grid) {
+    log.debug("linesHandling");
     List<List<Point>> lines = grid.lines();
     List<String> collect = lines.stream().map(points -> toLine(points, grid)).toList();
-    log.debug("collect: {}", collect);
-    findCommonElementsAndIndices(collect).forEach((key, value) -> log.debug("key: {}, value: {}", key, value));
+    return commonElementsResult(collect, grid.getHeight());
   }
 
   Map<String, List<Integer>> findCommonElementsAndIndices(List<String> list) {
@@ -72,7 +123,12 @@ public class Day13 extends DaySolver<String> {
     return characterStream.map(String::valueOf).collect(Collectors.joining());
   }
 
-  private void grids() {
+  private String toColumn(List<Point> line, CharGrid grid) {
+    Stream<Character> characterStream = line.stream().map(grid::get2);
+    return characterStream.map(String::valueOf).collect(Collectors.joining());
+  }
+
+  private void gridsInit() {
     List<Integer> emptyLines =
         IntStream.range(0, this.puzzle.size())
             .filter(index -> this.puzzle.get(index).isEmpty())
@@ -97,12 +153,12 @@ public class Day13 extends DaySolver<String> {
   CharGrid createGrid(int start, int end) {
     List<String> collect = IntStream.range(start, end - 1).mapToObj(this.puzzle::get).toList();
     CharGrid grid = new CharGrid(collect.stream().map(String::toCharArray).toArray(char[][]::new));
-    for (List<Point> line : grid.lines()) {
+    /*for (List<Point> line : grid.lines()) {
       Stream<Character> characterStream = line.stream().map(grid::get);
       String collect1 = characterStream.map(String::valueOf).collect(Collectors.joining());
       // log.debug("collect1: {}", collect1);
-    }
-
+    }*/
+    log.debug("created grid: {}", grid);
     return grid;
   }
 

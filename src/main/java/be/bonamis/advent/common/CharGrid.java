@@ -9,8 +9,10 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 @Getter
+@Slf4j
 public class CharGrid {
 
   private final char[][] data;
@@ -57,19 +59,23 @@ public class CharGrid {
     return null;
   }
 
+  public Character get2(Point p) {
+    return data[p.y][p.x];
+  }
+
   public Long number(Point p) {
     return (long) Character.getNumericValue(get(p));
   }
 
   public void printArray() {
-    System.out.println("start");
+    log.debug("start");
     for (char[] ints : this.data) {
       for (char anInt : ints) {
-        System.out.print(anInt);
+        log.debug(anInt + "");
       }
-      System.out.println();
+      log.debug("\n");
     }
-    System.out.println("end");
+    log.debug("end");
   }
 
   public void set(Point point, char i) {
