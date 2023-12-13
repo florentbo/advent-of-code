@@ -20,13 +20,13 @@ class Day10Test {
         log.info("Day10 part 01 result: {}", new ClockCircuit(lines2).run());
 
     }
-    @Test
+    /*@Test
     @Disabled
     void solvePart01() {
         List<String> lines = getLines(CODE_TXT);
         new ClockCircuit(lines).run();
         assertThat(lines.size()).isEqualTo(3);
-    }
+    }*/
 
     @Test
     void solvePart011() {
@@ -89,10 +89,10 @@ class Day10Test {
         }
     }
 
-    @Test
+    /*@Test
     @Disabled
     void solvePart02() {
         List<String> lines = getLines(CODE_TXT);
         assertThat(lines.size()).isEqualTo(3);
-    }
+    }*/
 }
