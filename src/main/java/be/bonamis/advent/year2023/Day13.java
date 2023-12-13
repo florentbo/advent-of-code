@@ -2,6 +2,7 @@ package be.bonamis.advent.year2023;
 
 import be.bonamis.advent.DaySolver;
 import be.bonamis.advent.common.CharGrid;
+import be.bonamis.advent.utils.CollectionsHelper;
 import be.bonamis.advent.utils.FileHelper;
 
 import java.awt.*;
@@ -13,6 +14,7 @@ import java.util.stream.Stream;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
 
 @Slf4j
 @Getter
@@ -27,13 +29,13 @@ public class Day13 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
-    int lines = this.grids.stream().map(this::linesHandling).reduce(Integer::sum).orElseThrow();
-    int columns = this.grids.stream().map(this::columnHandling).reduce(Integer::sum).orElseThrow();
+    int columns = CollectionsHelper.sum(this.grids.stream().map(this::columnHandling));
+    int lines = CollectionsHelper.sum(this.grids.stream().map(this::linesHandling));
 
     return lines * 100L + columns;
   }
 
-  private int columnHandling(CharGrid grid) {
+  int columnHandling(CharGrid grid) {
     log.debug("columnHandling");
     List<List<Point>> gridColumns = grid.columns();
     List<String> columns = gridColumns.stream().map(points -> toColumn(points, grid)).toList();
@@ -44,16 +46,26 @@ public class Day13 extends DaySolver<String> {
   private int commonElementsResult(List<String> columns, int width) {
     Map<String, List<Integer>> commonElement = findCommonElementsAndIndices(columns);
 
-    return commonElement.values().stream()
-        .filter(list -> (list.get(1) - list.get(0) == 1))
-        .findFirst()
-        .map(list -> toResult(list, columns, width))
+    List<Pair<Integer, Integer>> middles = findMiddles(commonElement.values());
+    return middles.stream()
+        .map(pair -> toResult(pair, columns, width))
+        .reduce(Integer::sum)
         .orElse(0);
   }
 
-  private int toResult(List<Integer> middle, List<String> columns, int width) {
-    int middleLeft = middle.get(0);
-    int middleRight = middle.get(1);
+  public List<Pair<Integer, Integer>> findMiddles(Collection<List<Integer>> lists) {
+    return lists.stream().flatMap(this::findMiddles).toList();
+  }
+
+  private Stream<Pair<Integer, Integer>> findMiddles(List<Integer> values) {
+    return IntStream.range(1, values.size())
+        .filter(i -> values.get(i) - values.get(i - 1) == 1)
+        .mapToObj(i -> Pair.of(values.get(i - 1), values.get(i)));
+  }
+
+  private int toResult(Pair<Integer, Integer> middle, List<String> columns, int width) {
+    int middleLeft = middle.getLeft();
+    int middleRight = middle.getRight();
     int end = width - middleRight - 1;
     int min = Math.min(middleLeft, end);
 
@@ -61,7 +73,6 @@ public class Day13 extends DaySolver<String> {
     log.debug("width: {}", width);
     log.debug("end: {}", end);
     log.debug("min: {}", min);
-
     boolean allMatch =
         IntStream.range(0, min)
             .allMatch(
@@ -79,7 +90,7 @@ public class Day13 extends DaySolver<String> {
     return result;
   }
 
-  private int linesHandling(CharGrid grid) {
+  int linesHandling(CharGrid grid) {
     log.debug("linesHandling");
     List<List<Point>> lines = grid.lines();
     List<String> collect = lines.stream().map(points -> toLine(points, grid)).toList();
@@ -95,6 +106,7 @@ public class Day13 extends DaySolver<String> {
     }
 
     elementIndicesMap.entrySet().removeIf(entry -> entry.getValue().size() < 2);
+    log.debug("elementIndicesMap: {}", elementIndicesMap);
 
     return elementIndicesMap;
   }
@@ -116,6 +128,10 @@ public class Day13 extends DaySolver<String> {
             .mapToObj(index -> index + 1)
             .toList();
     log.debug("emptyLines: {}", emptyLines);
+    for (int i = 0; i < emptyLines.size(); i++) {
+      log.info("emptyLines {}: {}", i, emptyLines.get(i));
+    }
+    log.info("emptyLines size: {}", emptyLines.size());
 
     List<Integer> numbers = new ArrayList<>();
     numbers.add(0);
@@ -129,6 +145,7 @@ public class Day13 extends DaySolver<String> {
             .toList();
 
     log.debug("grids: {}", grids);
+    log.info("grids size: {}", grids.size());
   }
 
   CharGrid createGrid(int start, int end) {
