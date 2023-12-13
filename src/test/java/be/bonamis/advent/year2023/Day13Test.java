@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.util.*;
 import java.util.List;
+
+import be.bonamis.advent.common.CharGrid;
 import lombok.extern.slf4j.*;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.*;
@@ -33,7 +35,7 @@ class Day13Test {
 
                   """
               .split("\n"));
-  private final Day13 day13 = new Day13(input, false);
+  private final Day13 day13 = new Day13(input);
 
   @Test
   void solvePart01() {
@@ -42,7 +44,7 @@ class Day13Test {
 
   @Test
   void columnHandling() {
-    assertThat(day13.columnHandling(day13.getGrids().get(0))).isEqualTo(5);
+    assertThat(day13.columnHandling(day13.getGrids().get(0), false)).isEqualTo(5);
   }
 
   @Test
@@ -68,8 +70,8 @@ class Day13Test {
 #####....########
 ##..##..##..#####
 """;
-    Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")), false);
-    assertThat(day13.columnHandling(day13WithEdgeCase.getGrids().get(0))).isEqualTo(15);
+    Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")));
+    assertThat(day13.columnHandling(day13WithEdgeCase.getGrids().get(0), false)).isEqualTo(15);
   }
 
   @Test
@@ -84,8 +86,8 @@ class Day13Test {
     ..##..###
     #....#..#
     """;
-    Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")), false);
-    assertThat(day13.linesHandling(day13WithEdgeCase.getGrids().get(0))).isEqualTo(4);
+    Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")));
+    assertThat(day13.linesHandling(day13WithEdgeCase.getGrids().get(0), false)).isEqualTo(4);
   }
 
   @Test
@@ -109,8 +111,8 @@ class Day13Test {
 ####....##.#.#.
 ..##..#########
 ..##..#########""";
-    Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")), false);
-    assertThat(day13.linesHandling(day13WithEdgeCase.getGrids().get(0))).isEqualTo(16);
+    Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")));
+    assertThat(day13.linesHandling(day13WithEdgeCase.getGrids().get(0), false)).isEqualTo(16);
   }
 
   @Test
@@ -133,45 +135,43 @@ class Day13Test {
 
   @Test
   void solvePart02() {
-    assertThat(day13.solvePart02()).isEqualTo(16);
+    assertThat(new Day13(input).solvePart02()).isEqualTo(400);
   }
 
   @Test
   void lineHandlingPart01() {
-    assertThat(day13.linesHandling(day13.getGrids().get(0))).isZero();
+    assertThat(day13.linesHandling(day13.getGrids().get(0), false)).isZero();
   }
 
   @Test
   void lineHandlingPart02() {
-    Day13 day13Smudge =
-        new Day13(
-            Arrays.asList(
-                """
-#.##..##.
-..#.##.#.
-##......#
-##......#
-..#.##.#.
-..##..##.
-#.#.##.#.
-"""
-                    .split("\n")), false);
-    assertThat(day13.linesHandling(day13Smudge.getGrids().get(0))).isZero();
 
-    //this is the first pattern with a dot in the 0,0 position
-    Day13 day13Smudge02 =
-        new Day13(
-            Arrays.asList(
-                """
-..##..##.
-..#.##.#.
-##......#
-##......#
-..#.##.#.
-..##..##.
-#.#.##.#.
-"""
-                    .split("\n")), false);
-    assertThat(day13.linesHandling(day13Smudge02.getGrids().get(0))).isEqualTo(3);
+    assertThat(day13.linesHandling(day13.getGrids().get(0), false)).isZero();
+
+    // this is the first pattern with a dot in the 0,0 position
+
+    List<String> smuggedText =
+        Arrays.asList(
+            """
+        ..##..##.
+        ..#.##.#.
+        ##......#
+        ##......#
+        ..#.##.#.
+        ..##..##.
+        #.#.##.#.
+        """
+                .split("\n"));
+    Day13 day13WithoutSmudge = new Day13(smuggedText);
+    assertThat(day13.linesHandling(day13WithoutSmudge.getGrids().get(0), false)).isEqualTo(3);
+    Day13 day13WithSmudge = new Day13(smuggedText);
+    assertThat(day13WithSmudge.linesHandling(day13.getGrids().get(0), true)).isEqualTo(3);
+  }
+
+  @Test
+  void linesHandlingWithSmudge() {
+    CharGrid secondPattern = day13.getGrids().get(1);
+    assertThat(day13.linesHandling(secondPattern, false)).isEqualTo(4);
+    assertThat(day13.linesHandling(secondPattern, true)).isEqualTo(1);
   }
 }

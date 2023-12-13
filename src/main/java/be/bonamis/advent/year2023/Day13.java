@@ -8,6 +8,7 @@ import be.bonamis.advent.utils.FileHelper;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -19,25 +20,38 @@ import org.apache.commons.lang3.tuple.Pair;
 @Slf4j
 @Getter
 public class Day13 extends DaySolver<String> {
-
   private final List<CharGrid> grids;
-  private final boolean withSmudge;
 
-  public Day13(List<String> puzzle, boolean withSmudge) {
+  public Day13(List<String> puzzle) {
     super(puzzle);
-    this.withSmudge = withSmudge;
     this.grids = gridsInit();
   }
 
   @Override
   public long solvePart01() {
-    int columns = CollectionsHelper.sum(this.grids.stream().map(this::columnHandling));
-    int lines = CollectionsHelper.sum(this.grids.stream().map(this::linesHandling));
+    return solve(false);
+  }
+
+  private long solve(boolean withSmudge) {
+    int columns =
+        CollectionsHelper.sum(this.grids.stream().map(grid -> columnHandling(grid, withSmudge)));
+    int lines =
+        CollectionsHelper.sum(this.grids.stream().map(grid -> linesHandling(grid, withSmudge)));
 
     return lines * 100L + columns;
   }
 
-  int columnHandling(CharGrid grid) {
+  @Override
+  public long solvePart02() {
+    return solve(true);
+  }
+
+  int columnHandling(CharGrid grid, boolean withSmudge) {
+    int previous = columnResult(grid);
+    return withSmudge ? smudgeResult(grid, columnHandling, previous) : previous;
+  }
+
+  private int columnResult(CharGrid grid) {
     log.debug("columnHandling");
     List<List<Point>> gridColumns = grid.columns();
     List<String> columns = gridColumns.stream().map(points -> toColumn(points, grid)).toList();
@@ -51,7 +65,8 @@ public class Day13 extends DaySolver<String> {
     List<Pair<Integer, Integer>> middles = findMiddles(commonElement.values());
     return middles.stream()
         .map(pair -> toResult(pair, columns, width))
-        .reduce(Integer::sum)
+        .filter(i -> i != 0)
+        .findFirst()
         .orElse(0);
   }
 
@@ -92,12 +107,43 @@ public class Day13 extends DaySolver<String> {
     return result;
   }
 
-  int linesHandling(CharGrid grid) {
+  int linesHandling(CharGrid grid, boolean withSmudge) {
+    int lineResult = lineResult(grid);
+    return withSmudge ? smudgeResult(grid, linesHandling, lineResult) : lineResult;
+  }
+
+  private Integer smudgeResult(
+      CharGrid grid, Function<CharGrid, Integer> handling, int previousResult) {
+    return grid.stream()
+        .map(point -> toGrid(point, grid, handling))
+        .filter(res -> isaBoolean(previousResult, res))
+        .findFirst()
+        .orElse(0);
+  }
+
+  private boolean isaBoolean(int previousResult, Integer res) {
+    boolean b = res != previousResult && res != 0;
+    return b;
+  }
+
+  int lineResult(CharGrid grid) {
     log.debug("linesHandling");
     List<List<Point>> lines = grid.lines();
     List<String> collect = lines.stream().map(points -> toLine(points, grid)).toList();
     return commonElementsResult(collect, grid.getHeight());
   }
+
+  private int toGrid(Point point, final CharGrid grid, Function<CharGrid, Integer> handling) {
+    Character c = grid.get(point);
+    CharGrid newGrid =
+        new CharGrid(Arrays.stream(grid.getData()).map(char[]::clone).toArray(char[][]::new));
+    newGrid.set(point, c == '.' ? '#' : '.');
+    return handling.apply(newGrid);
+  }
+
+  Function<CharGrid, Integer> linesHandling = this::lineResult;
+
+  Function<CharGrid, Integer> columnHandling = this::columnResult;
 
   Map<String, List<Integer>> findCommonElementsAndIndices(List<String> list) {
     Map<String, List<Integer>> elementIndicesMap = new HashMap<>();
@@ -157,15 +203,11 @@ public class Day13 extends DaySolver<String> {
     return grid;
   }
 
-  @Override
-  public long solvePart02() {
-    return this.puzzle.size() + 1L;
-  }
-
   public static void main(String[] args) {
     String content = FileHelper.content("2023/13/2023_13_input.txt");
     List<String> puzzle = Arrays.asList(content.split("\n"));
-    Day13 day = new Day13(puzzle, false);
+    Day13 day = new Day13(puzzle);
     log.info("solution part 1: {}", day.solvePart01());
+    log.info("solution part 2: {}", day.solvePart02());
   }
 }
