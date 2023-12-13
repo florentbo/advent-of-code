@@ -20,11 +20,13 @@ import org.apache.commons.lang3.tuple.Pair;
 @Getter
 public class Day13 extends DaySolver<String> {
 
-  private List<CharGrid> grids;
+  private final List<CharGrid> grids;
+  private final boolean withSmudge;
 
-  public Day13(List<String> puzzle) {
+  public Day13(List<String> puzzle, boolean withSmudge) {
     super(puzzle);
-    gridsInit();
+    this.withSmudge = withSmudge;
+    this.grids = gridsInit();
   }
 
   @Override
@@ -121,7 +123,7 @@ public class Day13 extends DaySolver<String> {
     return characterStream.map(String::valueOf).collect(Collectors.joining());
   }
 
-  private void gridsInit() {
+  private List<CharGrid> gridsInit() {
     List<Integer> emptyLines =
         IntStream.range(0, this.puzzle.size())
             .filter(index -> this.puzzle.get(index).isEmpty())
@@ -139,13 +141,13 @@ public class Day13 extends DaySolver<String> {
     numbers.add(this.puzzle.size() + 1);
     log.debug("numbers: {}", numbers);
 
-    grids =
+    List<CharGrid> charGrids =
         IntStream.range(1, numbers.size())
             .mapToObj(i -> createGrid(numbers.get(i - 1), numbers.get(i)))
             .toList();
-
-    log.debug("grids: {}", grids);
-    log.info("grids size: {}", grids.size());
+    log.debug("grids: {}", charGrids);
+    log.info("grids size: {}", charGrids.size());
+    return charGrids;
   }
 
   CharGrid createGrid(int start, int end) {
@@ -163,7 +165,7 @@ public class Day13 extends DaySolver<String> {
   public static void main(String[] args) {
     String content = FileHelper.content("2023/13/2023_13_input.txt");
     List<String> puzzle = Arrays.asList(content.split("\n"));
-    Day13 day = new Day13(puzzle);
+    Day13 day = new Day13(puzzle, false);
     log.info("solution part 1: {}", day.solvePart01());
   }
 }
