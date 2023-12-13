@@ -135,4 +135,43 @@ class Day13Test {
   void solvePart02() {
     assertThat(day13.solvePart02()).isEqualTo(16);
   }
+
+  @Test
+  void lineHandlingPart01() {
+    assertThat(day13.linesHandling(day13.getGrids().get(0))).isZero();
+  }
+
+  @Test
+  void lineHandlingPart02() {
+    Day13 day13Smudge =
+        new Day13(
+            Arrays.asList(
+                """
+#.##..##.
+..#.##.#.
+##......#
+##......#
+..#.##.#.
+..##..##.
+#.#.##.#.
+"""
+                    .split("\n")));
+    assertThat(day13.linesHandling(day13Smudge.getGrids().get(0))).isZero();
+
+    //this is the first pattern with a dot in the 0,0 position
+    Day13 day13Smudge02 =
+        new Day13(
+            Arrays.asList(
+                """
+..##..##.
+..#.##.#.
+##......#
+##......#
+..#.##.#.
+..##..##.
+#.#.##.#.
+"""
+                    .split("\n")));
+    assertThat(day13.linesHandling(day13Smudge02.getGrids().get(0))).isEqualTo(3);
+  }
 }
