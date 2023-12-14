@@ -130,9 +130,13 @@ class Day14Test {
     }*/
     log.debug("memo: {}", memo.values());
 
+    int index = 25 + modulo + 1;
+
+    log.debug("index: {}", index);
+
     List<String> key =
         memo.entrySet().stream()
-            .filter(entry -> entry.getValue().equals(modulo + 1))
+            .filter(entry -> entry.getValue().equals(index))
             .findFirst()
             .orElseThrow()
             .getKey();
@@ -155,9 +159,8 @@ class Day14Test {
       memo.put(lines, i);
       CharGrid charGrid = new CharGrid(lines);
       Integer sum = loadsSum(charGrid);
-      if (sum == 64) {
-        log.debug("sum: {} value {}", sum, i);
-      }
+      log.debug("sum: {} value {}", sum, i);
+
     }
     return memo;
   }
