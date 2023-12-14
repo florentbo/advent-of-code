@@ -43,8 +43,18 @@ class Day13Test {
   }
 
   @Test
+  void solvePart01Bis() {
+    assertThat(day13.solvePart01Bis()).isEqualTo(405);
+  }
+
+  @Test
   void columnHandling() {
-    assertThat(day13.columnHandling(day13.getGrids().get(0), false)).isEqualTo(5);
+    CharGrid grid = day13.getGrids().get(0);
+    assertThat(day13.columnHandling(grid, false)).isEqualTo(5);
+    List<String> columns = grid.columnsAsLines2();
+    Pair<Integer, Integer> pair = Pair.of(5, 6);
+    assertThat(day13.findReflectionLines(columns)).contains(pair);
+    assertThat(day13.lineResult(columns)).hasValue(5);
   }
 
   @Test
@@ -71,7 +81,9 @@ class Day13Test {
 ##..##..##..#####
 """;
     Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")));
-    assertThat(day13.columnHandling(day13WithEdgeCase.getGrids().get(0), false)).isEqualTo(15);
+    CharGrid grid = day13WithEdgeCase.getGrids().get(0);
+    assertThat(day13.columnHandling(grid, false)).isEqualTo(15);
+    assertThat(day13.lineResult(grid.columnsAsLines2())).hasValue(15);
   }
 
   @Test
@@ -87,7 +99,9 @@ class Day13Test {
     #....#..#
     """;
     Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")));
-    assertThat(day13.linesHandling(day13WithEdgeCase.getGrids().get(0), false)).isEqualTo(4);
+    CharGrid grid = day13WithEdgeCase.getGrids().get(0);
+    assertThat(day13.linesHandling(grid, false)).isEqualTo(4);
+    assertThat(day13.lineResult(grid.rowsAsLines2())).hasValue(4);
   }
 
   @Test
@@ -112,7 +126,9 @@ class Day13Test {
 ..##..#########
 ..##..#########""";
     Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")));
-    assertThat(day13.linesHandling(day13WithEdgeCase.getGrids().get(0), false)).isEqualTo(16);
+    CharGrid grid = day13WithEdgeCase.getGrids().get(0);
+    assertThat(day13.linesHandling(grid, false)).isEqualTo(16);
+    assertThat(day13.lineResult(grid.rowsAsLines2())).hasValue(16);
   }
 
   @Test

@@ -32,6 +32,59 @@ public class Day13 extends DaySolver<String> {
     return solve(false);
   }
 
+  public long solvePart01Bis() {
+    return solveBis(false);
+  }
+
+  long solveBis(boolean withSmudge) {
+    int columns =
+        CollectionsHelper.sum(this.grids.stream().map(grid -> lineResult2(grid.columnsAsLines2())));
+    int lines =
+        CollectionsHelper.sum(this.grids.stream().map(grid -> lineResult2(grid.rowsAsLines2())));
+
+    return lines * 100L + columns;
+  }
+
+  private Integer lineResult2(List<String> lines) {
+    return lineResult(lines).orElse(0);
+  }
+
+  List<Pair<Integer, Integer>> findReflectionLines(List<String> columns) {
+    log.debug("col: {}", columns);
+    return IntStream.range(0, columns.size() - 1)
+        .filter(i -> columns.get(i).equals(columns.get(i + 1)))
+        .mapToObj(i -> Pair.of(i + 1, i + 2))
+        .toList();
+  }
+
+  Optional<Integer> lineResult(List<String> lines) {
+    Stream<Optional<Integer>> optionalStream =
+        findReflectionLines(lines).stream().map(pair -> toResult2(pair, lines));
+    Stream<Integer> integerStream = optionalStream.filter(Optional::isPresent).map(Optional::get);
+    return integerStream.findFirst();
+  }
+
+  private Optional<Integer> toResult2(Pair<Integer, Integer> middle, List<String> columns) {
+    int middleLeft = middle.getLeft() - 1;
+    int middleRight = middle.getRight() - 1;
+    int end = columns.size() - middleRight - 1;
+    int min = Math.min(middleLeft, end);
+
+    boolean allMatch =
+        IntStream.range(0, min)
+            .allMatch(
+                index -> {
+                  int rightIndex = middleLeft + 2 + index;
+                  int leftIndex = middleLeft - 1 - index;
+                  return rightIndex >= 0
+                      && rightIndex < columns.size()
+                      && columns.get(rightIndex).equals(columns.get(leftIndex));
+                });
+    log.debug("allMatch: {}", allMatch);
+
+    return allMatch ? Optional.of(middleRight) : Optional.empty();
+  }
+
   private long solve(boolean withSmudge) {
     int columns =
         CollectionsHelper.sum(this.grids.stream().map(grid -> columnHandling(grid, withSmudge)));
@@ -116,14 +169,9 @@ public class Day13 extends DaySolver<String> {
       CharGrid grid, Function<CharGrid, Integer> handling, int previousResult) {
     return grid.stream()
         .map(point -> toGrid(point, grid, handling))
-        .filter(res -> isaBoolean(previousResult, res))
+        .filter(res -> res != previousResult && res != 0)
         .findFirst()
         .orElse(0);
-  }
-
-  private boolean isaBoolean(int previousResult, Integer res) {
-    boolean b = res != previousResult && res != 0;
-    return b;
   }
 
   int lineResult(CharGrid grid) {
@@ -208,6 +256,7 @@ public class Day13 extends DaySolver<String> {
     List<String> puzzle = Arrays.asList(content.split("\n"));
     Day13 day = new Day13(puzzle);
     log.info("solution part 1: {}", day.solvePart01());
+    log.info("solution part 1: {}", day.solvePart01Bis());
     log.info("solution part 2: {}", day.solvePart02());
   }
 }

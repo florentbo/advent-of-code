@@ -116,6 +116,10 @@ public class CharGrid {
     Stream<Character> characterStream = line.stream().map(this::get);
     return characterStream.map(String::valueOf).collect(Collectors.joining());
   }
+  public String toLine2(List<Point> line) {
+    Stream<Character> characterStream = line.stream().map(this::get2);
+    return characterStream.map(String::valueOf).collect(Collectors.joining());
+  }
 
   public Character get(Point p) {
     if (p.x >= 0 && p.x < data.length && p.y >= 0 && p.y < data[0].length) {
@@ -210,5 +214,13 @@ public class CharGrid {
 
   public List<String> rowsAsLines() {
     return rows().stream().map(this::toLine).toList();
+  }
+
+  public List<String> rowsAsLines2() {
+    return rows().stream().map(this::toLine2).toList();
+  }
+
+  public List<String> columnsAsLines2() {
+    return columns().stream().map(this::toLine2).toList();
   }
 }
