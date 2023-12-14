@@ -34,8 +34,8 @@ public class Day14 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
-    moveRocks(grid, SOUTH);
-    return loadsSum(new CharGrid(grid.rowsAsLines()));
+    moveRocks(SOUTH);
+    return loadsSum();
   }
 
   @Override
@@ -65,31 +65,31 @@ public class Day14 extends DaySolver<String> {
     Map<List<String>, Pair<Integer, Integer>> memo = new LinkedHashMap<>();
 
     for (int i = 1; i <= 500; i++) {
-      cycle(grid);
+      cycle();
       List<String> lines = grid.rowsAsLines();
-      Integer loadsSum = loadsSum(new CharGrid(lines));
+      Integer loadsSum = loadsSum();
       memo.put(lines, Pair.of(i, loadsSum));
       // log.debug("sum: {} value {}", loadsSum, i);
     }
     return memo;
   }
 
-  Integer loadsSum(CharGrid grid) {
-    return loads(grid).stream().reduce(Integer::sum).orElseThrow();
+  Integer loadsSum() {
+    return loads().stream().reduce(Integer::sum).orElseThrow();
   }
 
-  private List<Integer> loads(CharGrid grid) {
+  private List<Integer> loads() {
     return grid.stream()
         .filter(p1 -> grid.get(p1).equals('O'))
         .map(p -> grid.getHeight() - p.y)
         .toList();
   }
 
-  void cycle(CharGrid grid) {
-    moveRocks(grid, SOUTH);
-    moveRocks(grid, WEST);
-    moveRocks(grid, NORTH);
-    moveRocks(grid, EAST);
+  void cycle() {
+    moveRocks(SOUTH);
+    moveRocks(WEST);
+    moveRocks(NORTH);
+    moveRocks(EAST);
   }
 
   Pair<Integer, Integer> findSeries(List<Integer> list) {
@@ -99,15 +99,14 @@ public class Day14 extends DaySolver<String> {
             .map(i -> list.size() - i - 1)
             .filter(i -> list.get(i) - list.get(i - 1) > 1)
             .findFirst();
-    if (first.isPresent()) {
-      int index = first.getAsInt();
+    if (first.isPresent()) {int index = first.getAsInt();
       return Pair.of(index, size - index);
     }
     return Pair.of(0, 0);
   }
 
-  void moveRocks(CharGrid grid, Rover.Direction direction) {
-    Stream<Point> stream = stream(grid, direction);
+  void moveRocks(Rover.Direction direction) {
+    Stream<Point> stream = stream(direction);
     stream.forEach(
         point -> {
           Character c = grid.get(point);
@@ -118,7 +117,7 @@ public class Day14 extends DaySolver<String> {
             while (canMove) {
               Position newPosition = rover.move(Rover.Command.FORWARD).position();
               Point movedPoint = new Point(newPosition.x(), newPosition.y());
-              canMove = isInTheGrid(grid, movedPoint) && isDot(grid, movedPoint);
+              canMove = isInTheGrid(movedPoint) && isDot(movedPoint);
               if (canMove) {
                 grid.set(movedPoint, ROCK);
                 Position position = rover.position();
@@ -130,7 +129,7 @@ public class Day14 extends DaySolver<String> {
         });
   }
 
-  private Stream<Point> stream(CharGrid grid, Rover.Direction direction) {
+  private Stream<Point> stream(Rover.Direction direction) {
     return switch (direction) {
       case NORTH -> grid.streamFromDown();
       case EAST -> grid.streamFromLeft();
@@ -138,11 +137,11 @@ public class Day14 extends DaySolver<String> {
     };
   }
 
-  private boolean isDot(CharGrid grid, Point movedPoint) {
+  private boolean isDot(Point movedPoint) {
     return grid.get(movedPoint).equals(DOT);
   }
 
-  private boolean isInTheGrid(CharGrid grid, Point movedPoint) {
+  private boolean isInTheGrid(Point movedPoint) {
     return grid.isInTheGrid().test(movedPoint);
   }
 
