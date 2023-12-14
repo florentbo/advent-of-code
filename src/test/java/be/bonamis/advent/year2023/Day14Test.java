@@ -74,9 +74,28 @@ O.#..O.#.#
 #....###..
 #OO..#....
 """;
+
+    /*    text = """
+    012
+    345
+    678
+    """;*/
     CharGrid grid = new CharGrid(Arrays.asList(text.split("\n")));
     log.debug("before moved");
-    grid.printArray();
+    grid.printLines();
+    /*log.debug("\n\nafter  rotated\n\n");
+    CharGrid rotated = grid.rotateCounterClockwise();
+    rotated.printLines();*/
+
+    /*log.debug("rotated");
+    grid.stream2()
+        .limit(10)
+        .forEach(
+            point -> {
+              Character c = grid.get(point);
+              log.debug("point {} value {}", point, c);
+            });*/
+
     grid.stream()
         .forEach(
             point -> {
@@ -95,12 +114,13 @@ O.#..O.#.#
                     grid.set(new Point(position.x(), position.y()), DOT);
                     rover = rover.move(Rover.Command.FORWARD);
                     // grid.printArray();
-                    log.debug("moved");
+                    // log.debug("moved");
                   }
                 }
               }
             });
-    grid.printArray();
+    // grid.printArray();
+
     Stream<Point> rocks = grid.stream().filter(p -> grid.get(p).equals('O'));
     int height = grid.getHeight();
     Integer sum = rocks.map(p -> height - p.y).reduce(Integer::sum).orElseThrow();
@@ -113,6 +133,21 @@ O.#..O.#.#
 
   private boolean isInTheGrid(CharGrid grid, Point movedPoint) {
     return grid.isInTheGrid().test(movedPoint);
+  }
+
+  @Test
+  void rotate() {
+    String text = """
+012
+345
+678
+""";
+
+    CharGrid grid = new CharGrid(text);
+
+    assertThat(grid.rowsAsLines()).containsExactly("012", "345", "678");
+    CharGrid rotated = grid.rotateCounterClockwise();
+    assertThat(rotated.rowsAsLines()).containsExactly("258", "147", "036");
   }
 
   @Test

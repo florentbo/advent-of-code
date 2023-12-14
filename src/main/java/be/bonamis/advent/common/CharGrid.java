@@ -2,9 +2,11 @@ package be.bonamis.advent.common;
 
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -32,6 +34,13 @@ public class CharGrid {
     this.width = grid.getWidth();
   }
 
+  public CharGrid(String text) {
+    CharGrid grid = this.grid(Arrays.asList(text.split("\n")));
+    this.data = grid.getData();
+    this.height = grid.getHeight();
+    this.width = grid.getWidth();
+  }
+
   private CharGrid grid(List<String> text) {
     char[][] grid = text.stream().map(String::toCharArray).toArray(char[][]::new);
 
@@ -50,6 +59,46 @@ public class CharGrid {
     return IntStream.range(0, data.length)
         .boxed()
         .flatMap(x -> IntStream.range(0, data[x].length).mapToObj(y -> new Point(x, y)));
+  }
+
+  public void printLines() {
+    this.rows().forEach(line -> log.info(toLine(line)));
+  }
+
+  public CharGrid rotateCounterClockwise() {
+    // yes strange char init probably
+    return new CharGrid(rotateClockWise(this.data));
+  }
+
+  private char[][] rotateClockWise(char[][] matrix) {
+    int size = matrix.length;
+    char[][] ret = new char[size][size];
+
+    for (int i = 0; i < size; ++i) {
+      for (int j = 0; j < size; ++j) {
+        ret[i][j] = matrix[size - j - 1][i];
+      }
+    }
+
+    return ret;
+  }
+
+  private char[][] rotateCounterClockWise(char[][] matrix) {
+    int size = matrix.length;
+    char[][] ret = new char[size][size];
+
+    for (int i = 0; i < size; ++i) {
+      for (int j = 0; j < size; ++j) {
+        ret[i][j] = matrix[j][size - i - 1];
+      }
+    }
+
+    return ret;
+  }
+
+  public String toLine(List<Point> line) {
+    Stream<Character> characterStream = line.stream().map(this::get);
+    return characterStream.map(String::valueOf).collect(Collectors.joining());
   }
 
   public Character get(Point p) {
@@ -141,5 +190,9 @@ public class CharGrid {
 
   public List<Point> column(int w) {
     return IntStream.range(0, getHeight()).mapToObj(h -> new Point(w, h)).toList();
+  }
+
+  public List<String> rowsAsLines() {
+    return rows().stream().map(this::toLine).toList();
   }
 }
