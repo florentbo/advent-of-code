@@ -66,7 +66,7 @@ public class Day14 extends DaySolver<String> {
   Map<Integer, String> listToMap(List<String> originalArray) {
     TreeMap<Integer, String> map = new TreeMap<>(Collections.reverseOrder());
 
-    int position = 10;
+    int position = originalArray.size();
 
     for (String character : originalArray) {
       if (!character.equals(".")) {

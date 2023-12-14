@@ -1,5 +1,6 @@
 package be.bonamis.advent.year2023;
 
+import be.bonamis.advent.utils.FileHelper;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
@@ -35,8 +36,16 @@ class Day14Test {
   @Test
   void rocks() {
     List<List<Point>> columns = day14.getGrid().columns();
-
     assertThat(day14.rocks(columns.get(2))).isEqualTo(List.of(10L, 4L, 3L));
+  }
+
+  @Test
+  void rocks2() {
+    String content = FileHelper.content("2023/14/2023_14_input.txt");
+    List<String> puzzle = Arrays.asList(content.split("\n"));
+    Day14 day = new Day14(puzzle);
+    List<List<Point>> columns = day.getGrid().columns();
+    assertThat(day.rocks(columns.get(0))).contains(100L,99L,91L);
   }
 
   @Test
