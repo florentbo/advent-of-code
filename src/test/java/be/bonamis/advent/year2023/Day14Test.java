@@ -1,17 +1,28 @@
 package be.bonamis.advent.year2023;
 
+import be.bonamis.advent.common.CharGrid;
 import be.bonamis.advent.utils.FileHelper;
+import be.bonamis.advent.utils.marsrover.Position;
+import be.bonamis.advent.utils.marsrover.Rover;
+import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
 import java.awt.*;
 import java.util.Arrays;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Stream;
 
+import static be.bonamis.advent.utils.marsrover.Rover.Direction.NORTH;
+import static be.bonamis.advent.utils.marsrover.Rover.Direction.SOUTH;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.*;
 
+@Slf4j
 class Day14Test {
 
+  private static final char ROCK = 'O';
+  private static final char DOT = '.';
   private final List<String> input =
       Arrays.asList(
           """
@@ -45,7 +56,63 @@ class Day14Test {
     List<String> puzzle = Arrays.asList(content.split("\n"));
     Day14 day = new Day14(puzzle);
     List<List<Point>> columns = day.getGrid().columns();
-    assertThat(day.rocks(columns.get(0))).contains(100L,99L,91L);
+    assertThat(day.rocks(columns.get(0))).contains(100L, 99L, 91L);
+  }
+
+  @Test
+  void moveRocks() {
+    String text =
+        """
+O....#....
+O.OO#....#
+.....##...
+OO.#O....O
+.O.....O#.
+O.#..O.#.#
+..O..#O..O
+.......O..
+#....###..
+#OO..#....
+""";
+    CharGrid grid = new CharGrid(Arrays.asList(text.split("\n")));
+    log.debug("before moved");
+    grid.printArray();
+    grid.stream()
+        .forEach(
+            point -> {
+              Character c = grid.get(point);
+              // log.debug("point {} value {}", point, c);
+              if (c.equals(ROCK)) {
+                Rover rover = new Rover(SOUTH, new Position(point.x, point.y));
+                boolean canMove = true;
+                while (canMove) {
+                  Position newPosition = rover.move(Rover.Command.FORWARD).position();
+                  Point movedPoint = new Point(newPosition.x(), newPosition.y());
+                  canMove = isInTheGrid(grid, movedPoint) && isDot(grid, movedPoint);
+                  if (canMove) {
+                    grid.set(movedPoint, ROCK);
+                    Position position = rover.position();
+                    grid.set(new Point(position.x(), position.y()), DOT);
+                    rover = rover.move(Rover.Command.FORWARD);
+                    // grid.printArray();
+                    log.debug("moved");
+                  }
+                }
+              }
+            });
+    grid.printArray();
+    Stream<Point> rocks = grid.stream().filter(p -> grid.get(p).equals('O'));
+    int height = grid.getHeight();
+    Integer sum = rocks.map(p -> height - p.y).reduce(Integer::sum).orElseThrow();
+    assertThat(sum).isEqualTo(136);
+  }
+
+  private boolean isDot(CharGrid grid, Point movedPoint) {
+    return grid.get(movedPoint).equals(DOT);
+  }
+
+  private boolean isInTheGrid(CharGrid grid, Point movedPoint) {
+    return grid.isInTheGrid().test(movedPoint);
   }
 
   @Test
