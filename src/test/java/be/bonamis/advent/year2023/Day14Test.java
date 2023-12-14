@@ -58,16 +58,16 @@ class Day14Test {
     #.OOO#...O
     """;
 
-    CharGrid grid = new CharGrid(input);
+    //CharGrid grid = new CharGrid(input);
     log.debug("before moved");
-    grid.printLines();
+    day14.getGrid().printLines();
 
     for (int i = 0; i < 3; i++) {
-      day14.cycle(grid);
+      day14.cycle();
     }
     log.debug("\n\nAfter cycle 03");
-    log.info("rows: {}", grid.rowsAsLines());
-    assertThat(grid.rowsAsLines()).isEqualTo(new CharGrid(expectedAfterCycle3).rowsAsLines());
+    log.info("rows: {}", day14.getGrid().rowsAsLines());
+    assertThat(day14.getGrid().rowsAsLines()).isEqualTo(new CharGrid(expectedAfterCycle3).rowsAsLines());
   }
 
   @Test
