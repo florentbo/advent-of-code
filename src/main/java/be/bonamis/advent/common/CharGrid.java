@@ -68,14 +68,14 @@ public class CharGrid {
   }
 
   public void printArray() {
-    log.debug("start");
+    System.out.println("start");
     for (char[] ints : this.data) {
       for (char anInt : ints) {
-        log.debug(anInt + "");
+        System.out.print(anInt);
       }
-      log.debug("\n");
+      System.out.println();
     }
-    log.debug("end");
+    System.out.println("end");
   }
 
   public void set(Point point, char i) {

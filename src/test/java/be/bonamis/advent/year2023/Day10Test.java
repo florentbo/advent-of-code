@@ -34,7 +34,7 @@ class Day10Test {
 
   @Test
   void solvePart01() {
-    CharGrid grid = grid(squareLoopText);
+    CharGrid grid = new CharGrid(Arrays.asList(squareLoopText.split("\n")));
 
     int result = solvePart01(grid);
     assertThat(result).isEqualTo(4);
@@ -49,7 +49,7 @@ class Day10Test {
   |F--J
   LJ...
   """;
-    CharGrid grid = grid(text);
+    CharGrid grid = new CharGrid(Arrays.asList(text.split("\n")));
 
     int result = solvePart01(grid);
     assertThat(result).isEqualTo(8);
@@ -57,7 +57,7 @@ class Day10Test {
 
   public static void main(String[] args) {
     String content = FileHelper.content("2023/10/2023_10_input.txt");
-    CharGrid grid = grid(content);
+    CharGrid grid = new CharGrid(Arrays.asList(content.split("\n")));
 
     int result = solvePart01(grid);
     log.info("solution part 1: {}", result);
@@ -91,20 +91,6 @@ class Day10Test {
     DijkstraShortestPath<Point, DefaultEdge> shortestPath = new DijkstraShortestPath<>(graph);
     GraphPath<Point, DefaultEdge> path = shortestPath.getPath(source, sink);
     return path.getVertexList();
-  }
-
-  private static CharGrid grid(String text) {
-    char[][] grid = Arrays.stream(text.split("\n")).map(String::toCharArray).toArray(char[][]::new);
-
-    // Swap rows and columns during reading
-    char[][] swappedGrid = new char[grid[0].length][grid.length];
-
-    for (int i = 0; i < grid.length; i++) {
-      for (int j = 0; j < grid[0].length; j++) {
-        swappedGrid[j][i] = grid[i][j];
-      }
-    }
-    return new CharGrid(swappedGrid);
   }
 
   static void addEdge(
@@ -163,7 +149,7 @@ class Day10Test {
 
   @Test
   void allowedPoints() {
-    CharGrid grid = grid(squareLoopText);
+    CharGrid grid = new CharGrid(Arrays.asList(squareLoopText.split("\n")));
     assertThat(allowedPoints(new Point(1, 2), grid, NORTH)).containsExactly(new Point(1, 1));
     assertThat(allowedPoints(new Point(1, 2), grid, SOUTH)).containsExactly(new Point(1, 3));
     assertThat(allowedPoints(new Point(1, 2), grid, WEST)).isEmpty();

@@ -30,9 +30,6 @@ public class Day14 extends DaySolver<String> {
   }
 
   List<Long> rocks(List<Point> column) {
-    int size = column.size();
-    log.debug("size: {}", size);
-
     List<String> values =
         column.stream()
             .map(grid::get)
@@ -42,7 +39,7 @@ public class Day14 extends DaySolver<String> {
     log.debug("values: {}", values);
     Map<Integer, String> map = listToMap(values);
     log.debug("map: {}", map);
-    long rockHeight = size + 1;
+    long rockHeight = column.size() + 1L;
     List<Long> rocks = new ArrayList<>();
     for (Map.Entry<Integer, String> mapEntry : map.entrySet()) {
       log.debug("mapEntry: {}", mapEntry);
@@ -52,11 +49,9 @@ public class Day14 extends DaySolver<String> {
       if (value.equals("O")) {
         rockHeight--;
         rocks.add(rockHeight);
-        log.debug("rocks: {}", rocks);
       }
       if (value.equals("#")) {
         rockHeight = key;
-        log.debug("rocks: {}", rocks);
       }
     }
     log.debug("rocks: {}", rocks);
@@ -76,11 +71,6 @@ public class Day14 extends DaySolver<String> {
     }
 
     return map;
-  }
-
-  private Optional<String> last(List<String> moved) {
-    int size = moved.size();
-    return size > 1 ? Optional.of(moved.get(size - 1)) : Optional.empty();
   }
 
   @Override
