@@ -61,6 +61,22 @@ public class CharGrid {
         .flatMap(x -> IntStream.range(0, data[x].length).mapToObj(y -> new Point(x, y)));
   }
 
+  public Stream<Point> streamFromDown() {
+    int length = data.length;
+    return IntStream.range(0, length)
+        .boxed()
+        .flatMap(
+            x -> IntStream.range(0, data[x].length).mapToObj(y -> new Point(x, length - y - 1)));
+  }
+
+  public Stream<Point> streamFromLeft() {
+    int length = data.length;
+    return IntStream.range(0, length)
+        .boxed()
+        .flatMap(
+            x -> IntStream.range(0, data[x].length).mapToObj(y -> new Point(length - x - 1, y)));
+  }
+
   public void printLines() {
     this.rows().forEach(line -> log.info(toLine(line)));
   }
