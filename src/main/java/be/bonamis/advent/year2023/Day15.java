@@ -7,6 +7,7 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Stream;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -15,22 +16,48 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class Day15 extends DaySolver<String> {
 
+  private final Stream<String> lenses;
+
   public Day15(String puzzle) {
     super(Collections.singletonList(puzzle));
+    List<String> list = Arrays.asList(this.puzzle.get(0).split(","));
+    log.info("list size: {}", list.size());
+    lenses = list.stream().map(String::strip);
   }
 
   @Override
   public long solvePart01() {
-    List<String> list = Arrays.asList(this.puzzle.get(0).split(","));
-    log.info("list size: {}", list.size());
-    return list.stream().map(String::strip).map(this::running).reduce(Long::sum).orElseThrow();
+    return lenses.map(Day15::hash).reduce(Long::sum).orElseThrow();
   }
 
-  long running(String input) {
-    return input.chars().mapToLong(i -> i).reduce(0, this::modify);
+  Map<Long, Map<String, Long>> boxes(int i) {
+    Map<Long, Map<String, Long>> boxes = new HashMap<>();
+    lenses
+        .limit(i)
+        .map(Lens::of)
+        .forEach(
+            lens -> {
+              long hash = lens.hash();
+              if (lens.operation() == '=') {
+                Map<String, Long> box = boxes.computeIfAbsent(hash, k -> new LinkedHashMap<>());
+                box.put(lens.label(), lens.length());
+              } else {
+                if (boxes.containsKey(hash)) {
+                  boxes.get(hash).remove(lens.label());
+                  if (boxes.get(hash).isEmpty()) {
+                    boxes.remove(hash);
+                  }
+                }
+              }
+            });
+    return boxes;
   }
 
-  long modify(long start, long hChar) {
+  static long hash(String input) {
+    return input.chars().mapToLong(i -> i).reduce(0, Day15::modify);
+  }
+
+  static long modify(long start, long hChar) {
     return ((start + hChar) * 17) % 256;
   }
 
@@ -47,6 +74,10 @@ public class Day15 extends DaySolver<String> {
   }
 
   record Lens(String label, char operation, long length) {
+
+    long hash() {
+      return Day15.hash(label);
+    }
 
     static Lens of(String input) {
       Pattern pattern = Pattern.compile("([a-zA-Z]+)([-=])(\\d*)");
