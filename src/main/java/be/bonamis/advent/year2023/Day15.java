@@ -7,9 +7,7 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
-import java.util.stream.Stream;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -71,21 +69,21 @@ public class Day15 extends DaySolver<String> {
             entry -> {
               long box = entry.getKey() + 1;
               log.debug("box: {}", box);
-              Map<String, Long> value = entry.getValue();
-              ArrayList<Map.Entry<String, Long>> entries = new ArrayList<>(value.entrySet());
+              List<Map.Entry<String, Long>> entries = new ArrayList<>(entry.getValue().entrySet());
               return IntStream.range(0, entries.size())
-                  .mapToObj(
-                      i -> {
-                        int slotNumber = i + 1;
-                        Long focalLength = entries.get(i).getValue();
-                        log.debug("slotNumber: {} focalLength {}", slotNumber, focalLength);
-                        return box * slotNumber * focalLength;
-                      })
+                  .mapToObj(i -> focusingPower(i, entries, box))
                   .reduce(Long::sum)
                   .orElseThrow();
             })
         .reduce(Long::sum)
         .orElseThrow();
+  }
+
+  private Long focusingPower(int i, List<Map.Entry<String, Long>> entries, long box) {
+    int slotNumber = i + 1;
+    Long focalLength = entries.get(i).getValue();
+    log.debug("slotNumber: {} focalLength {}", slotNumber, focalLength);
+    return box * slotNumber * focalLength;
   }
 
   public static void main(String[] args) {
