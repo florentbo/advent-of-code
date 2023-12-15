@@ -36,9 +36,13 @@ public class Day13 extends DaySolver<String> {
     return solveBis(false);
   }
 
+  public long solvePart02Bis() {
+    return solveBis(true);
+  }
+
   long solveBis(boolean withSmudge) {
-    int columns = solveBisLine(grid -> lineResult2(grid.columnsAsLines2()));
-    int rows = solveBisLine(grid -> lineResult2(grid.rowsAsLines2()));
+    int columns = solveBisLine(grid -> lineResult2(grid.columnsAsLines2(), withSmudge));
+    int rows = solveBisLine(grid -> lineResult2(grid.rowsAsLines2(), withSmudge));
 
     return rows * 100L + columns;
   }
@@ -47,8 +51,8 @@ public class Day13 extends DaySolver<String> {
     return CollectionsHelper.sum(this.grids.stream().map(function));
   }
 
-  private Integer lineResult2(List<String> lines) {
-    return lineResult(lines, false).orElse(0);
+  private Integer lineResult2(List<String> lines, boolean withSmudge) {
+    return lineResult(lines, withSmudge).orElse(0);
   }
 
   List<Pair<Integer, Integer>> findReflectionLines(List<String> columns) {
