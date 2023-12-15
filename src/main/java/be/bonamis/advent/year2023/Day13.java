@@ -323,5 +323,6 @@ public class Day13 extends DaySolver<String> {
     log.info("solution part 1: {}", day.solvePart01());
     log.info("solution part 1: {}", day.solvePart01Bis());
     log.info("solution part 2: {}", day.solvePart02());
+    log.info("solution part 2: {}", day.solvePart02Bis());
   }
 }
