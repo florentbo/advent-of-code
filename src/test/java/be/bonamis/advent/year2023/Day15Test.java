@@ -2,11 +2,7 @@ package be.bonamis.advent.year2023;
 
 import static org.assertj.core.api.Assertions.*;
 
-import java.util.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
+import be.bonamis.advent.year2023.Day15.Lens;
 import lombok.extern.slf4j.*;
 import org.junit.jupiter.api.*;
 
@@ -32,5 +28,16 @@ class Day15Test {
 
     assertThat(day15.running("HASH")).isEqualTo(52);
     assertThat(day15.running("rn=1")).isEqualTo(30);
+  }
+
+  @Test
+  void parser() {
+    Lens lens01 = Lens.of("rn=1");
+    Lens lens02 = Lens.of("cm-");
+    Lens lens03 = Lens.of("qhbrv=3");
+
+    log.debug("lens {}", lens01);
+    log.debug("lens {}", lens02);
+    log.debug("lens {}", lens03);
   }
 }
