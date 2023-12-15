@@ -156,6 +156,11 @@ class Day13Test {
   }
 
   @Test
+  void solvePart02Bis() {
+    assertThat(day13.solvePart02Bis()).isEqualTo(400);
+  }
+
+  @Test
   void lineHandlingPart01() {
     assertThat(day13.linesHandling(day13.getGrids().get(0), false)).isZero();
   }
