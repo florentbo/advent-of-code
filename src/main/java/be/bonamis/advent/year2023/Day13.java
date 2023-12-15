@@ -48,7 +48,7 @@ public class Day13 extends DaySolver<String> {
   }
 
   private Integer lineResult2(List<String> lines) {
-    return lineResult(lines).orElse(0);
+    return lineResult(lines, false).orElse(0);
   }
 
   List<Pair<Integer, Integer>> findReflectionLines(List<String> columns) {
@@ -59,11 +59,70 @@ public class Day13 extends DaySolver<String> {
         .toList();
   }
 
-  Optional<Integer> lineResult(List<String> lines) {
+  Optional<Integer> lineResult(List<String> lines, boolean withSmudge) {
+    Optional<Integer> firstResult = searchResult(lines);
+
+    if (withSmudge) {
+      return firstResult
+          .map(first -> foundSomethingBeforeHandling(lines, first))
+          .orElse(foundNothingBeforeHandling(lines));
+    } else {
+      return firstResult;
+    }
+  }
+
+  private Optional<Integer> searchResult(List<String> lines) {
     Stream<Optional<Integer>> optionalStream =
         findReflectionLines(lines).stream().map(pair -> toResult2(pair, lines));
     Stream<Integer> integerStream = optionalStream.filter(Optional::isPresent).map(Optional::get);
-    return integerStream.findFirst();
+    Optional<Integer> first = integerStream.findFirst();
+    return first;
+  }
+
+  private Optional<Integer> foundSomethingBeforeHandling(List<String> originalList, Integer first) {
+    Optional<List<String>> result =
+        modifiedList(originalList)
+            .filter(
+                list -> {
+                  Optional<Integer> foundResult = searchResult(list);
+                  return foundResult.isPresent() && !foundResult.get().equals(first);
+                })
+            .findFirst();
+    return result.map(strings -> searchResult(strings).orElseThrow());
+  }
+
+  private Optional<Integer> foundNothingBeforeHandling(List<String> originalList) {
+    originalList.forEach(log::debug);
+    Optional<List<String>> result =
+        modifiedList(originalList).filter(list -> searchResult(list).isPresent()).findFirst();
+    return result.map(strings -> searchResult(strings).orElseThrow());
+  }
+
+  private Stream<List<String>> modifiedList(List<String> originalList) {
+    return IntStream.range(0, originalList.size() * originalList.get(0).length())
+        .mapToObj(index -> modifiedGrid(originalList, index));
+  }
+
+  private List<String> modifiedGrid(List<String> originalList, int index) {
+    List<String> strings =
+        modifyList(
+            originalList,
+            index / originalList.get(0).length(),
+            index % originalList.get(0).length());
+    log.debug("\n\nmodified\n\n");
+    strings.forEach(log::debug);
+    return strings;
+  }
+
+  List<String> modifyList(List<String> originalList, int rowIndex, int columnIndex) {
+    StringBuilder modifiedString = new StringBuilder(originalList.get(rowIndex));
+    modifiedString.setCharAt(columnIndex, (modifiedString.charAt(columnIndex) == '.' ? '#' : '.'));
+
+    // Create a new list with the modified string
+    List<String> modifiedList = new ArrayList<>(originalList);
+    modifiedList.set(rowIndex, modifiedString.toString());
+
+    return modifiedList;
   }
 
   private Optional<Integer> toResult2(Pair<Integer, Integer> middle, List<String> columns) {
