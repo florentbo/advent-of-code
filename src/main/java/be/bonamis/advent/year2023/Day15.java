@@ -1,21 +1,13 @@
 package be.bonamis.advent.year2023;
 
-import static be.bonamis.advent.utils.marsrover.Rover.Direction.*;
-import static be.bonamis.advent.utils.marsrover.Rover.Direction.EAST;
-
 import be.bonamis.advent.DaySolver;
-import be.bonamis.advent.common.CharGrid;
 import be.bonamis.advent.utils.FileHelper;
-import be.bonamis.advent.utils.marsrover.Position;
-import be.bonamis.advent.utils.marsrover.Rover;
-import java.awt.*;
+
 import java.util.*;
 import java.util.List;
-import java.util.stream.*;
-import java.util.stream.Stream;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 
 @Slf4j
 @Getter
@@ -33,16 +25,11 @@ public class Day15 extends DaySolver<String> {
   }
 
   long running(String input) {
-    long result = 0;
-    char[] charArray = input.toCharArray();
-    for (char c : charArray) {
-      result = modify(result, c);
-    }
-    return result;
+    return input.chars().mapToLong(i -> i).reduce(0, this::modify);
   }
 
-  long modify(long start, char hChar) {
-    return ((start + (int) hChar) * 17) % 256;
+  long modify(long start, long hChar) {
+    return ((start + hChar) * 17) % 256;
   }
 
   @Override
