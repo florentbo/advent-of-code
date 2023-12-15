@@ -51,10 +51,11 @@ class Day13Test {
   void columnHandling() {
     CharGrid grid = day13.getGrids().get(0);
     assertThat(day13.columnHandling(grid, false)).isEqualTo(5);
+
     List<String> columns = grid.columnsAsLines2();
     Pair<Integer, Integer> pair = Pair.of(5, 6);
     assertThat(day13.findReflectionLines(columns)).contains(pair);
-    assertThat(day13.lineResult(columns)).hasValue(5);
+    assertThat(day13.lineResult(columns, false)).hasValue(5);
   }
 
   @Test
@@ -83,7 +84,7 @@ class Day13Test {
     Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")));
     CharGrid grid = day13WithEdgeCase.getGrids().get(0);
     assertThat(day13.columnHandling(grid, false)).isEqualTo(15);
-    assertThat(day13.lineResult(grid.columnsAsLines2())).hasValue(15);
+    assertThat(day13.lineResult(grid.columnsAsLines2(), false)).hasValue(15);
   }
 
   @Test
@@ -101,7 +102,7 @@ class Day13Test {
     Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")));
     CharGrid grid = day13WithEdgeCase.getGrids().get(0);
     assertThat(day13.linesHandling(grid, false)).isEqualTo(4);
-    assertThat(day13.lineResult(grid.rowsAsLines2())).hasValue(4);
+    assertThat(day13.lineResult(grid.rowsAsLines2(), false)).hasValue(4);
   }
 
   @Test
@@ -128,7 +129,7 @@ class Day13Test {
     Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")));
     CharGrid grid = day13WithEdgeCase.getGrids().get(0);
     assertThat(day13.linesHandling(grid, false)).isEqualTo(16);
-    assertThat(day13.lineResult(grid.rowsAsLines2())).hasValue(16);
+    assertThat(day13.lineResult(grid.rowsAsLines2(), false)).hasValue(16);
   }
 
   @Test
@@ -161,11 +162,10 @@ class Day13Test {
 
   @Test
   void lineHandlingPart02() {
-
-    assertThat(day13.linesHandling(day13.getGrids().get(0), false)).isZero();
+    CharGrid grid = day13.getGrids().get(0);
+    assertThat(day13.linesHandling(grid, false)).isZero();
 
     // this is the first pattern with a dot in the 0,0 position
-
     List<String> smuggedText =
         Arrays.asList(
             """
@@ -181,7 +181,14 @@ class Day13Test {
     Day13 day13WithoutSmudge = new Day13(smuggedText);
     assertThat(day13.linesHandling(day13WithoutSmudge.getGrids().get(0), false)).isEqualTo(3);
     Day13 day13WithSmudge = new Day13(smuggedText);
-    assertThat(day13WithSmudge.linesHandling(day13.getGrids().get(0), true)).isEqualTo(3);
+    assertThat(day13WithSmudge.linesHandling(grid, true)).isEqualTo(3);
+
+    List<String> rows = grid.rowsAsLines2();
+    Pair<Integer, Integer> pair = Pair.of(3, 4);
+    assertThat(day13.findReflectionLines(rows)).contains(pair);
+    assertThat(day13.lineResult(rows, false)).isEmpty();
+
+    assertThat(day13.lineResult(rows, true)).hasValue(3);
   }
 
   @Test
@@ -189,5 +196,11 @@ class Day13Test {
     CharGrid secondPattern = day13.getGrids().get(1);
     assertThat(day13.linesHandling(secondPattern, false)).isEqualTo(4);
     assertThat(day13.linesHandling(secondPattern, true)).isEqualTo(1);
+
+    List<String> rows = secondPattern.rowsAsLines2();
+    Pair<Integer, Integer> pair = Pair.of(4, 5);
+    assertThat(day13.findReflectionLines(rows)).contains(pair);
+    assertThat(day13.lineResult(rows, false)).hasValue(4);
+    assertThat(day13.lineResult(rows, true)).hasValue(1);
   }
 }
