@@ -37,12 +37,14 @@ public class Day13 extends DaySolver<String> {
   }
 
   long solveBis(boolean withSmudge) {
-    int columns =
-        CollectionsHelper.sum(this.grids.stream().map(grid -> lineResult2(grid.columnsAsLines2())));
-    int lines =
-        CollectionsHelper.sum(this.grids.stream().map(grid -> lineResult2(grid.rowsAsLines2())));
+    int columns = solveBisLine(grid -> lineResult2(grid.columnsAsLines2()));
+    int rows = solveBisLine(grid -> lineResult2(grid.rowsAsLines2()));
 
-    return lines * 100L + columns;
+    return rows * 100L + columns;
+  }
+
+  private int solveBisLine(Function<CharGrid, Integer> function) {
+    return CollectionsHelper.sum(this.grids.stream().map(function));
   }
 
   private Integer lineResult2(List<String> lines) {
