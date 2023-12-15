@@ -83,16 +83,16 @@ class Day15Test {
     log.debug("boxes: {}", boxes);
     assertThat(boxes.keySet()).hasSize(1);
 
-    boxTest(boxes, 2, 1);
-    boxTest(boxes, 3, 2);
-    boxTest(boxes, 4, 2);
-    boxTest(boxes, 5, 1);
-    boxTest(boxes, 6, 2);
-    boxTest(boxes, 7, 2);
-    boxTest(boxes, 8, 2);
-    boxTest(boxes, 9, 2);
-    boxTest(boxes, 10, 2);
-    boxTest(boxes, 11, 2);
+    boxTest(2, 1);
+    boxTest(3, 2);
+    boxTest(4, 2);
+    boxTest(5, 1);
+    boxTest(6, 2);
+    boxTest(7, 2);
+    boxTest(8, 2);
+    boxTest(9, 2);
+    boxTest(10, 2);
+    boxTest(11, 2);
 
     /*
         After "pc=4":
@@ -109,8 +109,8 @@ class Day15Test {
          */
   }
 
-  private void boxTest(Map<Long, Map<String, Long>> boxes, int i, int expected) {
-    boxes = new Day15(text).boxes(i);
+  private void boxTest(int i, int expected) {
+    Map<Long, Map<String, Long>> boxes = new Day15(text).boxes(i);
     log.debug("boxes: {}", boxes);
     assertThat(boxes.keySet()).hasSize(expected);
   }

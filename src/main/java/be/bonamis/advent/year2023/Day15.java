@@ -7,6 +7,8 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import lombok.Getter;
@@ -16,23 +18,23 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class Day15 extends DaySolver<String> {
 
-  private final Stream<String> lenses;
+  private final List<String> lenses;
 
   public Day15(String puzzle) {
     super(Collections.singletonList(puzzle));
     List<String> list = Arrays.asList(this.puzzle.get(0).split(","));
     log.info("list size: {}", list.size());
-    lenses = list.stream().map(String::strip);
+    lenses = list.stream().map(String::strip).toList();
   }
 
   @Override
   public long solvePart01() {
-    return lenses.map(Day15::hash).reduce(Long::sum).orElseThrow();
+    return lenses.stream().map(Day15::hash).reduce(Long::sum).orElseThrow();
   }
 
   Map<Long, Map<String, Long>> boxes(int i) {
     Map<Long, Map<String, Long>> boxes = new HashMap<>();
-    lenses
+    lenses.stream()
         .limit(i)
         .map(Lens::of)
         .forEach(
@@ -63,7 +65,27 @@ public class Day15 extends DaySolver<String> {
 
   @Override
   public long solvePart02() {
-    return 99;
+    Map<Long, Map<String, Long>> boxes = boxes(lenses.size());
+    return boxes.entrySet().stream()
+        .map(
+            entry -> {
+              long box = entry.getKey() + 1;
+              log.debug("box: {}", box);
+              Map<String, Long> value = entry.getValue();
+              ArrayList<Map.Entry<String, Long>> entries = new ArrayList<>(value.entrySet());
+              return IntStream.range(0, entries.size())
+                  .mapToObj(
+                      i -> {
+                        int slotNumber = i + 1;
+                        Long focalLength = entries.get(i).getValue();
+                        log.debug("slotNumber: {} focalLength {}", slotNumber, focalLength);
+                        return box * slotNumber * focalLength;
+                      })
+                  .reduce(Long::sum)
+                  .orElseThrow();
+            })
+        .reduce(Long::sum)
+        .orElseThrow();
   }
 
   public static void main(String[] args) {
