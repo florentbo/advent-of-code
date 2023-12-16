@@ -1,9 +1,11 @@
 package be.bonamis.advent.utils.marsrover;
 
 import lombok.Getter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Objects;
 
+@Slf4j
 public record Rover(Direction direction, Position position) {
 
   public Rover move(Command command) {
@@ -14,11 +16,15 @@ public record Rover(Direction direction, Position position) {
 
     switch (command) {
       case FORWARD -> {
+        int forwardMoveY =
+            verticalInverse
+                ? -this.direction().getForwardMoveY()
+                : this.direction().getForwardMoveY();
         return new Rover(
             direction,
             new Position(
                 this.position().x() + this.direction().getForwardMoveX(),
-                this.position().y() + this.direction().getForwardMoveY()));
+                this.position().y() + forwardMoveY));
       }
       case BACKWARD -> {
         return new Rover(
@@ -28,7 +34,9 @@ public record Rover(Direction direction, Position position) {
                 this.position().y() - this.direction().getForwardMoveY()));
       }
       default -> {
-        Direction newFacingDirection = newDirection();
+        // Direction newFacingDirection = verticalInverse ? newDirection().verticalInverse() :
+        // newDirection();
+        Direction newFacingDirection = goLeftDirection();
         if (Objects.equals(command, Command.RIGHT)) {
           newFacingDirection = newFacingDirection.inverse();
         }
@@ -38,7 +46,7 @@ public record Rover(Direction direction, Position position) {
     }
   }
 
-  private Direction newDirection() {
+  private Direction goLeftDirection() {
     return switch (direction) {
       case NORTH -> Direction.WEST;
       case SOUTH -> Direction.EAST;
