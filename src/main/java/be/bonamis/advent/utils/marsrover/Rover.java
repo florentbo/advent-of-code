@@ -10,14 +10,14 @@ public record Rover(Direction direction, Position position) {
     switch (command) {
       case FORWARD -> {
         return new Rover(
-                direction,
+            direction,
             new Position(
                 this.position().x() + this.direction().getForwardMoveX(),
                 this.position().y() + this.direction().getForwardMoveY()));
       }
       case BACKWARD -> {
         return new Rover(
-                direction,
+            direction,
             new Position(
                 this.position().x() - this.direction().getForwardMoveX(),
                 this.position().y() - this.direction().getForwardMoveY()));
@@ -50,7 +50,16 @@ public record Rover(Direction direction, Position position) {
 
     LEFT,
 
-    RIGHT
+    RIGHT;
+
+    public Command inverse() {
+      return switch (this) {
+        case FORWARD -> BACKWARD;
+        case BACKWARD -> FORWARD;
+        case LEFT -> RIGHT;
+        case RIGHT -> LEFT;
+      };
+    }
   }
 
   @Getter

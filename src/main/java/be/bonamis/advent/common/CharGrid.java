@@ -10,6 +10,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+import be.bonamis.advent.utils.marsrover.Position;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -116,6 +117,7 @@ public class CharGrid {
     Stream<Character> characterStream = line.stream().map(this::get);
     return characterStream.map(String::valueOf).collect(Collectors.joining());
   }
+
   public String toLine2(List<Point> line) {
     Stream<Character> characterStream = line.stream().map(this::get2);
     return characterStream.map(String::valueOf).collect(Collectors.joining());
@@ -222,5 +224,9 @@ public class CharGrid {
 
   public List<String> columnsAsLines2() {
     return columns().stream().map(this::toLine2).toList();
+  }
+
+  public char get(Position position) {
+      return get(new Point(position.x(), position.y()));
   }
 }
