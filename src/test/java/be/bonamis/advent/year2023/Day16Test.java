@@ -26,4 +26,18 @@ class Day16Test {
   void solvePart01() {
     assertThat(day16.solvePart01()).isEqualTo(46);
   }
+
+  @Test
+  void solvePart02() {
+    assertThat(day16.solvePart02()).isEqualTo(51);
+  }
+
+  @Test
+  void edges() {
+    CharGrid grid = day16.getGrid();
+    assertThat(grid.topEdge().count()).isEqualTo(grid.getWidth());
+    assertThat(grid.bottomEdge().count()).isEqualTo(grid.getWidth());
+    assertThat(grid.leftEdge().count()).isEqualTo(grid.getHeight());
+    assertThat(grid.rightEdge().count()).isEqualTo(grid.getHeight());
+  }
 }

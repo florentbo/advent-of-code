@@ -78,6 +78,22 @@ public class CharGrid {
             x -> IntStream.range(0, data[x].length).mapToObj(y -> new Point(length - x - 1, y)));
   }
 
+  public Stream<Point> topEdge() {
+    return IntStream.range(0, data.length).mapToObj(x -> new Point(x, 0));
+  }
+
+  public Stream<Point> bottomEdge() {
+    return IntStream.range(0, data.length).mapToObj(x -> new Point(x, data[x].length - 1));
+  }
+
+  public Stream<Point> leftEdge() {
+    return IntStream.range(0, data.length).mapToObj(y -> new Point(0, y));
+  }
+
+  public Stream<Point> rightEdge() {
+    return IntStream.range(0, data.length).mapToObj(y -> new Point(data[y].length - 1, y));
+  }
+
   public void printLines() {
     this.rows().forEach(line -> log.info(toLine(line)));
   }
@@ -227,6 +243,6 @@ public class CharGrid {
   }
 
   public char get(Position position) {
-      return get(new Point(position.x(), position.y()));
+    return get(new Point(position.x(), position.y()));
   }
 }

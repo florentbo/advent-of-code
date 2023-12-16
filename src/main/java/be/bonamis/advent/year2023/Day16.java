@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import be.bonamis.advent.utils.marsrover.Rover.Command;
 import lombok.Getter;
@@ -31,8 +32,6 @@ public class Day16 extends DaySolver<String> {
 
   private final CharGrid grid;
 
-
-
   public Day16(List<String> puzzle) {
     super(puzzle);
     this.grid = new CharGrid(puzzle);
@@ -40,13 +39,12 @@ public class Day16 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
-    // grid.stream().skip(8).limit(15).forEach(x -> log.debug("point {} value {}", x ,
-    // grid.get(x)));
+    Rover rover = new Rover(EAST, new Position(-1, 0));
+    return energisedCount(rover);
+  }
+
+  private int energisedCount(Rover rover) {
     final Set<Rover> energized = new HashSet<>();
-    Position position = new Position(-1, 0);
-    Rover rover = new Rover(EAST, position);
-    // Beam beam = Beam.of(rover);
-    // List<Beam> beams = new ArrayList<>(List.of(beam));
     move(List.of(rover), energized);
 
     log.debug("energized size {}", energized.size());
@@ -57,12 +55,6 @@ public class Day16 extends DaySolver<String> {
   private void move(List<Rover> beams, Set<Rover> energized) {
     beams.forEach(rover -> move(rover, energized));
   }
-
-  /* private void move(Rover beam) {
-    Rover rover = beam;
-    log.debug("inside single bean move rover {} data ", rover);
-    move(rover);
-  }*/
 
   private void move(Rover rover, Set<Rover> energized) {
     log.debug("inside move data  rover {}", rover);
@@ -75,7 +67,7 @@ public class Day16 extends DaySolver<String> {
       switch (data) {
         case DOT -> {
           log.debug("dot point at {} with data {}", moved.position(), data);
-          move(moved,energized);
+          move(moved, energized);
         }
         case VERTICAL_SPLITTER -> {
           log.debug("vert split point ");
@@ -146,7 +138,17 @@ public class Day16 extends DaySolver<String> {
 
   @Override
   public long solvePart02() {
-    return this.puzzle.size();
+    Stream<Rover> leftEdge =
+        this.grid.leftEdge().map(point -> new Rover(EAST, new Position(point.x - 1, point.y)));
+    Stream<Rover> rightEdge =
+        this.grid.rightEdge().map(point -> new Rover(WEST, new Position(point.x + 1, point.y)));
+    Stream<Rover> topEdge =
+        this.grid.topEdge().map(point -> new Rover(SOUTH, new Position(point.x, point.y - 1)));
+    Stream<Rover> bottomEdge =
+        this.grid.bottomEdge().map(point -> new Rover(NORTH, new Position(point.x, point.y + 1)));
+    Stream<Rover> puzzle =
+        Stream.concat(leftEdge, Stream.concat(rightEdge, Stream.concat(topEdge, bottomEdge)));
+    return puzzle.map(this::energisedCount).max(Long::compare).orElseThrow();
   }
 
   private boolean isInTheGrid(Point movedPoint) {
