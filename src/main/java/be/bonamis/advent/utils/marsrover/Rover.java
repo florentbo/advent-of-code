@@ -5,7 +5,12 @@ import lombok.Getter;
 import java.util.Objects;
 
 public record Rover(Direction direction, Position position) {
+
   public Rover move(Command command) {
+    return move(command, false);
+  }
+
+  public Rover move(Command command, boolean verticalInverse) {
 
     switch (command) {
       case FORWARD -> {
