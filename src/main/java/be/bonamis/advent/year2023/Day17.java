@@ -114,7 +114,7 @@ public class Day17 extends DaySolver<String> {
         new PointDijkstraAlgorithm()
             .calculateShortestPathFromSource(sourceNode, sinkNode, extraValidation);
 
-    log.debug("result {}", result);
+    result.path().forEach(n -> log.debug("{}", n.getName()));
     return result.distance();
   }
 
