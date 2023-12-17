@@ -208,4 +208,23 @@ class Day13Test {
     assertThat(day13.lineResult(rows, false)).hasValue(4);
     assertThat(day13.lineResult(rows, true)).hasValue(1);
   }
+
+  @Test
+  void part2EdgeCase() {
+    String text = """
+.####..#.#.#.##..
+........#..##....
+..##..#.....#..##
+......##.##.#####
+######.#.####....
+..##....#..##.#..
+.#..#..#####.#...
+..##...#..#...#.#
+#######.#....####
+""";
+    Day13 day13WithEdgeCase = new Day13(Arrays.asList(text.split("\n")));
+    CharGrid grid = day13WithEdgeCase.getGrids().get(0);
+    List<String> columns = grid.columnsAsLines2();
+    assertThat(day13.lineResult(columns, true)).hasValue(16);
+  }
 }
