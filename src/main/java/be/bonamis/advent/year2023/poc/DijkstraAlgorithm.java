@@ -1,10 +1,16 @@
 package be.bonamis.advent.year2023.poc;
 
-import java.util.*;
+import lombok.extern.slf4j.Slf4j;
 
+import java.awt.*;
+import java.util.*;
+import java.util.List;
+
+@Slf4j
 public class DijkstraAlgorithm<T> {
 
-  public Result<T> calculateShortestPathFromSource(Node<T> source, Node<T> destination, boolean extraValidation) {
+  public Result<T> calculateShortestPathFromSource(
+      Node<T> source, Node<T> destination, boolean extraValidation) {
     source.setDistance(0);
 
     Set<Node<T>> settledNodes = new HashSet<>();
@@ -36,14 +42,24 @@ public class DijkstraAlgorithm<T> {
   }
 
   private void calculateMinimumDistance(
-          Node<T> evaluationNode, Integer edgeWeight, Node<T> sourceNode, boolean extraValidation) {
+      Node<T> evaluationNode, Integer edgeWeight, Node<T> sourceNode, boolean extraValidation) {
     Integer sourceDistance = sourceNode.getDistance();
-    if (sourceDistance + edgeWeight < evaluationNode.getDistance()) {
+    if (sourceDistance + edgeWeight < evaluationNode.getDistance()
+        && validate(extraValidation, sourceNode, evaluationNode)) {
       evaluationNode.setDistance(sourceDistance + edgeWeight);
       LinkedList<Node<T>> shortestPath = new LinkedList<>(sourceNode.getShortestPath());
       shortestPath.add(sourceNode);
       evaluationNode.setShortestPath(shortestPath);
     }
+  }
+
+  private boolean validate(boolean extraValidation, Node<T> sourceNode, Node<T> evaluationNode) {
+    boolean noValidationNeeded = !extraValidation;
+    return noValidationNeeded || validate(sourceNode, evaluationNode);
+  }
+
+  public boolean validate(Node<T> sourceNode, Node<T> evaluationNode) {
+    return true;
   }
 
   private Node<T> getLowestDistanceNode(Set<Node<T>> unsettledNodes) {

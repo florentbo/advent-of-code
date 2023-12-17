@@ -100,9 +100,9 @@ public class Day17 extends DaySolver<String> {
           for (var adjacent : adjacentPoints(point, grid)) {
             Node<Point> adjacentNode = nodes.get(adjacent);
             node.addDestination(adjacentNode, value);
-            //log.debug("Adding edge {} to {}", value, adjacentNode);
-            //log.debug("node {} adj {}", adjacentNode, adjacentNode.getAdjacentNodes());
-            //log.debug("node adja");
+            // log.debug("Adding edge {} to {}", value, adjacentNode);
+            // log.debug("node {} adj {}", adjacentNode, adjacentNode.getAdjacentNodes());
+            // log.debug("node adja");
           }
         });
 
@@ -111,7 +111,8 @@ public class Day17 extends DaySolver<String> {
     Node<Point> sourceNode = nodes.get(source);
     Node<Point> sinkNode = nodes.get(sink);
     DijkstraAlgorithm.Result<Point> result =
-        new DijkstraAlgorithm<Point>().calculateShortestPathFromSource(sourceNode, sinkNode, extraValidation);
+        new PointDijkstraAlgorithm()
+            .calculateShortestPathFromSource(sourceNode, sinkNode, extraValidation);
 
     log.debug("result {}", result);
     return result.distance();
@@ -128,5 +129,28 @@ public class Day17 extends DaySolver<String> {
     Day17 day = new Day17(puzzle);
     log.info("solution part 1: {}", day.solvePart01());
     log.info("solution part 2: {}", day.solvePart02());
+  }
+
+  static class PointDijkstraAlgorithm extends DijkstraAlgorithm<Point> {
+    @Override
+    public boolean validate(Node<Point> sourceNode, Node<Point> evaluationNode) {
+      List<Node<Point>> sourceNodePath = sourceNode.getShortestPath();
+      List<Node<Point>> evaluationNodePath = evaluationNode.getShortestPath();
+      if (sourceNodePath.size() > 2) {
+        List<Node<Point>> last3sourceNodePath =
+            sourceNodePath.subList(sourceNodePath.size() - 3, sourceNodePath.size());
+        List<Point> last3Points = last3sourceNodePath.stream().map(Node::getName).toList();
+        Point evaluationPoint = evaluationNode.getName();
+        boolean xCoordinatesAreNotAllTheSame =
+            last3Points.stream().map(p -> p.x).anyMatch(p -> p != evaluationPoint.x);
+        boolean yCoordinatesAreNotAllTheSame =
+            last3Points.stream().map(p -> p.y).anyMatch(p -> p != evaluationPoint.y);
+        /*List<Integer> xCoordinates = last3Points.stream().map(p -> p.x).toList();
+        List<Integer> yCoordinates = last3Points.stream().map(p -> p.y).toList();
+        log.debug("last3sourceNodePath: {}", last3sourceNodePath);*/
+        return xCoordinatesAreNotAllTheSame && yCoordinatesAreNotAllTheSame;
+      }
+      return true;
+    }
   }
 }
