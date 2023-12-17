@@ -5,11 +5,9 @@ import be.bonamis.advent.common.CharGrid;
 import be.bonamis.advent.utils.CollectionsHelper;
 import be.bonamis.advent.utils.FileHelper;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 import java.util.function.Function;
-import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -33,21 +31,21 @@ public class Day13 extends DaySolver<String> {
   }
 
   public long solvePart01Bis() {
-    return solveBis(false);
+    return solve(false);
   }
 
   public long solvePart02Bis() {
-    return solveBis(true);
+    return solve(true);
   }
 
-  long solveBis(boolean withSmudge) {
-    int columns = solveBisLine(grid -> lineResult2(grid.columnsAsLines2(), withSmudge));
-    int rows = solveBisLine(grid -> lineResult2(grid.rowsAsLines2(), withSmudge));
+  long solve(boolean withSmudge) {
+    int columns = solveLine(grid -> lineResult2(grid.columnsAsLines2(), withSmudge));
+    int rows = solveLine(grid -> lineResult2(grid.rowsAsLines2(), withSmudge));
 
     return rows * 100L + columns;
   }
 
-  private int solveBisLine(Function<CharGrid, Integer> function) {
+  private int solveLine(Function<CharGrid, Integer> function) {
     return CollectionsHelper.sum(this.grids.stream().map(function));
   }
 
@@ -141,113 +139,10 @@ public class Day13 extends DaySolver<String> {
     return allMatch ? Optional.of(middleRight) : Optional.empty();
   }
 
-  private long solve(boolean withSmudge) {
-    int columns =
-        CollectionsHelper.sum(this.grids.stream().map(grid -> columnHandling(grid, withSmudge)));
-    int lines =
-        CollectionsHelper.sum(this.grids.stream().map(grid -> linesHandling(grid, withSmudge)));
-
-    return lines * 100L + columns;
-  }
-
   @Override
   public long solvePart02() {
     return solve(true);
   }
-
-  int columnHandling(CharGrid grid, boolean withSmudge) {
-    int previous = columnResult(grid);
-    return withSmudge ? smudgeResult(grid, columnHandling, previous) : previous;
-  }
-
-  private int columnResult(CharGrid grid) {
-    log.debug("columnHandling");
-    List<List<Point>> gridColumns = grid.columns();
-    List<String> columns = gridColumns.stream().map(points -> toColumn(points, grid)).toList();
-
-    return commonElementsResult(columns, grid.getWidth());
-  }
-
-  private int commonElementsResult(List<String> columns, int width) {
-    Map<String, List<Integer>> commonElement = findCommonElementsAndIndices(columns);
-
-    List<Pair<Integer, Integer>> middles = findMiddles(commonElement.values());
-    return middles.stream()
-        .map(pair -> toResult(pair, columns, width))
-        .filter(i -> i != 0)
-        .findFirst()
-        .orElse(0);
-  }
-
-  public List<Pair<Integer, Integer>> findMiddles(Collection<List<Integer>> lists) {
-    return lists.stream().flatMap(this::findMiddles).toList();
-  }
-
-  private Stream<Pair<Integer, Integer>> findMiddles(List<Integer> values) {
-    return IntStream.range(1, values.size())
-        .filter(i -> values.get(i) - values.get(i - 1) == 1)
-        .mapToObj(i -> Pair.of(values.get(i - 1), values.get(i)));
-  }
-
-  private int toResult(Pair<Integer, Integer> middle, List<String> columns, int width) {
-    int middleLeft = middle.getLeft();
-    int middleRight = middle.getRight();
-    int end = width - middleRight - 1;
-    int min = Math.min(middleLeft, end);
-
-    log.debug("middle: {}", middle);
-    log.debug("width: {}", width);
-    log.debug("end: {}", end);
-    log.debug("min: {}", min);
-    boolean allMatch =
-        IntStream.range(0, min)
-            .allMatch(
-                index -> {
-                  int rightIndex = middleLeft + 2 + index;
-                  int leftIndex = middleLeft - 1 - index;
-                  return rightIndex >= 0
-                      && rightIndex < columns.size()
-                      && columns.get(rightIndex).equals(columns.get(leftIndex));
-                });
-    log.debug("allMatch: {}", allMatch);
-
-    int result = allMatch ? middleRight : 0;
-    log.debug("result: {}", result);
-    return result;
-  }
-
-  int linesHandling(CharGrid grid, boolean withSmudge) {
-    int lineResult = lineResult(grid);
-    return withSmudge ? smudgeResult(grid, linesHandling, lineResult) : lineResult;
-  }
-
-  private Integer smudgeResult(
-      CharGrid grid, Function<CharGrid, Integer> handling, int previousResult) {
-    return grid.stream()
-        .map(point -> toGrid(point, grid, handling))
-        .filter(res -> res != previousResult && res != 0)
-        .findFirst()
-        .orElse(0);
-  }
-
-  int lineResult(CharGrid grid) {
-    log.debug("linesHandling");
-    List<List<Point>> lines = grid.lines();
-    List<String> collect = lines.stream().map(points -> toLine(points, grid)).toList();
-    return commonElementsResult(collect, grid.getHeight());
-  }
-
-  private int toGrid(Point point, final CharGrid grid, Function<CharGrid, Integer> handling) {
-    Character c = grid.get(point);
-    CharGrid newGrid =
-        new CharGrid(Arrays.stream(grid.getData()).map(char[]::clone).toArray(char[][]::new));
-    newGrid.set(point, c == '.' ? '#' : '.');
-    return handling.apply(newGrid);
-  }
-
-  Function<CharGrid, Integer> linesHandling = this::lineResult;
-
-  Function<CharGrid, Integer> columnHandling = this::columnResult;
 
   Map<String, List<Integer>> findCommonElementsAndIndices(List<String> list) {
     Map<String, List<Integer>> elementIndicesMap = new HashMap<>();
@@ -261,16 +156,6 @@ public class Day13 extends DaySolver<String> {
     log.debug("elementIndicesMap: {}", elementIndicesMap);
 
     return elementIndicesMap;
-  }
-
-  private String toLine(List<Point> line, CharGrid grid) {
-    Stream<Character> characterStream = line.stream().map(grid::get);
-    return characterStream.map(String::valueOf).collect(Collectors.joining());
-  }
-
-  private String toColumn(List<Point> line, CharGrid grid) {
-    Stream<Character> characterStream = line.stream().map(grid::get2);
-    return characterStream.map(String::valueOf).collect(Collectors.joining());
   }
 
   private List<CharGrid> gridsInit() {
@@ -312,8 +197,6 @@ public class Day13 extends DaySolver<String> {
     List<String> puzzle = Arrays.asList(content.split("\n"));
     Day13 day = new Day13(puzzle);
     log.info("solution part 1: {}", day.solvePart01());
-    log.info("solution part 1: {}", day.solvePart01Bis());
     log.info("solution part 2: {}", day.solvePart02());
-    log.info("solution part 2: {}", day.solvePart02Bis());
   }
 }
