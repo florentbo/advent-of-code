@@ -64,7 +64,7 @@ public class Day13 extends DaySolver<String> {
   }
 
   Optional<Integer> lineResult(List<String> lines, boolean withSmudge) {
-    Optional<Integer> firstResult = searchResult(lines);
+    Optional<Integer> firstResult = searchSingleResult(lines);
 
     if (withSmudge) {
       return firstResult
@@ -75,31 +75,28 @@ public class Day13 extends DaySolver<String> {
     }
   }
 
-  private Optional<Integer> searchResult(List<String> lines) {
+  private Optional<Integer> searchSingleResult(List<String> lines) {
+    Stream<Integer> integerStream = searchMultipleResults(lines);
+    return integerStream.findFirst();
+  }
+
+  private Stream<Integer> searchMultipleResults(List<String> lines) {
     Stream<Optional<Integer>> optionalStream =
         findReflectionLines(lines).stream().map(pair -> toResult2(pair, lines));
-    Stream<Integer> integerStream = optionalStream.filter(Optional::isPresent).map(Optional::get);
-    Optional<Integer> first = integerStream.findFirst();
-    return first;
+    return optionalStream.filter(Optional::isPresent).map(Optional::get);
   }
 
   private Optional<Integer> foundSomethingBeforeHandling(List<String> originalList, Integer first) {
-    Optional<List<String>> result =
-        modifiedList(originalList)
-            .filter(
-                list -> {
-                  Optional<Integer> foundResult = searchResult(list);
-                  return foundResult.isPresent() && !foundResult.get().equals(first);
-                })
-            .findFirst();
-    return result.map(strings -> searchResult(strings).orElseThrow());
+    return modifiedList(originalList)
+        .flatMap(this::searchMultipleResults)
+        .filter(result -> !result.equals(first))
+        .findFirst();
   }
 
   private Optional<Integer> foundNothingBeforeHandling(List<String> originalList) {
-    originalList.forEach(log::debug);
     Optional<List<String>> result =
-        modifiedList(originalList).filter(list -> searchResult(list).isPresent()).findFirst();
-    return result.map(strings -> searchResult(strings).orElseThrow());
+        modifiedList(originalList).filter(list -> searchSingleResult(list).isPresent()).findFirst();
+    return result.map(strings -> searchSingleResult(strings).orElseThrow());
   }
 
   private Stream<List<String>> modifiedList(List<String> originalList) {
@@ -108,14 +105,8 @@ public class Day13 extends DaySolver<String> {
   }
 
   private List<String> modifiedGrid(List<String> originalList, int index) {
-    List<String> strings =
-        modifyList(
-            originalList,
-            index / originalList.get(0).length(),
-            index % originalList.get(0).length());
-    log.debug("\n\nmodified\n\n");
-    strings.forEach(log::debug);
-    return strings;
+    return modifyList(
+        originalList, index / originalList.get(0).length(), index % originalList.get(0).length());
   }
 
   List<String> modifyList(List<String> originalList, int rowIndex, int columnIndex) {
