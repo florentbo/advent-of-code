@@ -37,7 +37,7 @@ class DijkstraAlgorithmLongRunningUnitTest {
     graph.addNode(nodeE);
     graph.addNode(nodeF);
 
-    DijkstraAlgorithm.Result<String> result = new DijkstraAlgorithm<String>().calculateShortestPathFromSource(nodeA, nodeF);
+    DijkstraAlgorithm.Result<String> result = new DijkstraAlgorithm<String>().calculateShortestPathFromSource(nodeA, nodeF, false);
     System.out.println(result);
 
     /*for (Node node : graph.getNodes()) {
