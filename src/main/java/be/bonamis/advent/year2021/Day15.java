@@ -30,16 +30,16 @@ public class Day15 extends DaySolver<String> {
 
 	@Override
 	public long solvePart01() {
-		return getShortesPath(new Grid(data));
+		return shortestPath(new Grid(data));
 	}
 
 	@Override
 	public long solvePart02() {
 		final var enlarge = enlarge(this.data, 5);
-		return getShortesPath(new Grid(enlarge));
+		return shortestPath(new Grid(enlarge));
 	}
 
-	private long getShortesPath(Grid grid) {
+	private long shortestPath(Grid grid) {
 		var graph = new DefaultDirectedWeightedGraph<Point, DefaultWeightedEdge>(DefaultWeightedEdge.class);
 		grid.consume(graph::addVertex);
 		grid.consume(point -> addEdge(graph, point, grid));
