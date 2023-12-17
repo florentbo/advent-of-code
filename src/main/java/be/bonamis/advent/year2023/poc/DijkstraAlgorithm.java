@@ -4,8 +4,7 @@ import java.util.*;
 
 public class DijkstraAlgorithm<T> {
 
-  public Result<T> calculateShortestPathFromSource(
-      Node<T> source, Node<T> destination) {
+  public Result<T> calculateShortestPathFromSource(Node<T> source, Node<T> destination, boolean extraValidation) {
     source.setDistance(0);
 
     Set<Node<T>> settledNodes = new HashSet<>();
@@ -26,19 +25,18 @@ public class DijkstraAlgorithm<T> {
         Integer edgeWeight = adjacencyPair.getValue();
 
         if (!settledNodes.contains(adjacentNode)) {
-          calculateMinimumDistance(adjacentNode, edgeWeight, currentNode);
+          calculateMinimumDistance(adjacentNode, edgeWeight, currentNode, extraValidation);
           unsettledNodes.add(adjacentNode);
         }
       }
       settledNodes.add(currentNode);
     }
 
-    // If the destination is not reachable from the source
     return new Result<>(-1, null);
   }
 
   private void calculateMinimumDistance(
-      Node<T> evaluationNode, Integer edgeWeight, Node<T> sourceNode) {
+          Node<T> evaluationNode, Integer edgeWeight, Node<T> sourceNode, boolean extraValidation) {
     Integer sourceDistance = sourceNode.getDistance();
     if (sourceDistance + edgeWeight < evaluationNode.getDistance()) {
       evaluationNode.setDistance(sourceDistance + edgeWeight);

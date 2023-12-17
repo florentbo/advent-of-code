@@ -84,7 +84,7 @@ public class Day17 extends DaySolver<String> {
     }
   }
 
-  public long solveSimplePart01() {
+  public long solveShortestPathDijkstra(boolean extraValidation) {
     Graph graph = new Graph();
     Map<Point, Node<Point>> nodes = new HashMap<>();
     grid.consume(
@@ -100,10 +100,9 @@ public class Day17 extends DaySolver<String> {
           for (var adjacent : adjacentPoints(point, grid)) {
             Node<Point> adjacentNode = nodes.get(adjacent);
             node.addDestination(adjacentNode, value);
-            log.debug("Adding edge {} to {}", value, adjacentNode);
-            log.debug("node {} adj {}", adjacentNode, adjacentNode.getAdjacentNodes());
-            log.debug("node adja");
-            // nodes.put(point, adjacentNode);
+            //log.debug("Adding edge {} to {}", value, adjacentNode);
+            //log.debug("node {} adj {}", adjacentNode, adjacentNode.getAdjacentNodes());
+            //log.debug("node adja");
           }
         });
 
@@ -111,10 +110,8 @@ public class Day17 extends DaySolver<String> {
     final var sink = new Point(grid.getHeight() - 1, grid.getWidth() - 1);
     Node<Point> sourceNode = nodes.get(source);
     Node<Point> sinkNode = nodes.get(sink);
-    log.debug("sourceNode {}", sourceNode);
-    log.debug("sinkNode {}", sinkNode);
     DijkstraAlgorithm.Result<Point> result =
-        new DijkstraAlgorithm<Point>().calculateShortestPathFromSource(sourceNode, sinkNode);
+        new DijkstraAlgorithm<Point>().calculateShortestPathFromSource(sourceNode, sinkNode, extraValidation);
 
     log.debug("result {}", result);
     return result.distance();
