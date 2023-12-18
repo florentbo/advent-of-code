@@ -79,10 +79,18 @@ public class Day18 extends DaySolver<String> {
 
   long calculateArea(Polygon polygon) {
     List<Point> points = polygon.points();
-    Point[] polyPoints = points.toArray(new Point[0]);
-
-    return area(polyPoints);
+    return Math.abs(points.stream()
+            .mapToLong(point -> point.x * (getNextY(points, point) - point.y))
+            .sum());
   }
+
+  long getNextY(List<Point> points, Point currentPoint) {
+    int currentIndex = points.indexOf(currentPoint);
+    int nextIndex = (currentIndex + 1) % points.size();
+    return points.get(nextIndex).y;
+  }
+
+
 
   void createGrid(List<Dig> digs) {
     log.debug("digs: {}", digs);
