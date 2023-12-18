@@ -76,12 +76,19 @@ public class Day18 extends DaySolver<String> {
   int painted() {
     Set<Point> painted = new HashSet<>();
     for (int i = 0; i < this.grid.getHeight(); i++) {
-      painted.addAll(paintRow(i));
+      Set<Point> points = paintRow(i);
+      painted.addAll(points);
+
     }
+    Set<Point> paintedAfterRows = new HashSet<>(painted);
 
     for (int i = 0; i < this.grid.getWidth(); i++) {
       painted.addAll(paintColumn(i));
     }
+
+    Set<Point> actualOnlyInSet1 =
+        painted.stream().filter(e -> !paintedAfterRows.contains(e)).collect(Collectors.toSet());
+    actualOnlyInSet1.forEach(p -> log.info("painted: {}", p));
 
     return painted.size();
   }
@@ -94,17 +101,27 @@ public class Day18 extends DaySolver<String> {
     int min = this.grid.stream().filter(rowFilter).mapToInt(p -> p.x).min().orElse(width);
     int max = this.grid.stream().filter(rowFilter).mapToInt(p -> p.x).max().orElse(0);
 
-    paintPoints(rowNum, min, painted, max, width);
+    paintRowPoints(rowNum, min, painted, max, width);
     return painted;
   }
 
-  private void paintPoints(int lineNumber, int min, Set<Point> painted, int max, int size) {
+  private void paintRowPoints(int lineNumber, int min, Set<Point> painted, int max, int size) {
     for (int i = 0; i < min; i++) {
       painted.add(new Point(i, lineNumber));
     }
 
     for (int i = max + 1; i < size; i++) {
       painted.add(new Point(i, lineNumber));
+    }
+  }
+
+  private void paintColPoints(int lineNumber, int min, Set<Point> painted, int max, int size) {
+    for (int i = 0; i < min; i++) {
+      painted.add(new Point(lineNumber, i));
+    }
+
+    for (int i = max + 1; i < size; i++) {
+      painted.add(new Point(lineNumber, i));
     }
   }
 
@@ -116,7 +133,7 @@ public class Day18 extends DaySolver<String> {
     int min = this.grid.stream().filter(rowFilter).mapToInt(p -> p.y).min().orElse(height);
     int max = this.grid.stream().filter(rowFilter).mapToInt(p -> p.y).max().orElse(0);
 
-    paintPoints(colNum, min, painted, max, height);
+    paintColPoints(colNum, min, painted, max, height);
     return painted;
   }
 
