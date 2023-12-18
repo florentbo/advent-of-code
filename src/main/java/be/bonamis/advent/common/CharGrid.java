@@ -170,7 +170,7 @@ public class CharGrid {
   }
 
   public void set(Position position, char i) {
-    data[position.x()][position.y()] = i;
+    data[(int) position.x()][(int) position.y()] = i;
   }
 
   public void consume(Consumer<Point> consumer) {
@@ -247,6 +247,6 @@ public class CharGrid {
   }
 
   public char get(Position position) {
-    return get(new Point(position.x(), position.y()));
+    return get(new Point((int) position.x(), (int) position.y()));
   }
 }

@@ -12,10 +12,10 @@ public record Rover(Direction direction, Position position) {
   }
 
   public Rover move(Command command, boolean verticalInverse) {
-    return move(command, verticalInverse, 1);
+    return move(command, verticalInverse, 1L);
   }
 
-  public Rover move(Command command, boolean verticalInverse, int distance) {
+  public Rover move(Command command, boolean verticalInverse, long distance) {
 
     switch (command) {
       case FORWARD -> {

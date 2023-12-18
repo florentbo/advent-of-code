@@ -121,7 +121,7 @@ public class Day16 extends DaySolver<String> {
 
   private boolean isInTheGrid(Rover rover) {
     Position position = rover.position();
-    return isInTheGrid(new Point(position.x(), position.y()));
+    return isInTheGrid(new Point((int) position.x(), (int) position.y()));
   }
 
   private Rover moveRover(Rover rover, Command command) {

@@ -64,8 +64,8 @@ public class Day09 extends DaySolver<String> {
 
     private Position handlingTail(
         Position previousTail, WirePath path, WirePath previousPath, Position headNewPosition) {
-      int xDistance = Math.abs(previousTail.x() - headNewPosition.x());
-      int yDistance = Math.abs(previousTail.y() - headNewPosition.y());
+      long xDistance = Math.abs(previousTail.x() - headNewPosition.x());
+      long yDistance = Math.abs(previousTail.y() - headNewPosition.y());
       if (xDistance > 1 || yDistance > 1) {
         Position lastHeadPosition =
             newPosition(xDistance, yDistance, previousTail, path, previousPath);
@@ -76,7 +76,7 @@ public class Day09 extends DaySolver<String> {
     }
 
     private Position newPosition(
-        int xDistance, int yDistance, Position previousTail, WirePath path, WirePath previousPath) {
+        long xDistance, long yDistance, Position previousTail, WirePath path, WirePath previousPath) {
       Position previous = this.positions.get(this.positions().size() - 1);
       if (xDistance == 0 || yDistance == 0) {
         return previous;

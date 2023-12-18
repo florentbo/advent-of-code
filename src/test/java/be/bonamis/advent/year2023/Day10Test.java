@@ -113,7 +113,7 @@ class Day10Test {
             direction -> {
               Position position = position(point, direction.verticalInverse());
               // log.debug("position {} -> {}", point, position);
-              return new Point(position.x(), position.y());
+              return new Point((int) position.x(), (int) position.y());
             })
         .filter(grid.isInTheGrid())
         .filter(p -> isNotDot(p, grid))
