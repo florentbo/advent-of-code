@@ -95,9 +95,7 @@ public class Day18 extends DaySolver<String> {
 
   private Rover move(Position position, Dig dig) {
     Rover roverToMove = new Rover(dig.direction().toRoverDirection(), position);
-    for (int i = 0; i < dig.meters(); i++) {
-      roverToMove = roverToMove.move(FORWARD, true);
-    }
+    roverToMove = roverToMove.move(FORWARD, true, (int) dig.meters());
     Position movedPosition = roverToMove.position();
     this.poly.addPoint(new Point(movedPosition.x(), movedPosition.y()));
     return roverToMove;
