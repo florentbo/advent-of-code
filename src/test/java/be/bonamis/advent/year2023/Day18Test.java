@@ -4,7 +4,6 @@ import static org.assertj.core.api.Assertions.*;
 
 import be.bonamis.advent.utils.FileHelper;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -59,7 +58,7 @@ class Day18Test {
     assertThat(day18.paintColumn(8)).hasSize(7);
     assertThat(day18.paintColumn(9)).hasSize(10);
 
-    assertThat(day18.painted()).isEqualTo(10 * 10 - 4 * 3);
+    assertThat(day18.externalPainted()).isEqualTo(10 * 10 - 4 * 3);
   }
 
   @Test

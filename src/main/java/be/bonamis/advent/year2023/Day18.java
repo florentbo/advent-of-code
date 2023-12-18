@@ -56,7 +56,7 @@ public class Day18 extends DaySolver<String> {
       log.error("problem", e);
     }*/
 
-    return 999;
+    return (long) this.grid.getHeight() * this.grid.getWidth() - externalPainted();
   }
 
   void createGrid(List<Dig> digs) {
@@ -73,12 +73,11 @@ public class Day18 extends DaySolver<String> {
     }
   }
 
-  int painted() {
+  int externalPainted() {
     Set<Point> painted = new HashSet<>();
     for (int i = 0; i < this.grid.getHeight(); i++) {
       Set<Point> points = paintRow(i);
       painted.addAll(points);
-
     }
     Set<Point> paintedAfterRows = new HashSet<>(painted);
 
