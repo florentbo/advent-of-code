@@ -13,6 +13,8 @@ import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.*;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -26,13 +28,20 @@ public class Day18 extends DaySolver<String> {
 
   public Day18(List<String> puzzle) {
     super(puzzle);
-    this.grid = new CharGrid(puzzle);
+    String dots = IntStream.range(0, 15).mapToObj(i -> ".").collect(Collectors.joining());
+    List<String> dotLines = IntStream.range(0, 15).mapToObj(i -> dots).toList();
+    this.grid = new CharGrid(dotLines);
   }
 
   @Override
   public long solvePart01() {
+    this.grid.rowsAsLines2().forEach(log::info);
     List<Dig> puzzle = this.puzzle.stream().map(Dig::parse).toList();
-    this.puzzle.forEach(System.out::println);
+
+    Rover rover = new Rover(NORTH, new Position(0, 0));
+    grid.set(rover.position(), '#');
+
+
     return 999;
   }
 
