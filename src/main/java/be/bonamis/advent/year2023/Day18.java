@@ -129,12 +129,26 @@ public class Day18 extends DaySolver<String> {
       return new Dig(Direction.of(direction), meters, color);
     }
 
+    public Dig transformColor() {
+      String cleanedString = color.replaceAll("[()#]", "");
+      log.debug("cleanedString {}", cleanedString);
+      String firstChar = cleanedString.substring(0, cleanedString.length() - 1);
+      log.debug("firstChar {}", firstChar);
+      String lastChar = cleanedString.substring(cleanedString.length() - 1);
+      Dig.Direction value = Dig.Direction.values()[Integer.parseInt(lastChar)];
+      return new Dig(value, parseHexadecimal(firstChar), color);
+    }
+
+    public int parseHexadecimal(String s) {
+      return Integer.parseInt(s, 16);
+    }
+
     @AllArgsConstructor
     public enum Direction {
-      UP("U"),
+      RIGHT("R"),
       DOWN("D"),
       LEFT("L"),
-      RIGHT("R");
+      UP("U");
 
       private final String value;
 
