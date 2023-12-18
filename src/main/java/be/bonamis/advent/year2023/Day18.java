@@ -8,6 +8,11 @@ import be.bonamis.advent.common.CharGrid;
 import be.bonamis.advent.utils.FileHelper;
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
+
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.*;
 import java.util.stream.*;
 
@@ -19,13 +24,20 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class Day18 extends DaySolver<String> {
 
+  private static final int DIMENSIONS = 40;
   private final CharGrid grid;
 
   public Day18(List<String> puzzle) {
     super(puzzle);
-    String dots = IntStream.range(0, 15).mapToObj(i -> ".").collect(Collectors.joining());
-    List<String> dotLines = IntStream.range(0, 15).mapToObj(i -> dots).toList();
-    this.grid = new CharGrid(dotLines);
+    String result =
+        IntStream.range(0, DIMENSIONS)
+            .mapToObj(
+                line ->
+                    IntStream.range(0, DIMENSIONS)
+                        .mapToObj(dot -> ".")
+                        .collect(Collectors.joining("")))
+            .collect(Collectors.joining("\n"));
+    this.grid = new CharGrid(result);
   }
 
   @Override
@@ -33,15 +45,26 @@ public class Day18 extends DaySolver<String> {
     List<Dig> digs = this.puzzle.stream().map(Dig::parse).toList();
     log.info("digs: {}", digs);
 
-    Rover rover = new Rover(NORTH, new Position(0, 0));
+    Rover rover = new Rover(NORTH, new Position(DIMENSIONS / 2, DIMENSIONS / 2));
     grid.set(rover.position(), '#');
-    //this.grid.rowsAsLines2().forEach(log::info);
     for (Dig dig : digs) {
       rover = move(rover, dig);
     }
-    this.grid.rowsAsLines().forEach(log::info);
+    List<String> rows = this.grid.rowsAsLines();
+    for (String row : rows) {
+      log.info(row);
+    }
 
-    //rover = move(rover, digs.get(1));
+    /*try {
+      Path filePath = Paths.get("/home/florent/Documents/crt/output.txt");
+      Files.deleteIfExists(filePath);
+      Files.createFile(filePath);
+      for (String str : rows) {
+        Files.writeString(filePath, str + System.lineSeparator(), StandardOpenOption.APPEND);
+      }
+    } catch (Exception e) {
+      log.error("problem", e);
+    }*/
 
     return 999;
   }
