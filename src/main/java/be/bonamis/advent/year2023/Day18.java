@@ -8,7 +8,6 @@ import be.bonamis.advent.utils.FileHelper;
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
 
-import java.awt.*;
 import java.util.*;
 import java.util.List;
 
@@ -78,8 +77,8 @@ public class Day18 extends DaySolver<String> {
 
     for (int i = 0; i < n; i++) {
       int j = (i + 1) % n;
-      area += polyPoints[i].getY() * polyPoints[j].getX();
-      area -= polyPoints[j].getY() * polyPoints[i].getX();
+      area += polyPoints[i].y() * polyPoints[j].x();
+      area -= polyPoints[j].y() * polyPoints[i].x();
     }
     area /= 2.0;
     return (area < 0 ? -area : area);
@@ -127,6 +126,15 @@ public class Day18 extends DaySolver<String> {
     }
   }
 
+  record Point(long x, long y) {
+    public double distance(Point nextPoint) {
+      long dx = nextPoint.x() - this.x();
+      long dy = nextPoint.y() - this.y();
+
+      return Math.sqrt(dx * dx + dy * dy);
+    }
+  }
+
   record Dig(Direction direction, long meters, String color) {
     public static Dig parse(String line) {
       String[] parts = line.split(" ");
@@ -138,16 +146,14 @@ public class Day18 extends DaySolver<String> {
 
     public Dig transformColor() {
       String cleanedString = color.replaceAll("[()#]", "");
-      log.debug("cleanedString {}", cleanedString);
       String firstChar = cleanedString.substring(0, cleanedString.length() - 1);
-      log.debug("firstChar {}", firstChar);
       String lastChar = cleanedString.substring(cleanedString.length() - 1);
       Dig.Direction value = Dig.Direction.values()[Integer.parseInt(lastChar)];
       return new Dig(value, parseHexadecimal(firstChar), color);
     }
 
-    public int parseHexadecimal(String s) {
-      return Integer.parseInt(s, 16);
+    public long parseHexadecimal(String s) {
+      return Long.parseLong(s, 16);
     }
 
     @AllArgsConstructor
