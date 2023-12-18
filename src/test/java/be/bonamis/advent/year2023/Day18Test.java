@@ -29,6 +29,11 @@ class Day18Test {
   }
 
   @Test
+  void solvePart02() {
+    assertThat(day18.solvePart02()).isEqualTo(952408144115L);
+  }
+
+  @Test
   void paint() {
     day18 = new Day18(Arrays.asList("".split("\n")));
     Dig dig01 = new Dig(RIGHT, 3, "(#70c710)");
