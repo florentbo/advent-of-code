@@ -30,104 +30,64 @@ public class Day18 extends DaySolver<String> {
   public long solvePart01() {
     createGrid(this.puzzle.stream().map(Dig::parse).toList());
     long a = (long) calculateArea(poly);
-    int b = this.poly.points().size();
-    log.debug("area {} size {}", a, b);
+    double perimeter = calculatePerimeter(this.poly.points());
 
-    return a + b + b / 2 - 1;
+    float half = (float) (perimeter / 2);
+    log.debug("area {} half {}", a, half);
+
+    return (long) (a + half) + 1;
   }
 
-  double calculateArea(Day18.Polygon polygon) {
-    List<Point> points = polygon.points();
-    int n = points.size();
-
-    double area = 0.0;
-
-    for (int i = 0; i < n - 1; i++) {
-      Point current = points.get(i);
-      Point next = points.get(i + 1);
-      area += current.x * next.y - next.x * current.y;
+  double calculatePerimeter(List<Point> points) {
+    if (points == null || points.size() < 2) {
+      return 0.0;
     }
 
-    Point first = points.get(0);
-    Point last = points.get(n - 1);
-    area += last.x * first.y - first.x * last.y;
+    double perimeter = 0.0;
 
-    area = Math.abs(area) / 2.0;
+    for (int i = 0; i < points.size() - 1; i++) {
+      Point currentPoint = points.get(i);
+      Point nextPoint = points.get(i + 1);
 
-    return area;
+      double distance = currentPoint.distance(nextPoint);
+
+      perimeter += distance;
+    }
+
+    perimeter += points.get(points.size() - 1).distance(points.get(0));
+
+    return perimeter;
+  }
+
+  double area(Point[] polyPoints) {
+
+    int n = polyPoints.length;
+    double area = 0;
+
+    for (int i = 0; i < n; i++) {
+      int j = (i + 1) % n;
+      area += polyPoints[i].getY() * polyPoints[j].getX();
+      area -= polyPoints[j].getY() * polyPoints[i].getX();
+    }
+    area /= 2.0;
+    return (area < 0 ? -area : area);
+  }
+
+  double calculateArea(Polygon polygon) {
+    List<Point> points = polygon.points();
+    Point[] polyPoints = points.toArray(new Point[0]);
+
+    return area(polyPoints);
   }
 
   void createGrid(List<Dig> digs) {
     log.debug("digs: {}", digs);
 
     Rover rover = new Rover(NORTH, new Position(0, 0));
-    // grid.set(rover.position(), '#');
     for (Dig dig : digs) {
       rover = move(rover, dig);
     }
-    // List<String> rows = this.grid.rowsAsLines();
-    /*for (String row : rows) {
-      log.debug(row);
-    }*/
   }
-
-  /*int externalPainted() {
-    Set<Point> painted = new HashSet<>();
-    for (int i = 0; i < this.grid.getHeight(); i++) {
-      Set<Point> points = paintRow(i);
-      painted.addAll(points);
-    }
-
-    for (int i = 0; i < this.grid.getWidth(); i++) {
-      painted.addAll(paintColumn(i));
-    }
-
-    return painted.size();
-  }*/
-
-  /*Set<Point> paintRow(int rowNum) {
-    Set<Point> painted = new HashSet<>();
-
-    Predicate<Point> rowFilter = p -> p.y == rowNum && this.grid.get(p) == '#';
-    int width = this.grid.getWidth();
-    int min = this.grid.stream().filter(rowFilter).mapToInt(p -> p.x).min().orElse(width);
-    int max = this.grid.stream().filter(rowFilter).mapToInt(p -> p.x).max().orElse(0);
-
-    paintRowPoints(rowNum, min, painted, max, width);
-    return painted;
-  }
-
-  private void paintRowPoints(int lineNumber, int min, Set<Point> painted, int max, int size) {
-    for (int i = 0; i < min; i++) {
-      painted.add(new Point(i, lineNumber));
-    }
-
-    for (int i = max + 1; i < size; i++) {
-      painted.add(new Point(i, lineNumber));
-    }
-  }
-
-  private void paintColPoints(int lineNumber, int min, Set<Point> painted, int max, int size) {
-    for (int i = 0; i < min; i++) {
-      painted.add(new Point(lineNumber, i));
-    }
-
-    for (int i = max + 1; i < size; i++) {
-      painted.add(new Point(lineNumber, i));
-    }
-  }
-
-  Set<Point> paintColumn(int colNum) {
-    Set<Point> painted = new HashSet<>();
-
-    Predicate<Point> rowFilter = p -> p.x == colNum && this.grid.get(p) == '#';
-    int height = this.grid.getHeight();
-    int min = this.grid.stream().filter(rowFilter).mapToInt(p -> p.y).min().orElse(height);
-    int max = this.grid.stream().filter(rowFilter).mapToInt(p -> p.y).max().orElse(0);
-
-    paintColPoints(colNum, min, painted, max, height);
-    return painted;
-  }*/
 
   private Rover move(Rover rover, Dig dig) {
 
@@ -141,7 +101,6 @@ public class Day18 extends DaySolver<String> {
       roverToMove = roverToMove.move(FORWARD, true);
     }
     Position movedPosition = roverToMove.position();
-    // grid.set(movedRover.position(), '#');
     this.poly.addPoint(new Point(movedPosition.x(), movedPosition.y()));
     return roverToMove;
   }
