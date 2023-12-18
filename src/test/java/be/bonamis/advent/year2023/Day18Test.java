@@ -38,14 +38,28 @@ class Day18Test {
     day18.createGrid(List.of(dig01, dig02, dig03, dig04));
 
     assertThat(day18.paintRow(0)).hasSize(10);
-    assertThat(day18.paintRow(day18.getGrid().getHeight() - 1)).hasSize(10);
+    assertThat(day18.paintRow(1)).hasSize(10);
+    assertThat(day18.paintRow(2)).hasSize(10);
+    assertThat(day18.paintRow(3)).hasSize(10);
+    assertThat(day18.paintRow(4)).hasSize(10);
     assertThat(day18.paintRow(5)).hasSize(6);
+    assertThat(day18.paintRow(6)).hasSize(6);
+    assertThat(day18.paintRow(7)).hasSize(6);
+    assertThat(day18.paintRow(8)).hasSize(10);
+    assertThat(day18.paintRow(9)).hasSize(10);
 
-    assertThat(day18.paintColumn(0)).hasSize(10);
-    assertThat(day18.paintColumn(day18.getGrid().getWidth() - 1)).hasSize(10);
+    assertThat(day18.paintColumn(0)).hasSize(10);//.....####.
+    assertThat(day18.paintColumn(1)).hasSize(10);
+    assertThat(day18.paintColumn(2)).hasSize(10);
+    assertThat(day18.paintColumn(3)).hasSize(10);
+    assertThat(day18.paintColumn(4)).hasSize(10);
     assertThat(day18.paintColumn(5)).hasSize(7);
+    assertThat(day18.paintColumn(6)).hasSize(7);
+    assertThat(day18.paintColumn(7)).hasSize(7);
+    assertThat(day18.paintColumn(8)).hasSize(7);
+    assertThat(day18.paintColumn(9)).hasSize(10);
 
-    assertThat(day18.painted()).isEqualTo(10 * 10 - 3 * 2);
+    assertThat(day18.painted()).isEqualTo(10 * 10 - 4 * 3);
   }
 
   @Test
