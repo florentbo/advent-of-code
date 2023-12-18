@@ -21,13 +21,13 @@ public record Rover(Direction direction, Position position) {
       case FORWARD -> {
         int forwardMoveY =
             verticalInverse
-                ? -this.direction().getForwardMoveY()
-                : this.direction().getForwardMoveY();
+                ? - this.direction().getForwardMoveY()
+                :  this.direction().getForwardMoveY();
         return new Rover(
             direction,
             new Position(
-                this.position().x() + this.direction().getForwardMoveX(),
-                this.position().y() + forwardMoveY));
+                this.position().x() + distance * this.direction().getForwardMoveX(),
+                this.position().y() + distance *forwardMoveY));
       }
       case BACKWARD -> {
         return new Rover(
