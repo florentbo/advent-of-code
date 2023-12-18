@@ -38,6 +38,18 @@ public class Day18 extends DaySolver<String> {
     return (long) (a + half) + 1;
   }
 
+  @Override
+  public long solvePart02() {
+    createGrid(this.puzzle.stream().map(Dig::parse).map(Dig::transformColor).toList());
+    long a = (long) calculateArea(poly);
+    double perimeter = calculatePerimeter(this.poly.points());
+
+    float half = (float) (perimeter / 2);
+    log.debug("area {} half {}", a, half);
+
+    return (long) (a + half) + 1;
+  }
+
   double calculatePerimeter(List<Point> points) {
     if (points == null || points.size() < 2) {
       return 0.0;
@@ -99,11 +111,6 @@ public class Day18 extends DaySolver<String> {
     Position movedPosition = roverToMove.position();
     this.poly.addPoint(new Point(movedPosition.x(), movedPosition.y()));
     return roverToMove;
-  }
-
-  @Override
-  public long solvePart02() {
-    return 888;
   }
 
   public static void main(String[] args) {
