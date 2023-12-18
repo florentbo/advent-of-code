@@ -116,12 +116,12 @@ public class Day14 extends DaySolver<String> {
             boolean canMove = true;
             while (canMove) {
               Position newPosition = rover.move(Rover.Command.FORWARD).position();
-              Point movedPoint = new Point(newPosition.x(), newPosition.y());
+              Point movedPoint = new Point((int) newPosition.x(), (int) newPosition.y());
               canMove = isInTheGrid(movedPoint) && isDot(movedPoint);
               if (canMove) {
                 grid.set(movedPoint, ROCK);
                 Position position = rover.position();
-                grid.set(new Point(position.x(), position.y()), DOT);
+                grid.set(new Point((int) position.x(), (int) position.y()), DOT);
                 rover = rover.move(Rover.Command.FORWARD);
               }
             }
