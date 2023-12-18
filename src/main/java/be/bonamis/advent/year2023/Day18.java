@@ -9,11 +9,11 @@ import be.bonamis.advent.utils.FileHelper;
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
 
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
+import java.awt.*;
 import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.*;
 
 import lombok.AllArgsConstructor;
@@ -24,16 +24,17 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class Day18 extends DaySolver<String> {
 
-  private static final int DIMENSIONS = 40;
+  private final int dimensions;
   private final CharGrid grid;
 
-  public Day18(List<String> puzzle) {
+  public Day18(List<String> puzzle, int dimensions) {
     super(puzzle);
+    this.dimensions = dimensions;
     String result =
-        IntStream.range(0, DIMENSIONS)
+        IntStream.range(0, this.dimensions)
             .mapToObj(
                 line ->
-                    IntStream.range(0, DIMENSIONS)
+                    IntStream.range(0, this.dimensions)
                         .mapToObj(dot -> ".")
                         .collect(Collectors.joining("")))
             .collect(Collectors.joining("\n"));
@@ -42,18 +43,7 @@ public class Day18 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
-    List<Dig> digs = this.puzzle.stream().map(Dig::parse).toList();
-    log.info("digs: {}", digs);
-
-    Rover rover = new Rover(NORTH, new Position(DIMENSIONS / 2, DIMENSIONS / 2));
-    grid.set(rover.position(), '#');
-    for (Dig dig : digs) {
-      rover = move(rover, dig);
-    }
-    List<String> rows = this.grid.rowsAsLines();
-    for (String row : rows) {
-      log.info(row);
-    }
+    createGrid(this.puzzle.stream().map(Dig::parse).toList());
 
     /*try {
       Path filePath = Paths.get("/home/florent/Documents/crt/output.txt");
@@ -67,6 +57,67 @@ public class Day18 extends DaySolver<String> {
     }*/
 
     return 999;
+  }
+
+  void createGrid(List<Dig> digs) {
+    log.info("digs: {}", digs);
+
+    Rover rover = new Rover(NORTH, new Position(dimensions / 2, dimensions / 2));
+    grid.set(rover.position(), '#');
+    for (Dig dig : digs) {
+      rover = move(rover, dig);
+    }
+    List<String> rows = this.grid.rowsAsLines();
+    for (String row : rows) {
+      log.info(row);
+    }
+  }
+
+  int painted() {
+    Set<Point> painted = new HashSet<>();
+    for (int i = 0; i < this.grid.getHeight(); i++) {
+      painted.addAll(paintRow(i));
+    }
+
+    for (int i = 0; i < this.grid.getWidth(); i++) {
+      painted.addAll(paintColumn(i));
+    }
+
+    return painted.size();
+  }
+
+  Set<Point> paintRow(int rowNum) {
+    Set<Point> painted = new HashSet<>();
+
+    Predicate<Point> rowFilter = p -> p.y == rowNum && this.grid.get(p) == '#';
+    int width = this.grid.getWidth();
+    int min = this.grid.stream().filter(rowFilter).mapToInt(p -> p.x).min().orElse(width);
+    int max = this.grid.stream().filter(rowFilter).mapToInt(p -> p.x).max().orElse(0);
+
+    paintPoints(rowNum, min, painted, max, width);
+    return painted;
+  }
+
+  private void paintPoints(int lineNumber, int min, Set<Point> painted, int max, int size) {
+    for (int i = 0; i < min; i++) {
+      painted.add(new Point(i, lineNumber));
+    }
+
+    for (int i = max + 1; i < size; i++) {
+      painted.add(new Point(i, lineNumber));
+    }
+  }
+
+  Set<Point> paintColumn(int colNum) {
+    Set<Point> painted = new HashSet<>();
+
+    Predicate<Point> rowFilter = p -> p.x == colNum && this.grid.get(p) == '#';
+    int height = this.grid.getHeight();
+    int min = this.grid.stream().filter(rowFilter).mapToInt(p -> p.y).min().orElse(height);
+    int max = this.grid.stream().filter(rowFilter).mapToInt(p -> p.y).max().orElse(0);
+
+    paintPoints(colNum, min, painted, max, height);
+    return painted;
   }
 
   private Rover move(Rover rover, Dig dig) {
@@ -93,7 +144,7 @@ public class Day18 extends DaySolver<String> {
   public static void main(String[] args) {
     String content = FileHelper.content("2023/18/2023_18_input.txt");
     List<String> puzzle = Arrays.asList(content.split("\n"));
-    Day18 day = new Day18(puzzle);
+    Day18 day = new Day18(puzzle, 5000);
     log.info("solution part 1: {}", day.solvePart01());
     log.info("solution part 2: {}", day.solvePart02());
   }
