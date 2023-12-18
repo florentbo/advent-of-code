@@ -4,17 +4,13 @@ import static be.bonamis.advent.utils.marsrover.Rover.Command.*;
 import static be.bonamis.advent.utils.marsrover.Rover.Direction.NORTH;
 
 import be.bonamis.advent.DaySolver;
-import be.bonamis.advent.common.CharGrid;
 import be.bonamis.advent.utils.FileHelper;
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
 
 import java.awt.*;
 import java.util.*;
-import java.util.HashSet;
 import java.util.List;
-import java.util.function.Predicate;
-import java.util.stream.*;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,75 +20,72 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class Day18 extends DaySolver<String> {
 
-  private final int dimensions;
-  private final CharGrid grid;
+  private final Polygon poly = new Polygon(new ArrayList<>());
 
-  public Day18(List<String> puzzle, int dimensions) {
+  public Day18(List<String> puzzle) {
     super(puzzle);
-    this.dimensions = dimensions;
-    String result =
-        IntStream.range(0, this.dimensions)
-            .mapToObj(
-                line ->
-                    IntStream.range(0, this.dimensions)
-                        .mapToObj(dot -> ".")
-                        .collect(Collectors.joining("")))
-            .collect(Collectors.joining("\n"));
-    this.grid = new CharGrid(result);
   }
 
   @Override
   public long solvePart01() {
     createGrid(this.puzzle.stream().map(Dig::parse).toList());
+    long a = (long) calculateArea(poly);
+    int b = this.poly.points().size();
+    log.debug("area {} size {}", a, b);
 
-    /*try {
-      Path filePath = Paths.get("/home/florent/Documents/crt/output.txt");
-      Files.deleteIfExists(filePath);
-      Files.createFile(filePath);
-      for (String str : rows) {
-        Files.writeString(filePath, str + System.lineSeparator(), StandardOpenOption.APPEND);
-      }
-    } catch (Exception e) {
-      log.error("problem", e);
-    }*/
+    return a + b + b / 2 - 1;
+  }
 
-    return (long) this.grid.getHeight() * this.grid.getWidth() - externalPainted();
+  double calculateArea(Day18.Polygon polygon) {
+    List<Point> points = polygon.points();
+    int n = points.size();
+
+    double area = 0.0;
+
+    for (int i = 0; i < n - 1; i++) {
+      Point current = points.get(i);
+      Point next = points.get(i + 1);
+      area += current.x * next.y - next.x * current.y;
+    }
+
+    Point first = points.get(0);
+    Point last = points.get(n - 1);
+    area += last.x * first.y - first.x * last.y;
+
+    area = Math.abs(area) / 2.0;
+
+    return area;
   }
 
   void createGrid(List<Dig> digs) {
-    log.info("digs: {}", digs);
+    log.debug("digs: {}", digs);
 
-    Rover rover = new Rover(NORTH, new Position(dimensions / 2, dimensions / 2));
-    grid.set(rover.position(), '#');
+    Rover rover = new Rover(NORTH, new Position(0, 0));
+    // grid.set(rover.position(), '#');
     for (Dig dig : digs) {
       rover = move(rover, dig);
     }
-    List<String> rows = this.grid.rowsAsLines();
-    for (String row : rows) {
-      log.info(row);
-    }
+    // List<String> rows = this.grid.rowsAsLines();
+    /*for (String row : rows) {
+      log.debug(row);
+    }*/
   }
 
-  int externalPainted() {
+  /*int externalPainted() {
     Set<Point> painted = new HashSet<>();
     for (int i = 0; i < this.grid.getHeight(); i++) {
       Set<Point> points = paintRow(i);
       painted.addAll(points);
     }
-    Set<Point> paintedAfterRows = new HashSet<>(painted);
 
     for (int i = 0; i < this.grid.getWidth(); i++) {
       painted.addAll(paintColumn(i));
     }
 
-    Set<Point> actualOnlyInSet1 =
-        painted.stream().filter(e -> !paintedAfterRows.contains(e)).collect(Collectors.toSet());
-    actualOnlyInSet1.forEach(p -> log.info("painted: {}", p));
-
     return painted.size();
-  }
+  }*/
 
-  Set<Point> paintRow(int rowNum) {
+  /*Set<Point> paintRow(int rowNum) {
     Set<Point> painted = new HashSet<>();
 
     Predicate<Point> rowFilter = p -> p.y == rowNum && this.grid.get(p) == '#';
@@ -134,21 +127,22 @@ public class Day18 extends DaySolver<String> {
 
     paintColPoints(colNum, min, painted, max, height);
     return painted;
-  }
+  }*/
 
   private Rover move(Rover rover, Dig dig) {
-    Rover moved = move(rover.position(), dig);
 
-    return moved;
+    return move(rover.position(), dig);
   }
 
   private Rover move(Position position, Dig dig) {
     Rover roverToMove = new Rover(dig.direction().toRoverDirection(), position);
     for (int i = 0; i < dig.meters(); i++) {
-      Rover movedRover = roverToMove.move(FORWARD, true);
-      grid.set(movedRover.position(), '#');
-      roverToMove = movedRover;
+
+      roverToMove = roverToMove.move(FORWARD, true);
     }
+    Position movedPosition = roverToMove.position();
+    // grid.set(movedRover.position(), '#');
+    this.poly.addPoint(new Point(movedPosition.x(), movedPosition.y()));
     return roverToMove;
   }
 
@@ -160,9 +154,15 @@ public class Day18 extends DaySolver<String> {
   public static void main(String[] args) {
     String content = FileHelper.content("2023/18/2023_18_input.txt");
     List<String> puzzle = Arrays.asList(content.split("\n"));
-    Day18 day = new Day18(puzzle, 5000);
+    Day18 day = new Day18(puzzle);
     log.info("solution part 1: {}", day.solvePart01());
     log.info("solution part 2: {}", day.solvePart02());
+  }
+
+  record Polygon(List<Point> points) {
+    void addPoint(Point point) {
+      points.add(point);
+    }
   }
 
   record Dig(Direction direction, long meters, String color) {

@@ -19,7 +19,7 @@ class Day18Test {
   @BeforeEach
   void setUp() {
     String content = FileHelper.content("2023/18/2023_18_00_code.txt");
-    day18 = new Day18(Arrays.asList(content.split("\n")), 30);
+    day18 = new Day18(Arrays.asList(content.split("\n")));
   }
 
   @Test
@@ -27,16 +27,21 @@ class Day18Test {
     assertThat(day18.solvePart01()).isEqualTo(62);
   }
 
+
+
   @Test
   void paint() {
-    day18 = new Day18(Arrays.asList("".split("\n")), 10);
+    day18 = new Day18(Arrays.asList("".split("\n")));
     Dig dig01 = new Dig(Dig.Direction.RIGHT, 3, "(#70c710)");
     Dig dig02 = new Dig(Dig.Direction.DOWN, 2, "(#70c710)");
     Dig dig03 = new Dig(Dig.Direction.LEFT, 3, "(#70c710)");
     Dig dig04 = new Dig(Dig.Direction.UP, 2, "(#70c710)");
     day18.createGrid(List.of(dig01, dig02, dig03, dig04));
+    Day18.Polygon poly = day18.getPoly();
+    assertThat(day18.calculateArea(poly)).isEqualTo(6);
 
-    assertThat(day18.paintRow(0)).hasSize(10);
+
+    /*assertThat(day18.paintRow(0)).hasSize(10);
     assertThat(day18.paintRow(1)).hasSize(10);
     assertThat(day18.paintRow(2)).hasSize(10);
     assertThat(day18.paintRow(3)).hasSize(10);
@@ -58,7 +63,7 @@ class Day18Test {
     assertThat(day18.paintColumn(8)).hasSize(7);
     assertThat(day18.paintColumn(9)).hasSize(10);
 
-    assertThat(day18.externalPainted()).isEqualTo(10 * 10 - 4 * 3);
+    assertThat(day18.externalPainted()).isEqualTo(10 * 10 - 4 * 3);*/
   }
 
   @Test
