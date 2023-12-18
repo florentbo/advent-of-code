@@ -134,23 +134,24 @@ public class Day17 extends DaySolver<String> {
   static class PointDijkstraAlgorithm extends DijkstraAlgorithm<Point> {
     @Override
     public boolean validate(Node<Point> sourceNode, Node<Point> evaluationNode) {
+      Point evaluationPoint = evaluationNode.getName();
       List<Node<Point>> sourceNodePath = sourceNode.getShortestPath();
       List<Node<Point>> evaluationNodePath = evaluationNode.getShortestPath();
       if (sourceNodePath.size() > 2) {
-        List<Node<Point>> last3sourceNodePath =
-            sourceNodePath.subList(sourceNodePath.size() - 3, sourceNodePath.size());
-        List<Point> last3Points = last3sourceNodePath.stream().map(Node::getName).toList();
-        Point evaluationPoint = evaluationNode.getName();
+        List<Point> last3Points = lastNPoints(sourceNodePath, 3);
         boolean xCoordinatesAreNotAllTheSame =
             last3Points.stream().map(p -> p.x).anyMatch(p -> p != evaluationPoint.x);
         boolean yCoordinatesAreNotAllTheSame =
             last3Points.stream().map(p -> p.y).anyMatch(p -> p != evaluationPoint.y);
-        /*List<Integer> xCoordinates = last3Points.stream().map(p -> p.x).toList();
-        List<Integer> yCoordinates = last3Points.stream().map(p -> p.y).toList();
-        log.debug("last3sourceNodePath: {}", last3sourceNodePath);*/
         return xCoordinatesAreNotAllTheSame && yCoordinatesAreNotAllTheSame;
       }
       return true;
     }
+  }
+
+  private static List<Point> lastNPoints(List<Node<Point>> sourceNodePath, int i) {
+    return sourceNodePath.subList(sourceNodePath.size() - i, sourceNodePath.size()).stream()
+        .map(Node::getName)
+        .toList();
   }
 }
