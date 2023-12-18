@@ -9,7 +9,6 @@ import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
 
 import java.util.*;
-import java.util.List;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -28,39 +27,35 @@ public class Day18 extends DaySolver<String> {
   @Override
   public long solvePart01() {
     createGrid(this.puzzle.stream().map(Dig::parse).toList());
-    long a = (long) calculateArea(poly);
-    double perimeter = calculatePerimeter(this.poly.points());
+    long a = calculateArea(poly);
+    long perimeter = calculatePerimeter(this.poly.points());
 
-    float half = (float) (perimeter / 2);
-    log.debug("area {} half {}", a, half);
+    perimeter /= 2;
+    log.debug("area {} half {}", a, perimeter);
 
-    return (long) (a + half) + 1;
+    return a + perimeter + 1;
   }
 
   @Override
   public long solvePart02() {
     createGrid(this.puzzle.stream().map(Dig::parse).map(Dig::transformColor).toList());
-    long a = (long) calculateArea(poly);
-    double perimeter = calculatePerimeter(this.poly.points());
+    long a = calculateArea(poly);
+    long perimeter = calculatePerimeter(this.poly.points());
 
-    float half = (float) (perimeter / 2);
-    log.debug("area {} half {}", a, half);
+    perimeter /= 2;
+    log.debug("area {} half {}", a, perimeter);
 
-    return (long) (a + half) + 1;
+    return a + perimeter + 1;
   }
 
-  double calculatePerimeter(List<Point> points) {
-    if (points == null || points.size() < 2) {
-      return 0.0;
-    }
-
-    double perimeter = 0.0;
+  long calculatePerimeter(List<Point> points) {
+    long perimeter = 0;
 
     for (int i = 0; i < points.size() - 1; i++) {
       Point currentPoint = points.get(i);
       Point nextPoint = points.get(i + 1);
 
-      double distance = currentPoint.distance(nextPoint);
+      long distance = currentPoint.distance(nextPoint);
 
       perimeter += distance;
     }
@@ -70,21 +65,21 @@ public class Day18 extends DaySolver<String> {
     return perimeter;
   }
 
-  double area(Point[] polyPoints) {
+  long area(Point[] polyPoints) {
 
     int n = polyPoints.length;
-    double area = 0;
+    long area = 0;
 
     for (int i = 0; i < n; i++) {
       int j = (i + 1) % n;
       area += polyPoints[i].y() * polyPoints[j].x();
       area -= polyPoints[j].y() * polyPoints[i].x();
     }
-    area /= 2.0;
+    area /= 2;
     return (area < 0 ? -area : area);
   }
 
-  double calculateArea(Polygon polygon) {
+  long calculateArea(Polygon polygon) {
     List<Point> points = polygon.points();
     Point[] polyPoints = points.toArray(new Point[0]);
 
@@ -127,11 +122,11 @@ public class Day18 extends DaySolver<String> {
   }
 
   record Point(long x, long y) {
-    public double distance(Point nextPoint) {
-      long dx = nextPoint.x() - this.x();
-      long dy = nextPoint.y() - this.y();
 
-      return Math.sqrt(dx * dx + dy * dy);
+    long distance(Point p2) {
+      long dx = p2.x - this.x;
+      long dy = p2.y - this.y;
+      return Math.abs(dx) + Math.abs(dy);
     }
   }
 
