@@ -27,18 +27,16 @@ public class Day18 extends DaySolver<String> {
   @Override
   public long solvePart01() {
     createGrid(this.puzzle.stream().map(Dig::parse).toList());
-    long a = calculateArea(poly);
-    long perimeter = calculatePerimeter(this.poly.points());
-
-    perimeter /= 2;
-    log.debug("area {} half {}", a, perimeter);
-
-    return a + perimeter + 1;
+    return solvePoly();
   }
 
   @Override
   public long solvePart02() {
     createGrid(this.puzzle.stream().map(Dig::parse).map(Dig::transformColor).toList());
+    return solvePoly();
+  }
+
+  private long solvePoly() {
     long a = calculateArea(poly);
     long perimeter = calculatePerimeter(this.poly.points());
 
