@@ -29,6 +29,6 @@ class Day18Test {
   @Test
   void parse() {
     Dig dig = Dig.parse("R 6 (#70c710)");
-    assertThat(dig).isEqualTo(new Dig("R", 6, "(#70c710)"));
+    assertThat(dig).isEqualTo(new Dig(Dig.Direction.RIGHT, 6, "(#70c710)"));
   }
 }
