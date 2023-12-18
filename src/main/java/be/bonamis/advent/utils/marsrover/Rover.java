@@ -7,12 +7,15 @@ import java.util.Objects;
 
 @Slf4j
 public record Rover(Direction direction, Position position) {
-
   public Rover move(Command command) {
     return move(command, false);
   }
 
   public Rover move(Command command, boolean verticalInverse) {
+    return move(command, verticalInverse, 1);
+  }
+
+  public Rover move(Command command, boolean verticalInverse, int distance) {
 
     switch (command) {
       case FORWARD -> {
@@ -34,8 +37,6 @@ public record Rover(Direction direction, Position position) {
                 this.position().y() - this.direction().getForwardMoveY()));
       }
       default -> {
-        // Direction newFacingDirection = verticalInverse ? newDirection().verticalInverse() :
-        // newDirection();
         Direction newFacingDirection = goLeftDirection();
         if (Objects.equals(command, Command.RIGHT)) {
           newFacingDirection = newFacingDirection.inverse();
