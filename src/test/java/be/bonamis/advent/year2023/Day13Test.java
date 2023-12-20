@@ -59,7 +59,7 @@ class Day13Test {
 
   @Test
   void columnHandlingWithEdgeCase() {
-    log.info("test case start");
+    log.info("symbol case start");
     String text =
         """
 ####.#..#.####..#
