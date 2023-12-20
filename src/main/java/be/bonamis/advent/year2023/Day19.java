@@ -43,7 +43,11 @@ public class Day19 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
-    return 1000L;
+    return this.ratings.ratings().stream()
+        .filter(rating -> rating.isAccepted(this.workFlows))
+        .map(Rating::total)
+        .reduce(Long::sum)
+        .orElseThrow();
   }
 
   @Override
@@ -133,28 +137,28 @@ public class Day19 extends DaySolver<String> {
         }
 
         public boolean test(Rating rating) {
-          Integer number = rating.get(this.key);
+          Long number = rating.get(this.key);
           return symbol == '>' ? number > value : number < value;
         }
       }
     }
   }
 
-  record Rating(Map<String, Integer> values) {
+  record Rating(Map<String, Long> values) {
     static Rating parse(String input) {
 
       String[] pairs = input.substring(1, input.length() - 1).split(",");
-      Map<String, Integer> map =
+      Map<String, Long> map =
           Arrays.stream(pairs)
               .map(pair -> pair.split("="))
-              .collect(Collectors.toMap(pair -> pair[0], pair -> Integer.parseInt(pair[1])));
+              .collect(Collectors.toMap(pair -> pair[0], pair -> Long.parseLong(pair[1])));
 
       log.debug("map: {}", map);
 
       return new Rating(map);
     }
 
-    public Integer get(String key) {
+    public Long get(String key) {
       return values.get(key);
     }
 
@@ -174,6 +178,10 @@ public class Day19 extends DaySolver<String> {
 
       log.debug("last destination: {}", destination);
       return destination.equals(ACCEPTED);
+    }
+
+    public long total() {
+      return this.values.values().stream().reduce(Long::sum).orElseThrow();
     }
   }
 }

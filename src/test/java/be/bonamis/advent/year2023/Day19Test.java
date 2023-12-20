@@ -45,10 +45,10 @@ class Day19Test {
   }
 
   @Test
-  void passeRating() {
+  void parseRating() {
     String input = "{x=787,m=2655,a=1222,s=2876}";
     Rating rating = Rating.parse(input);
-    assertThat(rating.values()).isEqualTo(Map.of("x", 787, "m", 2655, "a", 1222, "s", 2876));
+    assertThat(rating.values()).isEqualTo(Map.of("x", 787L, "m", 2655L, "a", 1222L, "s", 2876L));
   }
 
   @Test
@@ -79,10 +79,22 @@ class Day19Test {
   }
 
   @Test
-  void testCondition() {
+  void rating_condition() {
     String input = "{x=787,m=2655,a=1222,s=2876}";
     Rating rating = Rating.parse(input);
     Rule.Condition condition = Rule.Condition.from("value=s<1351");
     assertThat(condition.test(rating)).isFalse();
+  }
+
+  @Test
+  void rating_total() {
+    String input = "{x=787,m=2655,a=1222,s=2876}";
+    Rating rating = Rating.parse(input);
+    assertThat(rating.total()).isEqualTo(7540L);
+  }
+
+  @Test
+  void solvePart01() {
+    assertThat(day19.solvePart01()).isEqualTo(19114);
   }
 }
