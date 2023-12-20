@@ -10,13 +10,15 @@ import be.bonamis.advent.utils.FileHelper;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
+import static be.bonamis.advent.year2023.Day19.WorkFlow.Rule.ACCEPTED;
+import static be.bonamis.advent.year2023.Day19.WorkFlow.Rule.REJECTED;
+
 @Slf4j
 @Getter
 public class Day19 extends DaySolver<String> {
 
   private final WorkFlows workFlows;
   private final Ratings ratings;
-
 
   public Day19(List<String> puzzle) {
     super(puzzle);
@@ -90,6 +92,7 @@ public class Day19 extends DaySolver<String> {
     record Rule(String value) {
       static String ACCEPTED = "A";
       static String REJECTED = "R";
+
       public String destination() {
         if (value.contains(":")) {
           String[] split = value.split(":");
@@ -153,6 +156,24 @@ public class Day19 extends DaySolver<String> {
 
     public Integer get(String key) {
       return values.get(key);
+    }
+
+    public boolean isAccepted(WorkFlows workFlows) {
+      log.debug("rating: {}", this);
+      String destination = "in";
+      while (!destination.equals(ACCEPTED) && !destination.equals(REJECTED)) {
+        WorkFlow start = workFlows.get(destination);
+        destination =
+            start.rules().stream()
+                .filter(rule -> rule.hasPassedTest(this))
+                .findFirst()
+                .map(WorkFlow.Rule::destination)
+                .orElseThrow();
+        log.debug("destination in while: {}", destination);
+      }
+
+      log.debug("last destination: {}", destination);
+      return destination.equals(ACCEPTED);
     }
   }
 }
