@@ -1,30 +1,20 @@
 package be.bonamis.advent.year2023;
 
-import static be.bonamis.advent.utils.marsrover.Rover.Command.*;
-import static be.bonamis.advent.utils.marsrover.Rover.Direction.NORTH;
-
 import be.bonamis.advent.DaySolver;
-import be.bonamis.advent.utils.FileHelper;
-import be.bonamis.advent.utils.marsrover.Position;
-import be.bonamis.advent.utils.marsrover.Rover;
-import java.util.*;
-import java.util.ArrayList;
-import java.util.function.IntConsumer;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import java.util.*;
+import java.util.regex.*;
+import java.util.stream.*;
+
+import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @Getter
 public class Day19 extends DaySolver<String> {
 
-  private final List<WorkFlow> workFlows;
-  private final List<Rating> ratings;
+  private final WorkFlows workFlows;
+  private final Ratings ratings;
 
   public Day19(List<String> puzzle) {
     super(puzzle);
@@ -36,13 +26,15 @@ public class Day19 extends DaySolver<String> {
 
     int emptyLineIndex = first.stream().boxed().toList().get(0);
     workFlows =
-        IntStream.range(0, emptyLineIndex)
-            .mapToObj(index -> WorkFlow.parse(puzzle.get(index)))
-            .toList();
+        new WorkFlows(
+            IntStream.range(0, emptyLineIndex)
+                .mapToObj(index -> WorkFlow.parse(puzzle.get(index)))
+                .toList());
     ratings =
-        IntStream.range(emptyLineIndex + 1, puzzle.size())
-            .mapToObj(index -> Rating.parse(puzzle.get(index)))
-            .toList();
+        new Ratings(
+            IntStream.range(emptyLineIndex + 1, puzzle.size())
+                .mapToObj(index -> Rating.parse(puzzle.get(index)))
+                .toList());
   }
 
   @Override
@@ -54,6 +46,21 @@ public class Day19 extends DaySolver<String> {
   public long solvePart02() {
     return 1000L;
   }
+
+  record WorkFlows(List<WorkFlow> workFlows) {
+    public WorkFlow start() {
+      return get("in");
+    }
+
+    WorkFlow get(String name) {
+      return this.workFlows.stream()
+          .filter(workFlow -> workFlow.name().equals(name))
+          .findFirst()
+          .orElseThrow();
+    }
+  }
+
+  record Ratings(List<Rating> ratings) {}
 
   record WorkFlow(String name, List<Rule> rules) {
     static WorkFlow parse(String input) {
