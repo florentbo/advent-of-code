@@ -1,10 +1,9 @@
 package be.bonamis.advent.year2023;
 
-import static be.bonamis.advent.year2023.Day18.Dig.Direction.RIGHT;
+import static be.bonamis.advent.year2023.Day19.WorkFlow.Rule.ACCEPTED;
+import static be.bonamis.advent.year2023.Day19.WorkFlow.Rule.REJECTED;
 import static org.assertj.core.api.Assertions.*;
 
-import be.bonamis.advent.utils.FileHelper;
-import be.bonamis.advent.year2023.Day18.Dig;
 import java.util.*;
 import java.util.List;
 
@@ -69,5 +68,36 @@ class Day19Test {
   @Test
   void start() {
     assertThat(day19.getWorkFlows().start().name()).isEqualTo("in");
+  }
+
+  @Test
+  void acceptedPart() {
+    Rating rating = day19.getRatings().ratings().get(0);
+    log.debug("rating: {}", rating);
+
+    String destination = "in";
+    while (!destination.equals(ACCEPTED) || destination.equals(REJECTED)) {
+      WorkFlow start = day19.getWorkFlows().get(destination);
+      destination =
+          start.rules().stream()
+              .filter(rule -> rule.hasPassedTest(rating))
+              .findFirst()
+              .map(Rule::destination)
+              .orElseThrow();
+      log.debug("destination: {}", destination);
+    }
+
+    log.debug("destination: {}", destination);
+    boolean accepted = destination.equals(ACCEPTED);
+
+    assertThat(accepted).isTrue();
+  }
+
+  @Test
+  void testCondition() {
+    String input = "{x=787,m=2655,a=1222,s=2876}";
+    Rating rating = Rating.parse(input);
+    Rule.Condition condition = Rule.Condition.from("value=s<1351");
+    assertThat(condition.test(rating)).isFalse();
   }
 }
