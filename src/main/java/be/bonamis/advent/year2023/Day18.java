@@ -63,25 +63,10 @@ public class Day18 extends DaySolver<String> {
     return perimeter;
   }
 
-  long area(Point[] polyPoints) {
-
-    int n = polyPoints.length;
-    long area = 0;
-
-    for (int i = 0; i < n; i++) {
-      int j = (i + 1) % n;
-      area += polyPoints[i].y() * polyPoints[j].x();
-      area -= polyPoints[j].y() * polyPoints[i].x();
-    }
-    area /= 2;
-    return (area < 0 ? -area : area);
-  }
-
   long calculateArea(Polygon polygon) {
     List<Point> points = polygon.points();
-    return Math.abs(points.stream()
-            .mapToLong(point -> point.x * (getNextY(points, point) - point.y))
-            .sum());
+    return Math.abs(
+        points.stream().mapToLong(point -> point.x * (getNextY(points, point) - point.y)).sum());
   }
 
   long getNextY(List<Point> points, Point currentPoint) {
@@ -89,8 +74,6 @@ public class Day18 extends DaySolver<String> {
     int nextIndex = (currentIndex + 1) % points.size();
     return points.get(nextIndex).y;
   }
-
-
 
   void createGrid(List<Dig> digs) {
     log.debug("digs: {}", digs);
