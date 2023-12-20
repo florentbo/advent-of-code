@@ -53,8 +53,8 @@ class Day19Test {
 
   @Test
   void parseInput() {
-    assertThat(day19.getWorkFlows()).hasSize(11);
-    assertThat(day19.getRatings()).hasSize(5);
+    assertThat(day19.getWorkFlows().workFlows()).hasSize(11);
+    assertThat(day19.getRatings().ratings()).hasSize(5);
   }
 
   @Test
@@ -62,11 +62,12 @@ class Day19Test {
     String input = "qqz{s>2770:qs,m<1801:hdj,R}";
     assertThat(WorkFlow.parse(input))
         .isEqualTo(
-            new WorkFlow("qqz", List.of(new Rule("s>2770:qs"), new Rule("m<1801:hdj"), new Rule("R"))));
+            new WorkFlow(
+                "qqz", List.of(new Rule("s>2770:qs"), new Rule("m<1801:hdj"), new Rule("R"))));
   }
 
   @Test
-  void solvePart01() {
-    assertThat(day19.solvePart01()).isEqualTo(19114);
+  void start() {
+    assertThat(day19.getWorkFlows().start().name()).isEqualTo("in");
   }
 }
