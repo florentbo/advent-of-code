@@ -1,8 +1,7 @@
 package be.bonamis.advent.year2023;
 
-import static be.bonamis.advent.year2023.Day19.WorkFlow.Rule.ACCEPTED;
-import static be.bonamis.advent.year2023.Day19.WorkFlow.Rule.REJECTED;
 import static org.assertj.core.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
 import java.util.*;
 import java.util.List;
@@ -12,6 +11,8 @@ import be.bonamis.advent.year2023.Day19.WorkFlow;
 import be.bonamis.advent.year2023.Day19.WorkFlow.Rule;
 import lombok.extern.slf4j.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.*;
+import org.junit.jupiter.params.provider.CsvSource;
 
 @Slf4j
 class Day19Test {
@@ -70,27 +71,11 @@ class Day19Test {
     assertThat(day19.getWorkFlows().start().name()).isEqualTo("in");
   }
 
-  @Test
-  void acceptedPart() {
-    Rating rating = day19.getRatings().ratings().get(0);
-    log.debug("rating: {}", rating);
-
-    String destination = "in";
-    while (!destination.equals(ACCEPTED) || destination.equals(REJECTED)) {
-      WorkFlow start = day19.getWorkFlows().get(destination);
-      destination =
-          start.rules().stream()
-              .filter(rule -> rule.hasPassedTest(rating))
-              .findFirst()
-              .map(Rule::destination)
-              .orElseThrow();
-      log.debug("destination: {}", destination);
-    }
-
-    log.debug("destination: {}", destination);
-    boolean accepted = destination.equals(ACCEPTED);
-
-    assertThat(accepted).isTrue();
+  @ParameterizedTest
+  @CsvSource({"0,true", "1,false", "2,true", "3,false", "4,true"})
+  void isAccepted(int input, boolean expected) {
+    Day19.WorkFlows workFlows = day19.getWorkFlows();
+    assertThat(day19.getRatings().ratings().get(input).isAccepted(workFlows)).isEqualTo(expected);
   }
 
   @Test
