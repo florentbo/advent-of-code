@@ -4,27 +4,132 @@ import be.bonamis.advent.TextDaySolver;
 import be.bonamis.advent.utils.FileHelper;
 import java.util.*;
 import java.util.stream.*;
+
+import be.bonamis.advent.year2023.Day20.DestinationModule.Pulse;
+import be.bonamis.advent.year2023.Day20.DestinationModule.State;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.lang3.tuple.Pair;
+
+import static be.bonamis.advent.year2023.Day20.DestinationModule.Pulse.*;
+import static be.bonamis.advent.year2023.Day20.DestinationModule.State.*;
 
 @Slf4j
 @Getter
 public class Day20 extends TextDaySolver {
 
+  private static final String BUTTON = "button";
+  private static final String BROADCASTER = "broadcaster";
   private final Map<String, List<String>> moduleConfiguration;
+  private final Map<String, State> states;
 
   public Day20(List<String> puzzle) {
     super(puzzle);
     this.moduleConfiguration = readConfiguration();
+    this.states = states();
   }
 
   public Day20(String sample) {
     super(sample);
     this.moduleConfiguration = readConfiguration();
+    this.states = states();
+    log.debug("configuration: {}", this.moduleConfiguration);
+    log.debug("states: {}", this.states);
+    log.debug("fliFlops: {}", fliFlops());
+    log.debug("conjunctions: {}", conjunctions());
+  }
+
+  private Map<String, State> states() {
+    return this.moduleConfiguration.keySet().stream()
+        .collect(
+            Collectors.toMap(
+                key -> (key.contains("&") || key.contains("%")) ? key.substring(1) : key,
+                key -> OFF));
+  }
+
+  @Override
+  public long solvePart01() {
+    return 101L;
+  }
+
+  @Override
+  public long solvePart02() {
+    return 1000L;
+  }
+
+  void pushButton() {
+    Pair<Long, Long> counts = Pair.of(0L, 0L);
+
+    Queue<DestinationModule> queue = new LinkedList<>();
+    log.debug("queue: {}", queue);
+    sendPulses(BUTTON, LOW, queue);
+    while (!queue.isEmpty()) {
+      DestinationModule module = queue.poll();
+      log.debug("queue after poll size: {} content {}", queue.size(), queue);
+      String name = module.name();
+      log.debug("queue poll name: {}", name);
+      sendPulses(name, LOW, queue);
+    }
+  }
+
+  private void sendPulses(String origin, Pulse pulse, Queue<DestinationModule> queue) {
+    if (origin.equals(BUTTON) || origin.equals(BROADCASTER)) {
+      List<String> destinations = this.moduleConfiguration.get(origin);
+      destinations.forEach(destination -> addToQueue(origin, queue, destination, LOW));
+    } else {
+      destinations(origin)
+          .forEach(
+              destination -> {
+                if (pulse == LOW) {
+                  /*
+                  If a flip-flop module receives a high pulse, it is ignored and nothing happens.
+                  However, if a flip-flop module receives a low pulse, it flips between on and off.
+                  If it was off, it turns on and sends a high pulse. If it was on, it turns off and sends a low pulse.
+                   */
+                  State state = states.get(origin);
+                  // flip
+                  State newState = state == OFF ? ON : OFF;
+                  states.put(origin, newState);
+                  Pulse newPulse = state == OFF ? HIGH : LOW;
+                  addToQueue(origin, queue, destination, newPulse);
+                }
+              });
+    }
+  }
+
+  private void addToQueue(
+      String origin, Queue<DestinationModule> queue, String destination, Pulse newPulse) {
+    log.debug("{} -{}-> {}", origin, newPulse, destination);
+    queue.add(new DestinationModule(destination, newPulse));
+    log.debug("queue after add size: {} content {}", queue.size(), queue);
+  }
+
+  private List<String> destinations(String origin) {
+    return fliFlops().get(origin);
+  }
+
+  private Optional<List<String>> destinations2(String origin) {
+
+
+    return Optional.of(fliFlops().get(origin));
+  }
+
+  record DestinationModule(String name, Pulse pulse) {
+    enum State {
+      ON,
+      OFF
+    }
+
+    enum Pulse {
+      LOW,
+      HIGH
+    }
   }
 
   private Map<String, List<String>> readConfiguration() {
-    return this.puzzle.stream()
+    List<String> input = new ArrayList<>(this.puzzle);
+    input.add("button -> " + BROADCASTER);
+    return input.stream()
         .map(pair -> pair.split("->"))
         .collect(Collectors.toMap(pair -> pair[0].strip(), pair -> toList(pair[1].strip())));
   }
@@ -34,6 +139,9 @@ public class Day20 extends TextDaySolver {
   }
 
   Map<String, List<String>> fliFlops() {
+    /* map.put(BUTTON, this.moduleConfiguration.get(BUTTON));
+    map.put("broadcaster", this.moduleConfiguration.get("broadcaster"));*/
+    // Map<String, List<String>> map = new HashMap<>(filterModules("%"));
     return filterModules("%");
   }
 
@@ -45,16 +153,6 @@ public class Day20 extends TextDaySolver {
     return this.moduleConfiguration.entrySet().stream()
         .filter(entry -> entry.getKey().contains(prefix))
         .collect(Collectors.toMap(entry -> entry.getKey().substring(1), Map.Entry::getValue));
-  }
-
-  @Override
-  public long solvePart01() {
-    return 101L;
-  }
-
-  @Override
-  public long solvePart02() {
-    return 1000L;
   }
 
   public static void main(String[] args) {
