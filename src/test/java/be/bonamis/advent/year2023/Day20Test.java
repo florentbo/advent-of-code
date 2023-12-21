@@ -7,37 +7,35 @@ import lombok.extern.slf4j.*;
 import org.junit.jupiter.api.*;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.entry;
 
 @Slf4j
 class Day20Test {
 
-  private Day20 day20;
-
-  @BeforeEach
-  void setUp() {
-    String sample =
-        """
-       broadcaster -> a, b, c
-       %a -> b
-       %b -> c
-       %c -> inv
-       &inv -> a
-                      """;
-    day20 = new Day20(Arrays.asList(sample.split("\n")));
-  }
-
   @Test
   void parse() {
     List<String> input = List.of("broadcaster -> a, b, c");
-    Map<String, List<String>> map =
-        input.stream()
-            .map(pair -> pair.split("->"))
-            .collect(Collectors.toMap(pair -> pair[0].strip(), pair -> toList(pair[1].strip())));
+    Map<String, List<String>> map = new Day20(input).getModuleConfiguration();
     log.debug("map: {}", map);
-    assertThat(map).hasSize(1);
+    assertThat(map).hasSize(1).isEqualTo(Map.of("broadcaster", List.of("a", "b", "c")));
   }
 
-  private List<String> toList(String destinations) {
-    return Arrays.stream(destinations.split(",")).map(String::strip).toList();
+  @Test
+  void filterModules() {
+    String sample =
+        """
+           broadcaster -> a, b, c
+           %a -> b
+           %b -> c
+           %c -> inv
+           &inv -> a
+                          """;
+    Day20 day20 = new Day20(sample);
+    assertThat(day20.fliFlops())
+        .hasSize(3)
+        .containsExactly(
+            entry("a", List.of("b")), entry("b", List.of("c")), entry("c", List.of("inv")));
+
+    assertThat(day20.conjunctions()).hasSize(1).containsExactly(entry("inv", List.of("a")));
   }
 }
