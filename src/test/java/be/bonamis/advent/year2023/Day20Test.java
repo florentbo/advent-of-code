@@ -66,11 +66,9 @@ class Day20Test {
                &inv -> a
                               """;
     Day20 day20 = new Day20(sample);
-    int lowPulses = 0;
-    int highPulses = 0;
-    day20.pushButton();
+    Day20.Counts counts = day20.pushButton();
 
-    assertThat(lowPulses).isEqualTo(8);
-    assertThat(highPulses).isEqualTo(4);
+    assertThat(counts.low()).isEqualTo(8);
+    assertThat(counts.high()).isEqualTo(4);
   }
 }
