@@ -85,19 +85,19 @@ public class Day20 extends TextDaySolver {
   private void pushButton() {
     Queue<DestinationModule> queue = new LinkedList<>();
     log.debug("queue: {}", queue);
-    sendPulses(BUTTON, LOW, queue);
+    sendPulses(BUTTON, LOW, queue, "start");
     while (!queue.isEmpty()) {
       DestinationModule module = queue.poll();
       // log.debug("queue after poll size: {} content {}", queue.size(), queue);
-      String name = module.destination();
       // log.debug("queue poll name: {}", name);
-      sendPulses(name, module.pulse(), queue);
+      sendPulses(module.destination(), module.pulse(), queue, module.origin());
     }
   }
 
   record Counts(Long low, Long high) {}
 
-  private void sendPulses(String origin, Pulse pulse, Queue<DestinationModule> queue) {
+  private void sendPulses(
+      String origin, Pulse pulse, Queue<DestinationModule> queue, String origin2) {
     if (origin.equals(BUTTON) || origin.equals(BROADCASTER)) {
       List<String> destinations = this.moduleConfiguration.get(origin);
       destinations.forEach(destination -> addToQueue(origin, queue, destination, LOW));
@@ -114,7 +114,7 @@ public class Day20 extends TextDaySolver {
       conjunctionDestinations(origin)
           .ifPresent(
               destinations2 -> {
-                Pulse newPulse = handleConjPulse(origin, pulse);
+                Pulse newPulse = handleConjPulse(origin, pulse, origin2);
                 destinations2.forEach(
                     destination -> addToQueue(origin, queue, destination, newPulse));
               });
@@ -129,12 +129,13 @@ public class Day20 extends TextDaySolver {
     return newPulse;
   }
 
-  private Pulse handleConjPulse(String origin, Pulse receivedPulse) {
+  private Pulse handleConjPulse(String destination, Pulse receivedPulse, String origin) {
     log.debug("handleConjPulse origin: {}", origin);
-    State state = states.get(origin);
+    log.debug("handleConjPulse destination: {}", destination);
+    State state = states.get(destination);
     State newState = state == OFF ? ON : OFF;
 
-    Map<String, Pulse> actualRemember = pulses.get(origin);
+    Map<String, Pulse> actualRemember = pulses.get(destination);
     log.debug("actualRemember: {}", actualRemember);
     Pulse newPulse = state == OFF ? LOW : HIGH;
     actualRemember.put(origin, receivedPulse);
@@ -143,14 +144,16 @@ public class Day20 extends TextDaySolver {
     /*
     Then, if it remembers high pulses for all inputs, it sends a low pulse; otherwise, it sends a high pulse.
      */
-    pulses.put(origin, actualRemember);
-    Pulse pulseToSend = receivedPulse == LOW ? HIGH : LOW;
+    pulses.put(destination, actualRemember);
+    boolean allHighs = actualRemember.values().stream().allMatch(pulse -> pulse.equals(HIGH));
+    Pulse pulseToSend = allHighs ? LOW : HIGH;
 
-    states.put(origin, newState);
-    log.debug("origin  {}  remember pulse {} received pulse {}", origin, "remember", receivedPulse);
+    states.put(destination, newState);
+    log.debug(
+        "origin  {}  remember pulse {} received pulse {}", destination, actualRemember, receivedPulse);
     log.debug("pulse to send {} sendPulse {}", pulseToSend, newPulse);
 
-    return newPulse;
+    return pulseToSend;
   }
 
   private void addToQueue(
