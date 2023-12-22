@@ -77,23 +77,41 @@ public class Day20 extends TextDaySolver {
       List<String> destinations = this.moduleConfiguration.get(origin);
       destinations.forEach(destination -> addToQueue(origin, queue, destination, LOW));
     } else {
-      destinations(origin)
-          .forEach(
-              destination -> {
-                if (pulse == LOW) {
-                  /*
-                  If a flip-flop module receives a high pulse, it is ignored and nothing happens.
-                  However, if a flip-flop module receives a low pulse, it flips between on and off.
-                  If it was off, it turns on and sends a high pulse. If it was on, it turns off and sends a low pulse.
-                   */
-                  State state = states.get(origin);
-                  // flip
-                  State newState = state == OFF ? ON : OFF;
-                  states.put(origin, newState);
-                  Pulse newPulse = state == OFF ? HIGH : LOW;
-                  addToQueue(origin, queue, destination, newPulse);
-                }
-              });
+      fliFlopDestinations(origin)
+          .ifPresent(
+              destinations ->
+                  destinations.forEach(
+                      destination -> {
+                        if (pulse == LOW) {
+                          /*
+                          If a flip-flop module receives a high pulse, it is ignored and nothing happens.
+                          However, if a flip-flop module receives a low pulse, it flips between on and off.
+                          If it was off, it turns on and sends a high pulse. If it was on, it turns off and sends a low pulse.
+                           */
+                          State state = states.get(origin);
+                          // flip
+                          State newState = state == OFF ? ON : OFF;
+                          states.put(origin, newState);
+                          Pulse newPulse = state == OFF ? HIGH : LOW;
+                          addToQueue(origin, queue, destination, newPulse);
+                        }
+                      }));
+      conjunctionDestinations(origin)
+          .ifPresent(
+              destinations2 ->
+                  destinations2.forEach(
+                      destination -> {
+                        /*
+                        Conjunction modules (prefix &) remember the type of the most recent pulse received from each of their connected input modules;
+                        they initially default to remembering a low pulse for each input.
+                        When a pulse is received, the conjunction module first updates its memory for that input.
+                        Then, if it remembers high pulses for all inputs, it sends a low pulse; otherwise, it sends a high pulse.
+                        inv -low-> a
+                         */
+                        State state = states.get(origin);
+                        Pulse newPulse = state == OFF ? LOW : HIGH;
+                        addToQueue(origin, queue, destination, newPulse);
+                      }));
     }
   }
 
@@ -104,14 +122,14 @@ public class Day20 extends TextDaySolver {
     log.debug("queue after add size: {} content {}", queue.size(), queue);
   }
 
-  private List<String> destinations(String origin) {
-    return fliFlops().get(origin);
+  private Optional<List<String>> fliFlopDestinations(String origin) {
+    return fliFlops().containsKey(origin) ? Optional.of(fliFlops().get(origin)) : Optional.empty();
   }
 
-  private Optional<List<String>> destinations2(String origin) {
-
-
-    return Optional.of(fliFlops().get(origin));
+  private Optional<List<String>> conjunctionDestinations(String origin) {
+    return conjunctions().containsKey(origin)
+        ? Optional.of(conjunctions().get(origin))
+        : Optional.empty();
   }
 
   record DestinationModule(String name, Pulse pulse) {
