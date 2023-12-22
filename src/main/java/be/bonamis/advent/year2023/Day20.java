@@ -21,7 +21,7 @@ public class Day20 extends TextDaySolver {
   private static final String BROADCASTER = "broadcaster";
   private final Map<String, List<String>> moduleConfiguration;
   private final Map<String, State> states;
-  private final Map<String, Pulse> pulses;
+  private final Map<String, Map<String, Pulse>> pulses;
 
   long lowPulses = 0;
   long highPulses = 0;
@@ -42,6 +42,7 @@ public class Day20 extends TextDaySolver {
     log.debug("states: {}", this.states);
     log.debug("fliFlops: {}", fliFlops());
     log.debug("conjunctions: {}", conjunctions());
+    log.debug("pulses: {}", pulses());
   }
 
   private Map<String, State> states() {
@@ -52,12 +53,15 @@ public class Day20 extends TextDaySolver {
                 key -> OFF));
   }
 
-  private Map<String, Pulse> pulses() {
-    return this.moduleConfiguration.keySet().stream()
-        .collect(
-            Collectors.toMap(
-                key -> (key.contains("&") || key.contains("%")) ? key.substring(1) : key,
-                key -> LOW));
+  private Map<String, Map<String, Pulse>> pulses() {
+    return conjunctions().keySet().stream().collect(Collectors.toMap(key -> key, this::toMap));
+  }
+
+  private Map<String, Pulse> toMap(String key) {
+    return fliFlops().entrySet().stream()
+        .filter(entry -> entry.getValue().contains(key))
+        .map(Map.Entry::getKey)
+        .collect(Collectors.toMap(key2 -> key2, key2 -> LOW));
   }
 
   @Override
@@ -84,9 +88,9 @@ public class Day20 extends TextDaySolver {
     sendPulses(BUTTON, LOW, queue);
     while (!queue.isEmpty()) {
       DestinationModule module = queue.poll();
-      log.debug("queue after poll size: {} content {}", queue.size(), queue);
-      String name = module.name();
-      log.debug("queue poll name: {}", name);
+      // log.debug("queue after poll size: {} content {}", queue.size(), queue);
+      String name = module.destination();
+      // log.debug("queue poll name: {}", name);
       sendPulses(name, module.pulse(), queue);
     }
   }
@@ -110,7 +114,7 @@ public class Day20 extends TextDaySolver {
       conjunctionDestinations(origin)
           .ifPresent(
               destinations2 -> {
-                Pulse newPulse = handleConjPulse(origin);
+                Pulse newPulse = handleConjPulse(origin, pulse);
                 destinations2.forEach(
                     destination -> addToQueue(origin, queue, destination, newPulse));
               });
@@ -125,11 +129,27 @@ public class Day20 extends TextDaySolver {
     return newPulse;
   }
 
-  private Pulse handleConjPulse(String origin) {
+  private Pulse handleConjPulse(String origin, Pulse receivedPulse) {
+    log.debug("handleConjPulse origin: {}", origin);
     State state = states.get(origin);
     State newState = state == OFF ? ON : OFF;
+
+    Map<String, Pulse> actualRemember = pulses.get(origin);
+    log.debug("actualRemember: {}", actualRemember);
     Pulse newPulse = state == OFF ? LOW : HIGH;
+    actualRemember.put(origin, receivedPulse);
+    log.debug("actualRemember with new reception: {}", actualRemember);
+
+    /*
+    Then, if it remembers high pulses for all inputs, it sends a low pulse; otherwise, it sends a high pulse.
+     */
+    pulses.put(origin, actualRemember);
+    Pulse pulseToSend = receivedPulse == LOW ? HIGH : LOW;
+
     states.put(origin, newState);
+    log.debug("origin  {}  remember pulse {} received pulse {}", origin, "remember", receivedPulse);
+    log.debug("pulse to send {} sendPulse {}", pulseToSend, newPulse);
+
     return newPulse;
   }
 
@@ -137,8 +157,8 @@ public class Day20 extends TextDaySolver {
       String origin, Queue<DestinationModule> queue, String destination, Pulse newPulse) {
     log.debug("----------------  {} -{}-> {}", origin, newPulse, destination);
     updateCounts(newPulse);
-    queue.add(new DestinationModule(destination, newPulse));
-    log.debug("queue after add size: {} content {}", queue.size(), queue);
+    queue.add(new DestinationModule(destination, newPulse, origin));
+    // log.debug("queue after add size: {} content {}", queue.size(), queue);
   }
 
   private void updateCounts(Pulse pulse) {
@@ -159,7 +179,7 @@ public class Day20 extends TextDaySolver {
         : Optional.empty();
   }
 
-  record DestinationModule(String name, Pulse pulse) {
+  record DestinationModule(String destination, Pulse pulse, String origin) {
     enum State {
       ON,
       OFF
