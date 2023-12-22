@@ -221,7 +221,7 @@ public class Day20 extends TextDaySolver {
   }
 
   public static void main(String[] args) {
-    String content = FileHelper.content("2023/19/2023_19_input.txt");
+    String content = FileHelper.content("2023/20/2023_20_input.txt");
     List<String> puzzle = Arrays.asList(content.split("\n"));
     Day20 day = new Day20(puzzle);
     log.info("solution part 1: {}", day.solvePart01());
