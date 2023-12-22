@@ -128,4 +128,18 @@ class Day20Test {
     Day20.Counts counts = day20.pushButton(2L);
     assertThat(counts).isEqualTo(new Day20.Counts(8L, 6L));
   }
+
+  @Test
+  void solvePart01SecondSample() {
+    String sample =
+            """
+               broadcaster -> a
+               %a -> inv, con
+               &inv -> b
+               %b -> con
+               &con -> output
+                                  """;
+    Day20 day20 = new Day20(sample);
+    assertThat(day20.solvePart01()).isEqualTo(11687500L);
+  }
 }
