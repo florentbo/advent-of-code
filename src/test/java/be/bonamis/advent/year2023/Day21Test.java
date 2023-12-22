@@ -18,7 +18,7 @@ class Day21Test {
   @BeforeEach
   void setUp() {
     String content = FileHelper.content("2023/21/2023_21_04_code.txt");
-    day = new Day21(Arrays.asList(content.split("\n")));
+    day = new Day21(Arrays.asList(content.split("\n")), 6);
   }
 
   @Test

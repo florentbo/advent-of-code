@@ -20,15 +20,17 @@ public class Day21 extends DaySolver<String> {
   private static final char ROCKS = '#';
 
   private final CharGrid grid;
+  private final int times;
 
-  public Day21(List<String> puzzle) {
+  public Day21(List<String> puzzle, int times) {
     super(puzzle);
+    this.times = times;
     this.grid = new CharGrid(this.puzzle.stream().map(String::toCharArray).toArray(char[][]::new));
   }
 
   @Override
   public long solvePart01() {
-    return multiSteps(6, Set.of(startPosition())).size();
+    return multiSteps(times, Set.of(startPosition())).size();
   }
 
   Point startPosition() {
@@ -80,7 +82,7 @@ public class Day21 extends DaySolver<String> {
   public static void main(String[] args) {
     String content = FileHelper.content("2023/21/2023_21_input.txt");
     List<String> puzzle = Arrays.asList(content.split("\n"));
-    Day21 day = new Day21(puzzle);
+    Day21 day = new Day21(puzzle, 64);
     log.info("solution part 1: {}", day.solvePart01());
     log.info("solution part 2: {}", day.solvePart02());
   }
