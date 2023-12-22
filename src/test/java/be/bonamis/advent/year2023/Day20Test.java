@@ -113,4 +113,19 @@ class Day20Test {
     Day20.Counts counts = day20.pushButton(1L);
     assertThat(counts).isEqualTo(new Day20.Counts(4L, 4L));
   }
+
+  @Test
+  void pushButtonSecondSampleTwoPushes() {
+    String sample =
+        """
+           broadcaster -> a
+           %a -> inv, con
+           &inv -> b
+           %b -> con
+           &con -> output
+                              """;
+    Day20 day20 = new Day20(sample);
+    Day20.Counts counts = day20.pushButton(2L);
+    assertThat(counts).isEqualTo(new Day20.Counts(8L, 6L));
+  }
 }
