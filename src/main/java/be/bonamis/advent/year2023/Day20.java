@@ -88,8 +88,8 @@ public class Day20 extends TextDaySolver {
     sendPulses(BUTTON, LOW, queue, "start");
     while (!queue.isEmpty()) {
       DestinationModule module = queue.poll();
-      // log.debug("queue after poll size: {} content {}", queue.size(), queue);
-      // log.debug("queue poll name: {}", name);
+      log.debug("queue after poll size: {} content {}", queue.size(), queue);
+      log.debug("queue poll : {}", module);
       sendPulses(module.destination(), module.pulse(), queue, module.origin());
     }
   }
@@ -132,12 +132,10 @@ public class Day20 extends TextDaySolver {
   private Pulse handleConjPulse(String destination, Pulse receivedPulse, String origin) {
     log.debug("handleConjPulse origin: {}", origin);
     log.debug("handleConjPulse destination: {}", destination);
-    State state = states.get(destination);
-    State newState = state == OFF ? ON : OFF;
 
     Map<String, Pulse> actualRemember = pulses.get(destination);
     log.debug("actualRemember: {}", actualRemember);
-    Pulse newPulse = state == OFF ? LOW : HIGH;
+
     actualRemember.put(origin, receivedPulse);
     log.debug("actualRemember with new reception: {}", actualRemember);
 
@@ -148,10 +146,12 @@ public class Day20 extends TextDaySolver {
     boolean allHighs = actualRemember.values().stream().allMatch(pulse -> pulse.equals(HIGH));
     Pulse pulseToSend = allHighs ? LOW : HIGH;
 
-    states.put(destination, newState);
     log.debug(
-        "origin  {}  remember pulse {} received pulse {}", destination, actualRemember, receivedPulse);
-    log.debug("pulse to send {} sendPulse {}", pulseToSend, newPulse);
+        "origin  {}  remember pulse {} received pulse {}",
+        destination,
+        actualRemember,
+        receivedPulse);
+    log.debug("pulse to send {} ", pulseToSend);
 
     return pulseToSend;
   }
@@ -161,7 +161,7 @@ public class Day20 extends TextDaySolver {
     log.debug("----------------  {} -{}-> {}", origin, newPulse, destination);
     updateCounts(newPulse);
     queue.add(new DestinationModule(destination, newPulse, origin));
-    // log.debug("queue after add size: {} content {}", queue.size(), queue);
+    log.debug("queue after add size: {} content {}", queue.size(), queue);
   }
 
   private void updateCounts(Pulse pulse) {
