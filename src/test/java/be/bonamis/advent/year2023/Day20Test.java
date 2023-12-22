@@ -1,8 +1,6 @@
 package be.bonamis.advent.year2023;
 
-import be.bonamis.advent.year2023.Day20.DestinationModule;
 import lombok.extern.slf4j.*;
-import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.*;
 
 import java.util.*;
@@ -56,7 +54,7 @@ class Day20Test {
   }
 
   @Test
-  void pushButton() {
+  void pushButtonFirstSample() {
     String sample =
         """
                broadcaster -> a, b, c
@@ -68,7 +66,22 @@ class Day20Test {
     Day20 day20 = new Day20(sample);
     Day20.Counts counts = day20.pushButton();
 
-    assertThat(counts.low()).isEqualTo(8);
+    assertThat(counts).isEqualTo(new Day20.Counts(8L, 4L));
     assertThat(counts.high()).isEqualTo(4);
+  }
+
+  @Test
+  void pushButtonSecondSample() {
+    String sample =
+        """
+           broadcaster -> a
+           %a -> inv, con
+           &inv -> b
+           %b -> con
+           &con -> output
+                              """;
+    Day20 day20 = new Day20(sample);
+    Day20.Counts counts = day20.pushButton();
+    assertThat(counts).isEqualTo(new Day20.Counts(4L, 4L));
   }
 }
