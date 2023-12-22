@@ -9,7 +9,6 @@ import be.bonamis.advent.year2023.Day20.DestinationModule.Pulse;
 import be.bonamis.advent.year2023.Day20.DestinationModule.State;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Pair;
 
 import static be.bonamis.advent.year2023.Day20.DestinationModule.Pulse.*;
 import static be.bonamis.advent.year2023.Day20.DestinationModule.State.*;
@@ -22,6 +21,9 @@ public class Day20 extends TextDaySolver {
   private static final String BROADCASTER = "broadcaster";
   private final Map<String, List<String>> moduleConfiguration;
   private final Map<String, State> states;
+
+  long lowPulses = 0;
+  long highPulses = 0;
 
   public Day20(List<String> puzzle) {
     super(puzzle);
@@ -57,9 +59,7 @@ public class Day20 extends TextDaySolver {
     return 1000L;
   }
 
-  void pushButton() {
-    Pair<Long, Long> counts = Pair.of(0L, 0L);
-
+  Counts pushButton() {
     Queue<DestinationModule> queue = new LinkedList<>();
     log.debug("queue: {}", queue);
     sendPulses(BUTTON, LOW, queue);
@@ -68,9 +68,12 @@ public class Day20 extends TextDaySolver {
       log.debug("queue after poll size: {} content {}", queue.size(), queue);
       String name = module.name();
       log.debug("queue poll name: {}", name);
-      sendPulses(name, LOW, queue);
+      sendPulses(name, module.pulse(), queue);
     }
+    return new Counts(lowPulses, highPulses);
   }
+
+  record Counts(Long low, Long high) {}
 
   private void sendPulses(String origin, Pulse pulse, Queue<DestinationModule> queue) {
     if (origin.equals(BUTTON) || origin.equals(BROADCASTER)) {
@@ -83,43 +86,44 @@ public class Day20 extends TextDaySolver {
                   destinations.forEach(
                       destination -> {
                         if (pulse == LOW) {
-                          /*
-                          If a flip-flop module receives a high pulse, it is ignored and nothing happens.
-                          However, if a flip-flop module receives a low pulse, it flips between on and off.
-                          If it was off, it turns on and sends a high pulse. If it was on, it turns off and sends a low pulse.
-                           */
-                          State state = states.get(origin);
-                          // flip
-                          State newState = state == OFF ? ON : OFF;
-                          states.put(origin, newState);
-                          Pulse newPulse = state == OFF ? HIGH : LOW;
-                          addToQueue(origin, queue, destination, newPulse);
+                          addToQueue(origin, HIGH, LOW, queue, destination);
                         }
                       }));
       conjunctionDestinations(origin)
           .ifPresent(
               destinations2 ->
                   destinations2.forEach(
-                      destination -> {
-                        /*
-                        Conjunction modules (prefix &) remember the type of the most recent pulse received from each of their connected input modules;
-                        they initially default to remembering a low pulse for each input.
-                        When a pulse is received, the conjunction module first updates its memory for that input.
-                        Then, if it remembers high pulses for all inputs, it sends a low pulse; otherwise, it sends a high pulse.
-                        inv -low-> a
-                         */
-                        State state = states.get(origin);
-                        Pulse newPulse = state == OFF ? LOW : HIGH;
-                        addToQueue(origin, queue, destination, newPulse);
-                      }));
+                      destination -> addToQueue(origin, LOW, HIGH, queue, destination)));
     }
   }
 
   private void addToQueue(
+      String origin,
+      Pulse pulse,
+      Pulse otherPulse,
+      Queue<DestinationModule> queue,
+      String destination) {
+    State state = states.get(origin);
+    State newState = state == OFF ? ON : OFF;
+    Pulse newPulse = state == OFF ? pulse : otherPulse;
+    states.put(origin, newState);
+    addToQueue(origin, queue, destination, newPulse);
+  }
+
+  private void addToQueue(
       String origin, Queue<DestinationModule> queue, String destination, Pulse newPulse) {
-    log.debug("{} -{}-> {}", origin, newPulse, destination);
+    log.debug("----------------  {} -{}-> {}", origin, newPulse, destination);
+    updateCounts(newPulse);
     queue.add(new DestinationModule(destination, newPulse));
     log.debug("queue after add size: {} content {}", queue.size(), queue);
+  }
+
+  private void updateCounts(Pulse pulse) {
+    if (pulse == HIGH) {
+      highPulses++;
+    } else {
+      lowPulses++;
+    }
   }
 
   private Optional<List<String>> fliFlopDestinations(String origin) {
@@ -157,9 +161,6 @@ public class Day20 extends TextDaySolver {
   }
 
   Map<String, List<String>> fliFlops() {
-    /* map.put(BUTTON, this.moduleConfiguration.get(BUTTON));
-    map.put("broadcaster", this.moduleConfiguration.get("broadcaster"));*/
-    // Map<String, List<String>> map = new HashMap<>(filterModules("%"));
     return filterModules("%");
   }
 
