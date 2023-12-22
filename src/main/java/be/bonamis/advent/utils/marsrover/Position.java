@@ -10,4 +10,8 @@ public record Position(long x, long y) {
   public static Point to(Position position) {
     return new Point((int) position.x(), (int) position.y());
   }
+
+  public static Position of(long x, long y) {
+    return new Position(x, y);
+  }
 }
