@@ -64,10 +64,39 @@ class Day20Test {
                &inv -> a
                               """;
     Day20 day20 = new Day20(sample);
-    Day20.Counts counts = day20.pushButton();
+    Day20.Counts counts = day20.pushButton(1L);
 
     assertThat(counts).isEqualTo(new Day20.Counts(8L, 4L));
-    assertThat(counts.high()).isEqualTo(4);
+  }
+
+  @Test
+  void pushButtonFirstSampleMultipleTimes() {
+    String sample =
+        """
+               broadcaster -> a, b, c
+               %a -> b
+               %b -> c
+               %c -> inv
+               &inv -> a
+                              """;
+    Day20 day20 = new Day20(sample);
+    Day20.Counts counts = day20.pushButton(1000L);
+
+    assertThat(counts).isEqualTo(new Day20.Counts(8000L, 4000L));
+  }
+
+  @Test
+  void solvePart01FirstSample() {
+    String sample =
+        """
+                   broadcaster -> a, b, c
+                   %a -> b
+                   %b -> c
+                   %c -> inv
+                   &inv -> a
+                                  """;
+    Day20 day20 = new Day20(sample);
+    assertThat(day20.solvePart01()).isEqualTo(32000000L);
   }
 
   @Test
@@ -81,7 +110,7 @@ class Day20Test {
            &con -> output
                               """;
     Day20 day20 = new Day20(sample);
-    Day20.Counts counts = day20.pushButton();
+    Day20.Counts counts = day20.pushButton(1L);
     assertThat(counts).isEqualTo(new Day20.Counts(4L, 4L));
   }
 }

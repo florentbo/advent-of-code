@@ -21,6 +21,7 @@ public class Day20 extends TextDaySolver {
   private static final String BROADCASTER = "broadcaster";
   private final Map<String, List<String>> moduleConfiguration;
   private final Map<String, State> states;
+  private final Map<String, Pulse> pulses;
 
   long lowPulses = 0;
   long highPulses = 0;
@@ -29,12 +30,14 @@ public class Day20 extends TextDaySolver {
     super(puzzle);
     this.moduleConfiguration = readConfiguration();
     this.states = states();
+    this.pulses = pulses();
   }
 
   public Day20(String sample) {
     super(sample);
     this.moduleConfiguration = readConfiguration();
     this.states = states();
+    this.pulses = pulses();
     log.debug("configuration: {}", this.moduleConfiguration);
     log.debug("states: {}", this.states);
     log.debug("fliFlops: {}", fliFlops());
@@ -49,9 +52,18 @@ public class Day20 extends TextDaySolver {
                 key -> OFF));
   }
 
+  private Map<String, Pulse> pulses() {
+    return this.moduleConfiguration.keySet().stream()
+        .collect(
+            Collectors.toMap(
+                key -> (key.contains("&") || key.contains("%")) ? key.substring(1) : key,
+                key -> LOW));
+  }
+
   @Override
   public long solvePart01() {
-    return 101L;
+    Counts counts = pushButton(1000L);
+    return counts.low() * counts.high();
   }
 
   @Override
@@ -59,7 +71,14 @@ public class Day20 extends TextDaySolver {
     return 1000L;
   }
 
-  Counts pushButton() {
+  Counts pushButton(long times) {
+    for (int i = 0; i < times; i++) {
+      pushButton();
+    }
+    return new Counts(lowPulses, highPulses);
+  }
+
+  private void pushButton() {
     Queue<DestinationModule> queue = new LinkedList<>();
     log.debug("queue: {}", queue);
     sendPulses(BUTTON, LOW, queue);
@@ -70,7 +89,6 @@ public class Day20 extends TextDaySolver {
       log.debug("queue poll name: {}", name);
       sendPulses(name, module.pulse(), queue);
     }
-    return new Counts(lowPulses, highPulses);
   }
 
   record Counts(Long low, Long high) {}
