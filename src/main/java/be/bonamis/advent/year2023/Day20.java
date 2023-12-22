@@ -82,32 +82,37 @@ public class Day20 extends TextDaySolver {
     } else {
       fliFlopDestinations(origin)
           .ifPresent(
-              destinations ->
+              destinations -> {
+                if (pulse == LOW) {
+                  Pulse newPulse = handlePulse(origin);
                   destinations.forEach(
-                      destination -> {
-                        if (pulse == LOW) {
-                          addToQueue(origin, HIGH, LOW, queue, destination);
-                        }
-                      }));
+                      destination -> addToQueue(origin, queue, destination, newPulse));
+                }
+              });
       conjunctionDestinations(origin)
           .ifPresent(
-              destinations2 ->
-                  destinations2.forEach(
-                      destination -> addToQueue(origin, LOW, HIGH, queue, destination)));
+              destinations2 -> {
+                Pulse newPulse = handleConjPulse(origin);
+                destinations2.forEach(
+                    destination -> addToQueue(origin, queue, destination, newPulse));
+              });
     }
   }
 
-  private void addToQueue(
-      String origin,
-      Pulse pulse,
-      Pulse otherPulse,
-      Queue<DestinationModule> queue,
-      String destination) {
+  private Pulse handlePulse(String origin) {
     State state = states.get(origin);
     State newState = state == OFF ? ON : OFF;
-    Pulse newPulse = state == OFF ? pulse : otherPulse;
+    Pulse newPulse = state == OFF ? HIGH : LOW;
     states.put(origin, newState);
-    addToQueue(origin, queue, destination, newPulse);
+    return newPulse;
+  }
+
+  private Pulse handleConjPulse(String origin) {
+    State state = states.get(origin);
+    State newState = state == OFF ? ON : OFF;
+    Pulse newPulse = state == OFF ? LOW : HIGH;
+    states.put(origin, newState);
+    return newPulse;
   }
 
   private void addToQueue(
