@@ -1,21 +1,19 @@
 package be.bonamis.advent.year2023.poc;
 
+import lombok.Getter;
+import lombok.Setter;
+
 import java.util.HashSet;
 import java.util.Set;
 
-public class Graph {
+@Getter
+@Setter
+public class Graph<T> {
 
-  private Set<Node> nodes = new HashSet<>();
+  private Set<Node<T>> nodes = new HashSet<>();
 
-  public void addNode(Node nodeA) {
+  public void addNode(Node<T> nodeA) {
     nodes.add(nodeA);
   }
 
-  public Set<Node> getNodes() {
-    return nodes;
-  }
-
-  public void setNodes(Set<Node> nodes) {
-    this.nodes = nodes;
-  }
 }
