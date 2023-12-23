@@ -25,7 +25,7 @@ public class DijkstraAlgorithm<T> {
         return new Result<>(destination.getDistance(), destination.getShortestPath());
       }
 
-      for (Map.Entry<Node<T>, Integer> adjacencyPair : currentNode.getAdjacentNodes().entrySet()) {
+      for (Map.Entry<Node<T>, Integer> adjacencyPair : adjacentNodes(currentNode).entrySet()) {
         Node<T> adjacentNode = adjacencyPair.getKey();
         Integer edgeWeight = adjacencyPair.getValue();
 
@@ -38,6 +38,10 @@ public class DijkstraAlgorithm<T> {
     }
 
     return new Result<>(-1, null);
+  }
+
+  protected Map<Node<T>, Integer> adjacentNodes(Node<T> currentNode) {
+    return currentNode.getAdjacentNodes();
   }
 
   private void calculateMinimumDistance(

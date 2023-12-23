@@ -209,6 +209,10 @@ public class CharGrid {
     return neighbours.stream().filter(isInTheGrid()).toList();
   }
 
+  public List<Point> neighbours(Point point) {
+    return neighbours(point, false);
+  }
+
   public Predicate<Point> isInTheGrid() {
     return p ->
         p.getX() >= 0 && p.getY() >= 0 && p.getX() < this.getHeight() && p.getY() < this.getWidth();
