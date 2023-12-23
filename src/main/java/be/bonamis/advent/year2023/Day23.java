@@ -52,7 +52,7 @@ public class Day23 extends DaySolver<String> {
     char dataEnd = data(end);
     log.debug("dataEnd {}", dataEnd);
 
-    Graph graph = new Graph();
+    Graph<Point> graph = new Graph<>();
     Map<Point, Node<Point>> nodes = new HashMap<>();
     grid.consume(
         point -> {
@@ -60,14 +60,23 @@ public class Day23 extends DaySolver<String> {
             Node<Point> node = new Node<>(point);
             nodes.put(point, node);
             graph.addNode(node);
+          }
+        });
+    grid.consume(
+        point -> {
+          if (isNotForest(point)) {
+            Node<Point> node = nodes.get(point);
             for (var adjacent : grid.neighbours(point)) {
-              if (isNotForest(point)) {
+              if (isNotForest(adjacent)) {
                 Node<Point> adjacentNode = nodes.get(adjacent);
                 node.addDestination(adjacentNode, 1);
               }
             }
           }
         });
+
+    Set<Node<Point>> graphNodes = graph.getNodes();
+    log.debug("graphNodes {}", graphNodes);
 
     final var source = startPosition.toPoint();
     final var sink = endPosition.toPoint();
@@ -81,10 +90,14 @@ public class Day23 extends DaySolver<String> {
     return result.distance();
   }
 
-  private boolean isNotForest(Point point) {
-    Character data = grid.get(point);
-    boolean condition = data != FOREST;
-    return condition;
+  boolean isNotForest(Point point) {
+    char data = grid.get(point);
+    return data != FOREST;
+  }
+
+  boolean isForest(Point point) {
+    char data = grid.get(point);
+    return data == FOREST;
   }
 
   private char data(Rover rover) {
