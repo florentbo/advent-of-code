@@ -3,66 +3,66 @@ package be.bonamis.advent.year2023;
 import be.bonamis.advent.DaySolver;
 import be.bonamis.advent.utils.FileHelper;
 import java.util.*;
+import java.util.ArrayList;
 
+import com.google.common.collect.Sets;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.lang3.tuple.Triple;
 
 @Slf4j
 @Getter
 public class Day24 extends DaySolver<String> {
 
-  public Day24(List<String> puzzle) {
+  private final long minValueTestArea;
+  private final long maxValueTestArea;
+
+  public Day24(List<String> puzzle, long minValueTestArea, long maxValueTestArea) {
     super(puzzle);
+    this.minValueTestArea = minValueTestArea;
+    this.maxValueTestArea = maxValueTestArea;
   }
 
   @Override
   public long solvePart01() {
-    String line = "20, 19, 15 @ 1, -5, -3";
+    Set<Set<String>> combinations = Sets.combinations(Sets.newTreeSet(this.puzzle), 2);
+    int count = 0;
+    for (Set<String> combination : combinations) {
+     // log.info("combination: {}", combination.size());
+      List<String> list = new ArrayList<>(combination);
+      //log.info("list: {}", list);
+      String next = combination.iterator().next();
+      Hailstone hailstoneA = Hailstone.from(list.get(0));
+      //log.info("hailstoneA: {}", hailstoneA);
+      String b = combination.iterator().next();
+      Hailstone hailstoneB = Hailstone.from(list.get(1));
+      //log.info("hailstoneB: {}", hailstoneB);
+      if (crossIsInsideTestArea(hailstoneA, hailstoneB)) {
+        count++;
+      }
+    }
 
-    String[] coordinates = line.split("@")[0].trim().split(",");
-    String secondPoint = "21, 14, 12";
-    log.info("parts: {}", Arrays.toString(line.split("@")));
-    String[] coordinates2 = secondPoint.split("@")[0].trim().split(",");
-    Point p1 =
-        Point.of(Long.parseLong(coordinates[0].trim()), Long.parseLong(coordinates[1].trim()));
-
-    String[] lineSlopes = line.split("@")[1].trim().split(",");
-
-    LineSlope lineSlope =
-        LineSlope.of(
-            Long.parseLong(lineSlopes[0].trim()),
-            Long.parseLong(lineSlopes[1].trim()),
-            Long.parseLong(lineSlopes[2].trim()));
-
-    log.info("lineSlope: {}", lineSlope);
-
-    Point p2 =
-        Point.of(Long.parseLong(coordinates2[0].trim()), Long.parseLong(coordinates2[1].trim()));
-    log.info("p1: {}, p2: {}", p1, p2);
-    double slope = (double) (p2.y() - p1.y()) / (p2.x() - p1.x());
-    log.info("slope: {}", slope);
-    log.info("slope2: {}", lineSlope.slope());
-
-    double intercept = p1.y() - slope * p1.x();
-    log.info("intercept: {}", intercept);
-    LinearEquation equation = LinearEquation.from(p1, p2);
-    log.info("equation: {}", equation);
-    log.info("equation2: {}", LinearEquation.from(p1, lineSlope));
-
-    return 888;
+    return count;
   }
 
-  record Point(double x, double y) {
+  public boolean crossIsInsideTestArea(Hailstone hailstoneA, Hailstone hailstoneB) {
+    Point cross = hailstoneA.cross(hailstoneB);
+    return cross.x() >= minValueTestArea
+        && cross.x() <= maxValueTestArea
+        && cross.y() >= minValueTestArea
+        && cross.y() <= maxValueTestArea;
+  }
+
+  public record Point(double x, double y) {
 
     public static Point of(double x, double y) {
       return new Point(x, y);
     }
   }
 
-  record Hailstone(Point point, LineSlope lineSlope) {
+  public record Hailstone(Point point, LineSlope lineSlope) {
     static Hailstone from(String line) {
       String[] coordinates = line.split("@")[0].trim().split(",");
+      log.info("coordinates: {}", coordinates[0].trim());
       String[] lineSlopes = line.split("@")[1].trim().split(",");
       return new Hailstone(
           Point.of(Long.parseLong(coordinates[0].trim()), Long.parseLong(coordinates[1].trim())),
@@ -92,11 +92,7 @@ public class Day24 extends DaySolver<String> {
     }
   }
 
-  record LinearEquation(double a, double b, double c) {
-    static LinearEquation from(Point p1, Point p2) {
-      return new LinearEquation(
-          p2.y() - p1.y(), p1.x() - p2.x(), p1.y() * p2.x() - p1.x() * p2.y());
-    }
+  public record LinearEquation(double a, double b, double c) {
 
     static LinearEquation from(Point point, LineSlope lineSlope) {
       double slope = lineSlope.slope();
@@ -118,9 +114,9 @@ public class Day24 extends DaySolver<String> {
   }
 
   public static void main(String[] args) {
-    String content = FileHelper.content("2023/25/2023_25_input.txt");
+    String content = FileHelper.content("2023/24/2023_24_input.txt");
     List<String> puzzle = Arrays.asList(content.split("\n"));
-    Day24 day = new Day24(puzzle);
+    Day24 day = new Day24(puzzle, 200000000000000L, 400000000000000L);
     log.info("solution part 1: {}", day.solvePart01());
     log.info("solution part 2: {}", day.solvePart02());
   }
