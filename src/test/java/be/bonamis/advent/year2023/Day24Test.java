@@ -24,7 +24,7 @@ class Day24Test {
                       20, 19, 15 @  1, -5, -3
 
                       """;
-    day = new Day24(Arrays.asList(sample.split("\n")));
+    day = new Day24(Arrays.asList(sample.split("\n")), 7, 27);
   }
 
   @Test
@@ -61,9 +61,16 @@ class Day24Test {
     assertThat(cross.y()).isCloseTo(15.333, offset(0.001));
   }
 
-  @Test@Disabled("not solved yet")
-  void solvePart01() {
+  @Test
+  void crossIsInsideTestArea() {
+    Hailstone hailstoneA = Hailstone.from("19, 13, 30 @ -2, 1, -2");
+    Hailstone hailstoneB = Hailstone.from("18, 19, 22 @ -1, -1, -2");
 
-    assertThat(day.solvePart01()).isEqualTo(54);
+    assertThat(day.crossIsInsideTestArea(hailstoneA, hailstoneB)).isTrue();
+  }
+
+  @Test
+  void solvePart01() {
+    assertThat(day.solvePart01()).isEqualTo(2);
   }
 }
