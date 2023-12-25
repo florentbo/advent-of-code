@@ -25,23 +25,24 @@ public class Day24 extends DaySolver<String> {
   @Override
   public long solvePart01() {
     Set<Set<String>> combinations = Sets.combinations(Sets.newTreeSet(this.puzzle), 2);
-    int count = 0;
-    for (Set<String> combination : combinations) {
-      List<String> list = new ArrayList<>(combination);
-      Hailstone hailstoneA = Hailstone.from(list.get(0));
-      Hailstone hailstoneB = Hailstone.from(list.get(1));
-      if (crossIsInsideTestArea(hailstoneA, hailstoneB)) {
-        count++;
-      }
-    }
 
-    return count;
+    return combinations.stream()
+        .filter(
+            combination -> {
+              List<String> list = new ArrayList<>(combination);
+              Hailstone hailstoneA = Hailstone.from(list.get(0));
+              Hailstone hailstoneB = Hailstone.from(list.get(1));
+              return crossIsInsideTestArea(hailstoneA, hailstoneB);
+            })
+        .count();
   }
 
   public boolean crossIsInsideTestArea(Hailstone hailstoneA, Hailstone hailstoneB) {
     Point cross = hailstoneA.cross(hailstoneB);
     log.debug("cross: {}", cross);
-    return isInsideTheArea(cross) && isInTheFuture(cross, hailstoneA);
+    return isInsideTheArea(cross)
+        && isInTheFuture(cross, hailstoneA)
+        && isInTheFuture(cross, hailstoneB);
   }
 
   private boolean isInTheFuture(Point cross, Hailstone hailstoneA) {
@@ -78,10 +79,6 @@ public class Day24 extends DaySolver<String> {
               Long.parseLong(lineSlopes[2].trim())));
     }
 
-    Point afterOne() {
-      return Point.of(point.x() + lineSlope.x(), point.y() + lineSlope.y());
-    }
-
     public LinearEquation toEquation() {
 
       return LinearEquation.from(this.point, this.lineSlope);
@@ -115,12 +112,6 @@ public class Day24 extends DaySolver<String> {
       double intersectionX = (this.b * second.c - second.b * this.c) / determinant;
       double intersectionY = (this.c * second.a - this.a * second.c) / determinant;
       return Point.of(intersectionX, intersectionY);
-    }
-
-    public double timeToCross(Point cross) {
-      log.debug("eq: {}", this);
-      log.debug("time: {}", a * cross.x() + b * cross.y() + c);
-      return 0;
     }
   }
 

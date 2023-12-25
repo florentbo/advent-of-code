@@ -31,8 +31,6 @@ class Day24Test {
   void parse() {
     Hailstone hailstone = Hailstone.from("20, 19, 15 @ 1, -5, -3");
     assertThat(hailstone).isEqualTo(new Hailstone(Point.of(20, 19), Day24.LineSlope.of(1, -5, -3)));
-
-    day.solvePart01();
     /*
         Hailstone A: 19, 13, 30 @ -2, 1, -2
     Hailstone B: 18, 19, 22 @ -1, -1, -2
@@ -77,8 +75,7 @@ class Day24Test {
 
     assertThat(
             day.crossIsInsideTestArea(
-                Hailstone.from("19, 13, 30 @ -2, 1, -2"),
-                Hailstone.from("20, 19, 15 @ 1, -5, -3")))
+                Hailstone.from("19, 13, 30 @ -2, 1, -2"), Hailstone.from("20, 19, 15 @ 1, -5, -3")))
         .isFalse();
   }
 
