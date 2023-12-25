@@ -1,18 +1,18 @@
 package be.bonamis.advent.year2023;
 
-import static be.bonamis.advent.utils.marsrover.Rover.Command.*;
-import static be.bonamis.advent.utils.marsrover.Rover.Direction.NORTH;
-
 import be.bonamis.advent.DaySolver;
-import be.bonamis.advent.utils.FileHelper;
-import be.bonamis.advent.utils.marsrover.Position;
-import be.bonamis.advent.utils.marsrover.Rover;
 
 import java.util.*;
 
+import be.bonamis.advent.utils.FileHelper;
+import be.bonamis.advent.utils.marsrover.Position;
+import be.bonamis.advent.utils.marsrover.Rover;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+
+import static be.bonamis.advent.utils.marsrover.Rover.Direction.*;
+import static be.bonamis.advent.utils.marsrover.Rover.Command.*;
 
 @Slf4j
 @Getter
@@ -155,10 +155,10 @@ public class Day18 extends DaySolver<String> {
 
       public Rover.Direction toRoverDirection() {
         return switch (this) {
-          case UP -> Rover.Direction.NORTH;
-          case DOWN -> Rover.Direction.SOUTH;
-          case LEFT -> Rover.Direction.WEST;
-          case RIGHT -> Rover.Direction.EAST;
+          case UP -> NORTH;
+          case DOWN -> SOUTH;
+          case LEFT -> WEST;
+          case RIGHT -> EAST;
         };
       }
     }
