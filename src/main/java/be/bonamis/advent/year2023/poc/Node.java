@@ -32,6 +32,22 @@ public class Node<T> {
     return shortestPath;
   }
 
+  private LinkedList<Node<T>> longestPath = new LinkedList<>();  // New field for storing the longest path
+
+
+  private Integer longestDistance = Integer.MIN_VALUE;  // New field for storing the length of the longest path
+
+
+  // New method for updating the longest path
+  public void updateLongestPath(List<Node<T>> path, int distance) {
+    if (distance > longestDistance) {
+      longestDistance = distance;
+      longestPath.clear();
+      longestPath.addAll(path);
+      longestPath.add(this);  // Add the current node to the longest path
+    }
+  }
+
   @Override
   public String toString() {
     return "Node{" +
