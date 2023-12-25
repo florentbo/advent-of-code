@@ -27,15 +27,9 @@ public class Day24 extends DaySolver<String> {
     Set<Set<String>> combinations = Sets.combinations(Sets.newTreeSet(this.puzzle), 2);
     int count = 0;
     for (Set<String> combination : combinations) {
-     // log.info("combination: {}", combination.size());
       List<String> list = new ArrayList<>(combination);
-      //log.info("list: {}", list);
-      String next = combination.iterator().next();
       Hailstone hailstoneA = Hailstone.from(list.get(0));
-      //log.info("hailstoneA: {}", hailstoneA);
-      String b = combination.iterator().next();
       Hailstone hailstoneB = Hailstone.from(list.get(1));
-      //log.info("hailstoneB: {}", hailstoneB);
       if (crossIsInsideTestArea(hailstoneA, hailstoneB)) {
         count++;
       }
@@ -46,6 +40,19 @@ public class Day24 extends DaySolver<String> {
 
   public boolean crossIsInsideTestArea(Hailstone hailstoneA, Hailstone hailstoneB) {
     Point cross = hailstoneA.cross(hailstoneB);
+    log.debug("cross: {}", cross);
+    return isInsideTheArea(cross) && isInTheFuture(cross, hailstoneA);
+  }
+
+  private boolean isInTheFuture(Point cross, Hailstone hailstoneA) {
+    if (hailstoneA.lineSlope().x() < 0) {
+      return cross.x() < hailstoneA.point().x();
+    } else {
+      return cross.x() > hailstoneA.point().x();
+    }
+  }
+
+  private boolean isInsideTheArea(Point cross) {
     return cross.x() >= minValueTestArea
         && cross.x() <= maxValueTestArea
         && cross.y() >= minValueTestArea
@@ -62,7 +69,6 @@ public class Day24 extends DaySolver<String> {
   public record Hailstone(Point point, LineSlope lineSlope) {
     static Hailstone from(String line) {
       String[] coordinates = line.split("@")[0].trim().split(",");
-      log.info("coordinates: {}", coordinates[0].trim());
       String[] lineSlopes = line.split("@")[1].trim().split(",");
       return new Hailstone(
           Point.of(Long.parseLong(coordinates[0].trim()), Long.parseLong(coordinates[1].trim())),
@@ -70,6 +76,10 @@ public class Day24 extends DaySolver<String> {
               Long.parseLong(lineSlopes[0].trim()),
               Long.parseLong(lineSlopes[1].trim()),
               Long.parseLong(lineSlopes[2].trim())));
+    }
+
+    Point afterOne() {
+      return Point.of(point.x() + lineSlope.x(), point.y() + lineSlope.y());
     }
 
     public LinearEquation toEquation() {
@@ -105,6 +115,12 @@ public class Day24 extends DaySolver<String> {
       double intersectionX = (this.b * second.c - second.b * this.c) / determinant;
       double intersectionY = (this.c * second.a - this.a * second.c) / determinant;
       return Point.of(intersectionX, intersectionY);
+    }
+
+    public double timeToCross(Point cross) {
+      log.debug("eq: {}", this);
+      log.debug("time: {}", a * cross.x() + b * cross.y() + c);
+      return 0;
     }
   }
 
