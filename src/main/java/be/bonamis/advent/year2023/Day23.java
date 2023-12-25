@@ -20,7 +20,6 @@ import java.util.stream.Stream;
 import be.bonamis.advent.year2023.poc.DijkstraAlgorithm;
 import be.bonamis.advent.year2023.poc.DijkstraAlgorithm.Result;
 import be.bonamis.advent.year2023.poc.Graph;
-import be.bonamis.advent.year2023.poc.LongestPathAlgorithm;
 import be.bonamis.advent.year2023.poc.Node;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -109,14 +108,14 @@ public class Day23 extends DaySolver<String> {
     return longestResult.distance();*/
   }
 
-  static class ForestLongestPathAlgorithm extends LongestPathAlgorithm<Point> {}
+/*  static class ForestLongestPathAlgorithm extends LongestPathAlgorithm<Point> {}
 
   static class ForestDijkstraAlgorithm extends DijkstraAlgorithm<Point> {
     @Override
     public boolean validate(Node<Point> sourceNode, Node<Point> evaluationNode) {
       return super.validate(sourceNode, evaluationNode);
     }
-  }
+  }*/
 
   boolean isNotForest(Point point) {
     char data = grid.get(point);
