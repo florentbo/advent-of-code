@@ -63,10 +63,23 @@ class Day24Test {
 
   @Test
   void crossIsInsideTestArea() {
-    Hailstone hailstoneA = Hailstone.from("19, 13, 30 @ -2, 1, -2");
-    Hailstone hailstoneB = Hailstone.from("18, 19, 22 @ -1, -1, -2");
+    assertThat(
+            day.crossIsInsideTestArea(
+                Hailstone.from("19, 13, 30 @ -2, 1, -2"),
+                Hailstone.from("18, 19, 22 @ -1, -1, -2")))
+        .isTrue();
 
-    assertThat(day.crossIsInsideTestArea(hailstoneA, hailstoneB)).isTrue();
+    assertThat(
+            day.crossIsInsideTestArea(
+                Hailstone.from("19, 13, 30 @ -2, 1, -2"),
+                Hailstone.from("12, 31, 28 @ -1, -2, -1")))
+        .isFalse();
+
+    assertThat(
+            day.crossIsInsideTestArea(
+                Hailstone.from("19, 13, 30 @ -2, 1, -2"),
+                Hailstone.from("20, 19, 15 @ 1, -5, -3")))
+        .isFalse();
   }
 
   @Test
