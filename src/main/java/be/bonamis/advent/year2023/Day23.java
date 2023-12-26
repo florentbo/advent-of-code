@@ -49,34 +49,29 @@ public class Day23 extends DaySolver<String> {
     log.info("dataStart {}", dataStart);
 
     Map<Position, Boolean> isVisited = new HashMap<>();
-    List<List<Position>> allPaths = findAllPaths(startPosition, endPosition, isVisited);
+    List<Integer> allPaths = findAllPaths(startPosition, endPosition, isVisited);
 
-    return allPaths.stream().mapToInt(positions -> positions.size() - 1).max().orElseThrow();
+    return allPaths.stream().mapToInt(positions -> positions - 1).max().orElseThrow();
   }
 
-  List<List<Position>> findAllPaths(
-      Position start, Position end, Map<Position, Boolean> isVisited) {
-    List<List<Position>> allPaths = new ArrayList<>();
+  List<Integer> findAllPaths(Position start, Position end, Map<Position, Boolean> isVisited) {
+    List<Integer> allPaths = new ArrayList<>();
     Deque<PathInfo> stack = new ArrayDeque<>();
-    stack.push(new PathInfo(start, new ArrayList<>(), isVisited));
+    stack.push(new PathInfo(start, isVisited, 0));
 
     while (!stack.isEmpty()) {
       PathInfo current = stack.pop();
       Position currentPosition = current.position();
-      List<Position> currentPath = current.path();
 
       current.isVisited().put(currentPosition, true);
 
-      currentPath.add(currentPosition);
-
+      int newPathSize = current.pathSize() + 1;
       if (currentPosition.equals(end)) {
-        allPaths.add(new ArrayList<>(currentPath));
+        allPaths.add(newPathSize);
       } else {
         for (Position neighbor : getNeighbors(currentPosition)) {
           if (!current.isVisited().getOrDefault(neighbor, false)) {
-            stack.push(
-                new PathInfo(
-                    neighbor, new ArrayList<>(currentPath), new HashMap<>(current.isVisited())));
+            stack.push(new PathInfo(neighbor, new HashMap<>(current.isVisited()), newPathSize));
           }
         }
       }
@@ -155,6 +150,5 @@ public class Day23 extends DaySolver<String> {
     log.info("solution part 2: {}", day.solvePart02());
   }
 
-  public record PathInfo(
-      Position position, List<Position> path, Map<Position, Boolean> isVisited) {}
+  public record PathInfo(Position position, Map<Position, Boolean> isVisited, int pathSize) {}
 }
