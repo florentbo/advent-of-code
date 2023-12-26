@@ -21,7 +21,8 @@ class Day23Test {
     day = new Day23(Arrays.asList(content.split("\n")));
   }
 
-  @Test@Disabled("Not solved yet")
+  @Test
+  @Disabled("Not solved yet")
   void solvePart01() {
     assertThat(day.solvePart01()).isEqualTo(94);
   }
