@@ -35,17 +35,18 @@ public class Day23 extends DaySolver<String> {
   public Day23(List<String> puzzle) {
     super(puzzle);
     this.grid = new CharGrid(puzzle);
+    log.info("grid  getHeight {} grid getWidth {}", grid.getHeight(), grid.getWidth());
   }
 
   @Override
   public long solvePart01() {
     Position startPosition = Position.of(1, 0);
-    log.debug("startPosition {}", startPosition);
-    Position endPosition = Position.of(grid.getWidth() - 2, grid.getHeight() - 1);
-    log.debug("endPosition {}", endPosition);
+    log.info("startPosition {}", startPosition);
+    Position endPosition = Position.of(grid.getHeight() - 2, grid.getWidth() - 1);
+    log.info("endPosition {}", endPosition);
     Rover start = new Rover(EAST, startPosition);
     char dataStart = data(start);
-    log.debug("dataStart {}", dataStart);
+    log.info("dataStart {}", dataStart);
 
     List<Position> path = new ArrayList<>();
     List<Integer> pathSizes = new ArrayList<>();
@@ -56,23 +57,18 @@ public class Day23 extends DaySolver<String> {
   }
 
   private void dfsWalk(
-          Position startPosition,
-          Position endPosition,
-          List<Position> path,
-          Map<Position, Boolean> isVisited, List<Integer> pathSizes) {
+      Position startPosition,
+      Position endPosition,
+      List<Position> path,
+      Map<Position, Boolean> isVisited,
+      List<Integer> pathSizes) {
     if (startPosition.equals(endPosition)) {
       int size = path.size();
-      log.debug("path  size {}", size);
+      log.info("path  size {}", size);
       pathSizes.add(size);
-      /*if (size > 90 && size < 100) {
-
-        path.forEach(n -> log.debug("{}", n));
-      }*/
-      //return size;
     }
     isVisited.put(startPosition, true);
-    Set<Position> adjacentNodes =
-        allowedPositions(startPosition); // startPosition.getAdjacentNodes().keySet();
+    Set<Position> adjacentNodes = allowedPositions(startPosition);
     adjacentNodes.forEach(
         node -> {
           if (!isVisited.getOrDefault(node, false)) {
@@ -82,7 +78,6 @@ public class Day23 extends DaySolver<String> {
           }
         });
     isVisited.put(startPosition, false);
-    //return 0;
   }
 
   private Set<Position> allowedPositions(Position startPosition) {

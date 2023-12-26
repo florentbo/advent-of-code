@@ -22,9 +22,15 @@ class Day23Test {
   }
 
   @Test
-  //@Disabled("Not solved yet")
   void solvePart01() {
     assertThat(day.solvePart01()).isEqualTo(94);
+  }
+
+  @Test
+  void solvePart01Other() {
+    String content = FileHelper.content("2023/23/2023_23_reddit_code.txt");
+    day = new Day23(Arrays.asList(content.split("\n")));
+    assertThat(day.solvePart01()).isEqualTo(19);
   }
 
   @Test
