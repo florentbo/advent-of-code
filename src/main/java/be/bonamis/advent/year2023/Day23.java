@@ -48,36 +48,45 @@ public class Day23 extends DaySolver<String> {
     char dataStart = data(start);
     log.info("dataStart {}", dataStart);
 
-    List<Position> path = new ArrayList<>();
-    List<Integer> pathSizes = new ArrayList<>();
     Map<Position, Boolean> isVisited = new HashMap<>();
-    dfsWalk(startPosition, endPosition, path, isVisited, pathSizes);
+    List<List<Position>> allPaths = findAllPaths(startPosition, endPosition, isVisited);
 
-    return pathSizes.stream().max(Integer::compareTo).orElseThrow();
+    return allPaths.stream().mapToInt(positions -> positions.size() - 1).max().orElseThrow();
   }
 
-  private void dfsWalk(
-      Position startPosition,
-      Position endPosition,
-      List<Position> path,
-      Map<Position, Boolean> isVisited,
-      List<Integer> pathSizes) {
-    if (startPosition.equals(endPosition)) {
-      int size = path.size();
-      log.info("path  size {}", size);
-      pathSizes.add(size);
-    }
-    isVisited.put(startPosition, true);
-    Set<Position> adjacentNodes = allowedPositions(startPosition);
-    adjacentNodes.forEach(
-        node -> {
-          if (!isVisited.getOrDefault(node, false)) {
-            path.add(node);
-            dfsWalk(node, endPosition, path, isVisited, pathSizes);
-            path.remove(node);
+  List<List<Position>> findAllPaths(
+      Position start, Position end, Map<Position, Boolean> isVisited) {
+    List<List<Position>> allPaths = new ArrayList<>();
+    Deque<PathInfo> stack = new ArrayDeque<>();
+    stack.push(new PathInfo(start, new ArrayList<>(), isVisited));
+
+    while (!stack.isEmpty()) {
+      PathInfo current = stack.pop();
+      Position currentPosition = current.position();
+      List<Position> currentPath = current.path();
+
+      current.isVisited().put(currentPosition, true);
+
+      currentPath.add(currentPosition);
+
+      if (currentPosition.equals(end)) {
+        allPaths.add(new ArrayList<>(currentPath));
+      } else {
+        for (Position neighbor : getNeighbors(currentPosition)) {
+          if (!current.isVisited().getOrDefault(neighbor, false)) {
+            stack.push(
+                new PathInfo(
+                    neighbor, new ArrayList<>(currentPath), new HashMap<>(current.isVisited())));
           }
-        });
-    isVisited.put(startPosition, false);
+        }
+      }
+    }
+
+    return allPaths;
+  }
+
+  private Set<Position> getNeighbors(Position currentPosition) {
+    return allowedPositions(currentPosition);
   }
 
   private Set<Position> allowedPositions(Position startPosition) {
@@ -119,15 +128,6 @@ public class Day23 extends DaySolver<String> {
     return data != FOREST;
   }
 
-  /*  static class ForestLongestPathAlgorithm extends LongestPathAlgorithm<Point> {}
-
-  static class ForestDijkstraAlgorithm extends DijkstraAlgorithm<Point> {
-    @Override
-    public boolean validate(Node<Point> sourceNode, Node<Point> evaluationNode) {
-      return super.validate(sourceNode, evaluationNode);
-    }
-  }*/
-
   boolean isNotForest(Point point) {
     char data = grid.get(point);
     return data != FOREST;
@@ -154,4 +154,7 @@ public class Day23 extends DaySolver<String> {
     log.info("solution part 1: {}", day.solvePart01());
     log.info("solution part 2: {}", day.solvePart02());
   }
+
+  public record PathInfo(
+      Position position, List<Position> path, Map<Position, Boolean> isVisited) {}
 }
