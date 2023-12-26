@@ -48,77 +48,27 @@ public class Day23 extends DaySolver<String> {
     log.debug("dataStart {}", dataStart);
 
     List<Position> path = new ArrayList<>();
+    List<Integer> pathSizes = new ArrayList<>();
     Map<Position, Boolean> isVisited = new HashMap<>();
-    dfsWalk(startPosition, endPosition, path, isVisited);
+    dfsWalk(startPosition, endPosition, path, isVisited, pathSizes);
 
-    /*Rover end = new Rover(EAST, endPosition);
-    char dataEnd = data(end);
-    log.debug("dataEnd {}", dataEnd);
-
-    Graph<Point> graph = new Graph<>();
-    Map<Point, Node<Point>> nodes = new HashMap<>();
-    grid.consume(
-        point -> {
-          if (isNotForest(point)) {
-            Node<Point> node = new Node<>(point);
-            nodes.put(point, node);
-            graph.addNode(node);
-          }
-        });
-
-    nodes
-        .keySet()
-        .forEach(
-            point -> {
-              for (var adjacent : grid.neighbours(point)) {
-                Node<Point> node = nodes.get(point);
-                if (isNotForest(adjacent)) {
-                  Node<Point> adjacentNode = nodes.get(adjacent);
-                  node.addDestination(adjacentNode, 1);
-                }
-              }
-            });
-
-    final var source = startPosition.toPoint();
-    final var sink = endPosition.toPoint();
-    Node<Point> sourceNode = nodes.get(source);
-    Node<Point> sinkNode = nodes.get(sink);*/
-    /* Result<Point> result =
-        new ForestDijkstraAlgorithm().calculateShortestPathFromSource(sourceNode, sinkNode, true);
-    List<Node<Point>> path = result.path();
-    log.debug("path  size {}", path.size());
-    path.forEach(n -> {
-      Point point = n.getName();
-      Character c = grid.get(point);
-      if (!STEEP_DIRECTIONS.contains(c)) {
-        grid.set(point, 'O');
-      }
-      //log.debug("{}", point);
-    });
-    grid.rowsAsLines().forEach(s -> log.debug("{}", s));*/
-    // graph.printAllPaths(sourceNode, sinkNode);
-    return 999L;
-
-    /*ForestLongestPathAlgorithm forestLongestPathAlgorithm = new ForestLongestPathAlgorithm();
-    Result<Point> longestResult = forestLongestPathAlgorithm.calculateLongestPathFromSource(sourceNode, sinkNode);
-    longestResult.path().forEach(n -> log.debug("{}", n.getName()));
-
-    return longestResult.distance();*/
+    return pathSizes.stream().max(Integer::compareTo).orElseThrow();
   }
 
   private void dfsWalk(
-      Position startPosition,
-      Position endPosition,
-      List<Position> path,
-      Map<Position, Boolean> isVisited) {
+          Position startPosition,
+          Position endPosition,
+          List<Position> path,
+          Map<Position, Boolean> isVisited, List<Integer> pathSizes) {
     if (startPosition.equals(endPosition)) {
       int size = path.size();
       log.debug("path  size {}", size);
+      pathSizes.add(size);
       /*if (size > 90 && size < 100) {
 
         path.forEach(n -> log.debug("{}", n));
       }*/
-      return;
+      //return size;
     }
     isVisited.put(startPosition, true);
     Set<Position> adjacentNodes =
@@ -127,11 +77,12 @@ public class Day23 extends DaySolver<String> {
         node -> {
           if (!isVisited.getOrDefault(node, false)) {
             path.add(node);
-            dfsWalk(node, endPosition, path, isVisited);
+            dfsWalk(node, endPosition, path, isVisited, pathSizes);
             path.remove(node);
           }
         });
     isVisited.put(startPosition, false);
+    //return 0;
   }
 
   private Set<Position> allowedPositions(Position startPosition) {
@@ -143,7 +94,7 @@ public class Day23 extends DaySolver<String> {
             })
         .filter(this::isPositionInTheGrid)
         .filter(this::isNotForest)
-        //.filter(this::isInGoodDirection)
+        .filter(this::isInGoodDirection)
         .map(Rover::position)
         .collect(Collectors.toSet());
     // is in the grid filter
@@ -154,13 +105,14 @@ public class Day23 extends DaySolver<String> {
 
   private boolean isInGoodDirection(Rover rover) {
     char data = data(rover);
-    log.debug("data {}", data);
-    return switch (rover.direction()) {
-      case NORTH -> data == NORTH_STEEP;
-      case SOUTH -> data == SOUTH_STEEP;
-      case EAST -> data == EAST_STEEP;
-      case WEST -> data == WEST_STEEP;
-    };
+    // log.debug("data {}", data);
+    return !STEEP_DIRECTIONS.contains(data)
+        || switch (rover.direction()) {
+          case NORTH -> data == NORTH_STEEP;
+          case SOUTH -> data == SOUTH_STEEP;
+          case EAST -> data == EAST_STEEP;
+          case WEST -> data == WEST_STEEP;
+        };
   }
 
   private boolean isPositionInTheGrid(Rover rover) {
