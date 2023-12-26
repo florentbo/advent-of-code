@@ -13,6 +13,7 @@ import java.util.*;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -40,6 +41,10 @@ public class Day23 extends DaySolver<String> {
 
   @Override
   public long solvePart01() {
+    return longestPath(true);
+  }
+
+  private int longestPath(boolean isInGooDirection) {
     Position startPosition = Position.of(1, 0);
     log.info("startPosition {}", startPosition);
     Position endPosition = Position.of(grid.getHeight() - 2, grid.getWidth() - 1);
@@ -49,12 +54,18 @@ public class Day23 extends DaySolver<String> {
     log.info("dataStart {}", dataStart);
 
     Map<Position, Boolean> isVisited = new HashMap<>();
-    List<Integer> allPaths = findAllPaths(startPosition, endPosition, isVisited);
+    List<Integer> allPaths = findAllPaths(startPosition, endPosition, isVisited, isInGooDirection);
+    log.info("allPaths size: {}", allPaths.size());
 
     return allPaths.stream().mapToInt(positions -> positions - 1).max().orElseThrow();
   }
 
-  List<Integer> findAllPaths(Position start, Position end, Map<Position, Boolean> isVisited) {
+  @Override
+  public long solvePart02() {
+    return longestPath(false);
+  }
+
+  List<Integer> findAllPaths(Position start, Position end, Map<Position, Boolean> isVisited, boolean isInGooDirection) {
     List<Integer> allPaths = new ArrayList<>();
     Deque<PathInfo> stack = new ArrayDeque<>();
     stack.push(new PathInfo(start, isVisited, 0));
@@ -69,7 +80,7 @@ public class Day23 extends DaySolver<String> {
       if (currentPosition.equals(end)) {
         allPaths.add(newPathSize);
       } else {
-        for (Position neighbor : getNeighbors(currentPosition)) {
+        for (Position neighbor : allowedPositions(currentPosition, isInGooDirection)) {
           if (!current.isVisited().getOrDefault(neighbor, false)) {
             stack.push(new PathInfo(neighbor, new HashMap<>(current.isVisited()), newPathSize));
           }
@@ -80,22 +91,15 @@ public class Day23 extends DaySolver<String> {
     return allPaths;
   }
 
-  private Set<Position> getNeighbors(Position currentPosition) {
-    return allowedPositions(currentPosition);
-  }
-
-  private Set<Position> allowedPositions(Position startPosition) {
-    return Arrays.stream(values())
-        .map(
-            direction -> {
-              Rover rover = new Rover(direction, startPosition);
-              return rover.move(FORWARD, true);
-            })
-        .filter(this::isPositionInTheGrid)
-        .filter(this::isNotForest)
-        .filter(this::isInGoodDirection)
-        .map(Rover::position)
-        .collect(Collectors.toSet());
+  private Set<Position> allowedPositions(Position startPosition, boolean isInGooDirection) {
+    Stream<Rover> rovers =
+        Arrays.stream(values())
+            .map(direction -> new Rover(direction, startPosition).move(FORWARD, true))
+            .filter(this::isPositionInTheGrid)
+            .filter(this::isNotForest);
+    Stream<Rover> allowedRovers =
+        isInGooDirection ? rovers.filter(this::isInGoodDirection) : rovers;
+    return allowedRovers.map(Rover::position).collect(Collectors.toSet());
     // is in the grid filter
     // is not a forest filter
     // is slope in good direction
@@ -135,11 +139,6 @@ public class Day23 extends DaySolver<String> {
 
   private char data(Rover rover) {
     return grid.get(rover.position());
-  }
-
-  @Override
-  public long solvePart02() {
-    return 9999L;
   }
 
   public static void main(String[] args) {

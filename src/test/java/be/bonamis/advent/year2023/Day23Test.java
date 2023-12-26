@@ -42,4 +42,9 @@ class Day23Test {
   void isForest() {
     assertThat(day.isForest(Position.of(0, 0).toPoint())).isTrue();
   }
+
+  @Test
+  void solvePart02() {
+    assertThat(day.solvePart02()).isEqualTo(154);
+  }
 }
