@@ -217,6 +217,9 @@ public class CharGrid {
     return p ->
         p.getX() >= 0 && p.getY() >= 0 && p.getX() < this.getHeight() && p.getY() < this.getWidth();
   }
+  public Predicate<Position> isPositionInTheGrid() {
+    return p -> (int) p.x() >= 0 && (int) p.y() >= 0 && (int) p.x() < this.getHeight() && (int) p.y() < this.getWidth();
+  }
 
   public Point find(int i) {
     return stream().filter(p -> number(p) == i).findFirst().orElseThrow();
