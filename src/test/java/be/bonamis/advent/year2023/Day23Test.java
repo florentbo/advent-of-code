@@ -22,7 +22,7 @@ class Day23Test {
   }
 
   @Test
-  @Disabled("Not solved yet")
+  //@Disabled("Not solved yet")
   void solvePart01() {
     assertThat(day.solvePart01()).isEqualTo(94);
   }
