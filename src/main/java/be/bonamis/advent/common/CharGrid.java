@@ -11,6 +11,7 @@ import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import be.bonamis.advent.utils.marsrover.Position;
+import be.bonamis.advent.utils.marsrover.Rover;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -217,8 +218,10 @@ public class CharGrid {
     return p ->
         p.getX() >= 0 && p.getY() >= 0 && p.getX() < this.getHeight() && p.getY() < this.getWidth();
   }
-  public Predicate<Position> isPositionInTheGrid() {
-    return p -> (int) p.x() >= 0 && (int) p.y() >= 0 && (int) p.x() < this.getHeight() && (int) p.y() < this.getWidth();
+
+  public boolean isPositionInTheGrid(Rover rover) {
+    Position p = rover.position();
+    return (int) p.x() >= 0 && (int) p.y() >= 0 && (int) p.x() < this.height && (int) p.y() < this.width;
   }
 
   public Point find(int i) {

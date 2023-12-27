@@ -32,7 +32,7 @@ public class Graph<T> {
     if (source.equals(destination)) {
       int size = path.size();
       if (size == 94) {
-        path.forEach(n -> log.debug("{}", n.getName()));
+        path.forEach(n -> log.debug("{}", n.getValue()));
       }
       return;
     }

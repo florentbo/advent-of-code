@@ -95,7 +95,7 @@ public class Day23 extends DaySolver<String> {
     Stream<Rover> rovers =
         Arrays.stream(values())
             .map(direction -> new Rover(direction, startPosition).move(FORWARD, true))
-            .filter(this::isPositionInTheGrid)
+            .filter(grid::isPositionInTheGrid)
             .filter(this::isNotForest);
     Stream<Rover> allowedRovers =
         isInGooDirection ? rovers.filter(this::isInGoodDirection) : rovers;
@@ -118,9 +118,6 @@ public class Day23 extends DaySolver<String> {
         };
   }
 
-  private boolean isPositionInTheGrid(Rover rover) {
-    return grid.isPositionInTheGrid().test(rover.position());
-  }
 
   private boolean isNotForest(Rover rover) {
     char data = grid.get(rover.position());

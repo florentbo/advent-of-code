@@ -1,6 +1,7 @@
 package be.bonamis.advent.year2023;
 
 import be.bonamis.advent.DaySolver;
+import be.bonamis.advent.common.CharGrid;
 import be.bonamis.advent.common.Grid;
 import be.bonamis.advent.utils.FileHelper;
 
@@ -11,8 +12,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Stream;
 
+import be.bonamis.advent.utils.marsrover.Position;
+import be.bonamis.advent.utils.marsrover.Rover;
 import be.bonamis.advent.year2023.poc.DijkstraAlgorithm;
-import be.bonamis.advent.year2023.poc.Graph;
+import be.bonamis.advent.year2023.poc.DijkstraAlgorithm.Result;
 import be.bonamis.advent.year2023.poc.Node;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -20,12 +23,17 @@ import org.jgrapht.alg.interfaces.*;
 import org.jgrapht.alg.shortestpath.*;
 import org.jgrapht.graph.*;
 
+import static be.bonamis.advent.utils.marsrover.Rover.Command.FORWARD;
+import static be.bonamis.advent.utils.marsrover.Rover.Direction.values;
+import static java.util.stream.Collectors.*;
+
 @Slf4j
 @Getter
 public class Day17 extends DaySolver<String> {
 
   private final int[][] data;
   private final Grid grid;
+  private final CharGrid charGrid;
 
   public Day17(List<String> puzzle) {
     super(puzzle);
@@ -35,6 +43,7 @@ public class Day17 extends DaySolver<String> {
             .map(sa -> Stream.of(sa).mapToInt(Integer::parseInt).toArray())
             .toArray(int[][]::new);
     grid = new Grid(data);
+    charGrid = new CharGrid(puzzle);
   }
 
   @Override
@@ -84,14 +93,37 @@ public class Day17 extends DaySolver<String> {
     }
   }
 
+  public long solveCustomShortest() {
+    Map<Position, Node<Position>> nodes = new HashMap<>();
+    charGrid.consume(
+        point -> {
+          Position position = Position.of(point);
+          Node<Position> node = new Node<>(position);
+          nodes.put(position, node);
+        });
+
+    Position startPosition = Position.of(0, 0);
+    log.info("startPosition {}", startPosition);
+    Position endPosition = Position.of(grid.getWidth() - 1, grid.getHeight() - 1);
+    log.info("endPosition {}", endPosition);
+    Node<Position> sourceNode = nodes.get(startPosition);
+    Node<Position> sinkNode = nodes.get(endPosition);
+
+    Result<Position> result =
+        new PositionDijkstraAlgorithm(charGrid, nodes)
+            .calculateShortestPathFromSource(sourceNode, sinkNode, false);
+
+    return result.distance();
+  }
+
   public long solveShortestPathDijkstra(boolean extraValidation) {
-    Graph graph = new Graph();
+    // Graph<Point> graph = new Graph<>();
     Map<Point, Node<Point>> nodes = new HashMap<>();
     grid.consume(
         point -> {
           Node<Point> node = new Node<>(point);
           nodes.put(point, node);
-          graph.addNode(node);
+          // graph.addNode(node);
         });
     grid.consume(
         point -> {
@@ -110,11 +142,11 @@ public class Day17 extends DaySolver<String> {
     final var sink = new Point(grid.getHeight() - 1, grid.getWidth() - 1);
     Node<Point> sourceNode = nodes.get(source);
     Node<Point> sinkNode = nodes.get(sink);
-    DijkstraAlgorithm.Result<Point> result =
+    Result<Point> result =
         new PointDijkstraAlgorithm()
             .calculateShortestPathFromSource(sourceNode, sinkNode, extraValidation);
 
-    result.path().forEach(n -> log.debug("{}", n.getName()));
+    result.path().forEach(n -> log.debug("{}", n.getValue()));
     return result.distance();
   }
 
@@ -131,27 +163,61 @@ public class Day17 extends DaySolver<String> {
     log.info("solution part 2: {}", day.solvePart02());
   }
 
-  static class PointDijkstraAlgorithm extends DijkstraAlgorithm<Point> {
+  static class PointDijkstraAlgorithm extends DijkstraAlgorithm<Point> {}
+
+  static class PositionDijkstraAlgorithm extends DijkstraAlgorithm<Position> {
+    private final CharGrid charGrid;
+    private final Map<Position, Node<Position>> nodes;
+
+    public PositionDijkstraAlgorithm(CharGrid charGrid, Map<Position, Node<Position>> nodes) {
+      this.charGrid = charGrid;
+      this.nodes = nodes;
+    }
+
     @Override
-    public boolean validate(Node<Point> sourceNode, Node<Point> evaluationNode) {
-      Point evaluationPoint = evaluationNode.getName();
-      List<Node<Point>> sourceNodePath = sourceNode.getShortestPath();
-      List<Node<Point>> evaluationNodePath = evaluationNode.getShortestPath();
-      if (sourceNodePath.size() > 2) {
-        List<Point> last3Points = lastNPoints(sourceNodePath, 3);
-        boolean xCoordinatesAreNotAllTheSame =
-            last3Points.stream().map(p -> p.x).anyMatch(p -> p != evaluationPoint.x);
-        boolean yCoordinatesAreNotAllTheSame =
-            last3Points.stream().map(p -> p.y).anyMatch(p -> p != evaluationPoint.y);
-        return xCoordinatesAreNotAllTheSame && yCoordinatesAreNotAllTheSame;
+    protected Map<Node<Position>, Integer> adjacentNodes(Node<Position> currentNode) {
+      List<Node<Position>> currentShortestPath = currentNode.getShortestPath();
+      Set<Position> positions = allowedPositions(currentNode.getValue(), currentShortestPath);
+      return positions.stream().collect(toMap(this.nodes::get, this::value));
+    }
+
+    private int value(Position node) {
+      char data = charGrid.get(node);
+      return Character.getNumericValue(data);
+    }
+
+    private Set<Position> allowedPositions(
+        Position startPosition, List<Node<Position>> currentShortestPath) {
+      return Arrays.stream(values())
+          .map(
+              direction -> {
+                Rover rover = new Rover(direction, startPosition);
+                return rover.move(FORWARD, true);
+              })
+          .filter(charGrid::isPositionInTheGrid)
+          // .filter(this::isNotForest)
+          .filter(rover -> canContinueInTheSameDirection(rover, currentShortestPath))
+          .map(Rover::position)
+          .collect(toSet());
+    }
+
+    private boolean canContinueInTheSameDirection(
+        Rover rover, List<Node<Position>> currentShortestPath) {
+      Position position = rover.position();
+      List<Position> positions = currentShortestPath.stream().map(Node::getValue).toList();
+      log.debug("positions {}", positions);
+      if (positions.size() > 3) {
+        List<Position> latest3AndActual =
+            new ArrayList<>(positions.subList(positions.size() - 3, positions.size()));
+        latest3AndActual.add(position);
+        log.debug("latest3 {}", latest3AndActual);
+        Set<Long> xValues = latest3AndActual.stream().map(Position::x).collect(toSet());
+        Set<Long> yValues = latest3AndActual.stream().map(Position::y).collect(toSet());
+        boolean allTheSame = xValues.size() == 1 || yValues.size() == 1;
+        log.debug("allTheSame {}", allTheSame);
+        return !allTheSame;
       }
       return true;
     }
-  }
-
-  private static List<Point> lastNPoints(List<Node<Point>> sourceNodePath, int i) {
-    return sourceNodePath.subList(sourceNodePath.size() - i, sourceNodePath.size()).stream()
-        .map(Node::getName)
-        .toList();
   }
 }

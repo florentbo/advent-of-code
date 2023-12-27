@@ -17,24 +17,26 @@ public class DijkstraAlgorithm<T> {
     unsettledNodes.add(source);
 
     while (!unsettledNodes.isEmpty()) {
-      Node<T> currentNode = getLowestDistanceNode(unsettledNodes);
-      unsettledNodes.remove(currentNode);
+      Node<T> currentSourceNode = getLowestDistanceNode(unsettledNodes);
+      unsettledNodes.remove(currentSourceNode);
 
-      if (currentNode.equals(destination)) {
+      if (currentSourceNode.equals(destination)) {
         // If the destination node is reached, return the result
         return new Result<>(destination.getDistance(), destination.getShortestPath());
       }
 
-      for (Map.Entry<Node<T>, Integer> adjacencyPair : adjacentNodes(currentNode).entrySet()) {
-        Node<T> adjacentNode = adjacencyPair.getKey();
+      for (Map.Entry<Node<T>, Integer> adjacencyPair :
+          adjacentNodes(currentSourceNode).entrySet()) {
+        Node<T> evaluationAdjacentNode = adjacencyPair.getKey();
         Integer edgeWeight = adjacencyPair.getValue();
 
-        if (!settledNodes.contains(adjacentNode)) {
-          calculateMinimumDistance(adjacentNode, edgeWeight, currentNode, extraValidation);
-          unsettledNodes.add(adjacentNode);
+        if (!settledNodes.contains(evaluationAdjacentNode)) {
+          calculateMinimumDistance(
+              evaluationAdjacentNode, edgeWeight, currentSourceNode, extraValidation);
+          unsettledNodes.add(evaluationAdjacentNode);
         }
       }
-      settledNodes.add(currentNode);
+      settledNodes.add(currentSourceNode);
     }
 
     return new Result<>(-1, null);
@@ -49,6 +51,7 @@ public class DijkstraAlgorithm<T> {
     Integer sourceDistance = sourceNode.getDistance();
     if (sourceDistance + edgeWeight < evaluationNode.getDistance()
         && validate(extraValidation, sourceNode, evaluationNode)) {
+
       evaluationNode.setDistance(sourceDistance + edgeWeight);
       LinkedList<Node<T>> shortestPath = new LinkedList<>(sourceNode.getShortestPath());
       shortestPath.add(sourceNode);
