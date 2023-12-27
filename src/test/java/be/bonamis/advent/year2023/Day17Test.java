@@ -36,4 +36,12 @@ class Day17Test {
     day17 = new Day17(Arrays.asList(content.split("\n")));
     assertThat(day17.solveShortestPathDijkstra(true)).isEqualTo(102);
   }
+
+  @Test
+  @Disabled("infinite loop")
+  void solvePart01Custom() {
+    String content = FileHelper.content("2023/17/2023_17_00_code.txt");
+    day17 = new Day17(Arrays.asList(content.split("\n")));
+    assertThat(day17.solveCustomShortest()).isEqualTo(102);
+  }
 }

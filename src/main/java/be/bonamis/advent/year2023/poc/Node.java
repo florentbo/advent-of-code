@@ -3,16 +3,13 @@ package be.bonamis.advent.year2023.poc;
 import lombok.Getter;
 import lombok.Setter;
 
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Setter
 @Getter
 public class Node<T> {
 
-  private T name;
+  private T value;
 
   private LinkedList<Node<T>> shortestPath = new LinkedList<>();
 
@@ -20,8 +17,8 @@ public class Node<T> {
 
   private Map<Node<T>, Integer> adjacentNodes = new HashMap<>();
 
-  public Node(T name) {
-    this.name = name;
+  public Node(T value) {
+    this.value = value;
   }
 
   public void addDestination(Node<T> destination, int distance) {
@@ -49,9 +46,22 @@ public class Node<T> {
   }
 
   @Override
+  public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+    Node<?> node = (Node<?>) o;
+    return Objects.equals(value, node.value);
+  }
+
+  @Override
+  public int hashCode() {
+    return Objects.hash(value);
+  }
+
+  @Override
   public String toString() {
     return "Node{" +
-            "name='" + name + '\'' +
+            "name='" + value + '\'' +
             '}';
   }
 }
