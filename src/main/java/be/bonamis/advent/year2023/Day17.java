@@ -5,15 +5,18 @@ import be.bonamis.advent.common.CharGrid;
 import be.bonamis.advent.utils.FileHelper;
 
 import java.util.*;
+import java.util.stream.Stream;
 
 import be.bonamis.advent.utils.marsrover.*;
 import be.bonamis.advent.utils.marsrover.Rover.Direction;
+import be.bonamis.advent.year2023.Day17.PositionDijkstraAlgorithm.Crucible;
 import be.bonamis.advent.year2023.poc.DijkstraAlgorithm;
 import be.bonamis.advent.year2023.poc.Node;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import static be.bonamis.advent.utils.marsrover.Rover.Command.FORWARD;
+import static be.bonamis.advent.utils.marsrover.Rover.Command.RIGHT;
 import static java.util.stream.Collectors.*;
 
 @Slf4j
@@ -45,9 +48,9 @@ public class Day17 extends DaySolver<String> {
     Node<Position> sourceNode = nodes.get(startPosition);
     Node<Position> sinkNode = nodes.get(endPosition);
 
-    List<Node<Position>> shortestPath =
-        new PositionDijkstraAlgorithm(charGrid, nodes).findShortestPath(sourceNode, sinkNode);
-    shortestPath.forEach(p -> log.debug("pos {} value {}", p, value(p.getValue())));
+    PositionDijkstraAlgorithm algorithm = new PositionDijkstraAlgorithm(charGrid, nodes);
+    List<Node<Position>> shortestPath = algorithm.findShortestPath(sourceNode, sinkNode);
+    // shortestPath.forEach(p -> log.debug("pos {} value {}", p, value(p.getValue())));
 
     Optional<Integer> sum =
         shortestPath.stream().map(node -> value(node.getValue())).reduce(Integer::sum);
@@ -56,6 +59,11 @@ public class Day17 extends DaySolver<String> {
     int end = value(endPosition);
     int start = value(startPosition);
     log.info("start {} end {}", start, end);
+
+    Crucible src = new Crucible(new Rover(Direction.EAST, startPosition), new ArrayList<>());
+    Crucible dest = new Crucible(new Rover(Direction.EAST, endPosition), new ArrayList<>());
+    algorithm.shortestPath(src, dest);
+
     return sum.orElseThrow() - start;
   }
 
@@ -101,18 +109,25 @@ public class Day17 extends DaySolver<String> {
         Crucible polled = pq.poll();
         if (polled.rover().position().equals(dest.rover().position())) {
           log.info("found shortest path");
+          Integer dist01 = dist.get(polled.rover().position());
+          Integer dist02 = dist.get(dest.rover().position());
+          log.info("dist 01: {}", dist01);
+          log.info("dist 02: {}", dist02);
           break;
         }
-        List<Rover> previous = polled.previous;
-        for (Rover neighbor : neighbors(polled)) {
+        Collection<Rover> neighbors = neighbors(polled);
+        for (Rover neighbor : neighbors) {
           Position neighborPosition = neighbor.position();
-          int weight = value(neighborPosition);
           Rover polledRover = polled.rover();
+
+          int weight = value(neighborPosition);
           int newDistance = dist.get(polledRover.position()) + weight;
+
           if (dist.get(neighborPosition) > newDistance) {
             dist.put(neighborPosition, newDistance);
-            previous.add(polledRover);
-            pq.add(new Crucible(neighbor, previous));
+            List<Rover> newPrevious = new ArrayList<>(polled.previous);
+            newPrevious.add(polledRover);
+            pq.add(new Crucible(neighbor, newPrevious));
           }
         }
       }
@@ -185,10 +200,29 @@ public class Day17 extends DaySolver<String> {
     List<Rover> neighbors(Crucible crucible) {
       Rover rover = crucible.rover();
       List<Rover> previous = crucible.previous();
-      Set<Position> positions = allowedPositions(rover.position());
-      return positions.stream()
-          .map(position -> new Rover(rover.direction(), position))
-          .collect(toList());
+
+      Rover same = rover.move(FORWARD, true);
+      Direction inverse = same.direction().inverse();
+      Stream<Rover> others =
+          Arrays.stream(Direction.values())
+              .filter(
+                  direction -> !direction.equals(inverse) && !direction.equals(same.direction()))
+              .map(direction -> new Rover(direction, rover.position()).move(FORWARD, true));
+
+      int size = 3;
+
+      Stream<Rover> stream =
+          previous.size() >= size && allTheSame(previous, size)
+              ? others
+              : Stream.concat(others, Stream.of(same));
+      return stream.filter(charGrid::isPositionInTheGrid).toList();
+    }
+
+    private boolean allTheSame(List<Rover> previous, int size) {
+      List<Rover> latest3AndActual =
+          new ArrayList<>(previous.subList(previous.size() - size, previous.size()));
+      List<Direction> directions = latest3AndActual.stream().map(Rover::direction).toList();
+      return directions.stream().distinct().count() == 1;
     }
 
     private Set<Position> allowedPositions(Position currentPosition) {
