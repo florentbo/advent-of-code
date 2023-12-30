@@ -56,7 +56,7 @@ public class Day17 extends DaySolver<String> {
         log.info("found shortest path");
         Integer dist01 = dist.get(polled.rover().position());
         log.info("dist 01: {}", dist01);
-        return dist01;
+        // return dist01;
       }
       Collection<Rover> neighbors = neighbors(polled);
       Rover polledRover = polled.rover();
@@ -76,7 +76,10 @@ public class Day17 extends DaySolver<String> {
         }
       }
     }
-    return null;
+    //dist.forEach((k, v) -> log.info("key {} value {} ", k, v));
+    Position endPosition = dest.rover().position();
+    Integer i = dist.get(endPosition);
+    return i - value(endPosition);
   }
 
   List<Rover> neighbors(Crucible crucible) {
