@@ -49,7 +49,7 @@ public class Day17 extends DaySolver<String> {
     Map<Position, Integer> dist =
         this.charGrid.stream().collect(toMap(Position::of, p -> Integer.MAX_VALUE));
     pq.add(src);
-    dist.put(src.rover().position(), 0);
+    dist.put(src.rover().position(), value(src.rover().position()));
     while (!pq.isEmpty()) {
       Crucible polled = pq.poll();
       if (polled.rover().position().equals(dest.rover().position())) {
@@ -76,10 +76,9 @@ public class Day17 extends DaySolver<String> {
         }
       }
     }
-    //dist.forEach((k, v) -> log.info("key {} value {} ", k, v));
+    // dist.forEach((k, v) -> log.info("key {} value {} ", k, v));
     Position endPosition = dest.rover().position();
-    Integer i = dist.get(endPosition);
-    return i - value(endPosition);
+    return dist.get(endPosition);
   }
 
   List<Rover> neighbors(Crucible crucible) {
@@ -97,9 +96,7 @@ public class Day17 extends DaySolver<String> {
 
     int size = 3;
 
-    return (previous.size() >= size && allTheSame(previous, size)
-            ? others
-            : Stream.concat(others, Stream.of(same)))
+    return Stream.concat(others, Stream.of(same))
         .filter(charGrid::isPositionInTheGrid)
         .filter(r -> !positions.contains(r.position()))
         .toList();
