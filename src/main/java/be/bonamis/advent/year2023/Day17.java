@@ -16,7 +16,6 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import static be.bonamis.advent.utils.marsrover.Rover.Command.FORWARD;
-import static be.bonamis.advent.utils.marsrover.Rover.Command.RIGHT;
 import static java.util.stream.Collectors.*;
 
 @Slf4j
@@ -49,7 +48,7 @@ public class Day17 extends DaySolver<String> {
     Node<Position> sinkNode = nodes.get(endPosition);
 
     PositionDijkstraAlgorithm algorithm = new PositionDijkstraAlgorithm(charGrid, nodes);
-    List<Node<Position>> shortestPath = algorithm.findShortestPath(sourceNode, sinkNode);
+    /*    List<Node<Position>> shortestPath = algorithm.findShortestPath(sourceNode, sinkNode);
     // shortestPath.forEach(p -> log.debug("pos {} value {}", p, value(p.getValue())));
 
     Optional<Integer> sum =
@@ -58,13 +57,11 @@ public class Day17 extends DaySolver<String> {
 
     int end = value(endPosition);
     int start = value(startPosition);
-    log.info("start {} end {}", start, end);
+    log.info("start {} end {}", start, end);*/
 
     Crucible src = new Crucible(new Rover(Direction.EAST, startPosition), new ArrayList<>());
     Crucible dest = new Crucible(new Rover(Direction.EAST, endPosition), new ArrayList<>());
-    algorithm.shortestPath(src, dest);
-
-    return sum.orElseThrow() - start;
+    return algorithm.shortestPath(src, dest);
   }
 
   private int value(Position node) {
@@ -96,7 +93,7 @@ public class Day17 extends DaySolver<String> {
 
     record Crucible(Rover rover, List<Rover> previous) {}
 
-    void shortestPath(Crucible src, Crucible dest) {
+    Integer shortestPath(Crucible src, Crucible dest) {
       PriorityQueue<Crucible> pq =
           new PriorityQueue<>(
               (r1, r2) ->
@@ -110,10 +107,8 @@ public class Day17 extends DaySolver<String> {
         if (polled.rover().position().equals(dest.rover().position())) {
           log.info("found shortest path");
           Integer dist01 = dist.get(polled.rover().position());
-          Integer dist02 = dist.get(dest.rover().position());
           log.info("dist 01: {}", dist01);
-          log.info("dist 02: {}", dist02);
-          break;
+          return dist01;
         }
         Collection<Rover> neighbors = neighbors(polled);
         for (Rover neighbor : neighbors) {
@@ -127,10 +122,12 @@ public class Day17 extends DaySolver<String> {
             dist.put(neighborPosition, newDistance);
             List<Rover> newPrevious = new ArrayList<>(polled.previous);
             newPrevious.add(polledRover);
+
             pq.add(new Crucible(neighbor, newPrevious));
           }
         }
       }
+      return null;
     }
 
     public List<Node<Position>> findShortestPath(Node<Position> start, Node<Position> end) {
@@ -199,7 +196,8 @@ public class Day17 extends DaySolver<String> {
 
     List<Rover> neighbors(Crucible crucible) {
       Rover rover = crucible.rover();
-      List<Rover> previous = crucible.previous();
+      List<Rover> previous = new ArrayList<>(crucible.previous());
+      previous.add(rover);
 
       Rover same = rover.move(FORWARD, true);
       Direction inverse = same.direction().inverse();
@@ -211,18 +209,17 @@ public class Day17 extends DaySolver<String> {
 
       int size = 3;
 
-      Stream<Rover> stream =
-          previous.size() >= size && allTheSame(previous, size)
+      return (previous.size() >= size && allTheSame(previous, size)
               ? others
-              : Stream.concat(others, Stream.of(same));
-      return stream.filter(charGrid::isPositionInTheGrid).toList();
+              : Stream.concat(others, Stream.of(same)))
+          .toList().stream().filter(charGrid::isPositionInTheGrid).toList();
     }
 
     private boolean allTheSame(List<Rover> previous, int size) {
-      List<Rover> latest3AndActual =
+      List<Rover> latest3 =
           new ArrayList<>(previous.subList(previous.size() - size, previous.size()));
-      List<Direction> directions = latest3AndActual.stream().map(Rover::direction).toList();
-      return directions.stream().distinct().count() == 1;
+      Set<Direction> directions = latest3.stream().map(Rover::direction).collect(toSet());
+      return directions.size() == 1;
     }
 
     private Set<Position> allowedPositions(Position currentPosition) {
