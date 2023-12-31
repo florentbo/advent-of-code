@@ -113,10 +113,32 @@ public class Day17 extends DaySolver<String> {
     return new Crucible(direction, previous);
   }
 
-  private Stream<Crucible> findNeighbors(Crucible crucible, Stream<Crucible> others, Rover same, Parts part) {
-    return crucible.previous() + 1 > 3
-        ? others
-        : Stream.concat(others, Stream.of(fromDirection(same, crucible.previous() + 1)));
+  private Stream<Crucible> findNeighbors(
+      Crucible crucible, Stream<Crucible> others, Rover same, Parts part) {
+    return switch (part) {
+      case ONE -> partOneNeighbors(crucible, others, same);
+      case TWO -> partTwoNeighbors(crucible, others, same);
+    };
+  }
+
+  private Stream<Crucible> partOneNeighbors(
+      Crucible crucible, Stream<Crucible> others, Rover same) {
+    int newPrevious = crucible.previous() + 1;
+    return newPrevious <= 3
+        ? Stream.concat(others, Stream.of(fromDirection(same, newPrevious)))
+        : others;
+  }
+
+  private Stream<Crucible> partTwoNeighbors(
+      Crucible crucible, Stream<Crucible> others, Rover same) {
+    int newPrevious = crucible.previous() + 1;
+    if (newPrevious <= 4) {
+      return Stream.of(fromDirection(same, newPrevious));
+    }
+    if (newPrevious <= 10) {
+      return Stream.concat(others, Stream.of(fromDirection(same, newPrevious)));
+    }
+    return others;
   }
 
   private boolean isPositionInTheGrid(Crucible crucible2) {

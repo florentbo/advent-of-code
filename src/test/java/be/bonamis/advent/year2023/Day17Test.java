@@ -20,6 +20,14 @@ class Day17Test {
   }
 
   @Test
+  @Disabled("no such element")
+  void solvePart02() {
+    String content = FileHelper.content("2023/17/2023_17_00_code.txt");
+    Day17 day17 = new Day17(Arrays.asList(content.split("\n")));
+    assertThat(day17.solvePart02()).isEqualTo(94);
+  }
+
+  @Test
   void solvePart01Test() {
     String content = FileHelper.content("2023/17/2023_17_00_sample.txt");
     Day17 day17 = new Day17(Arrays.asList(content.split("\n")));
