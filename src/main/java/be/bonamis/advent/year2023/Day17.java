@@ -14,6 +14,7 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
 import static be.bonamis.advent.utils.marsrover.Rover.Command.FORWARD;
+import static be.bonamis.advent.year2023.Day17.Parts.*;
 
 @Slf4j
 @Getter
@@ -26,15 +27,24 @@ public class Day17 extends DaySolver<String> {
     charGrid = new CharGrid(puzzle);
   }
 
+  enum Parts {
+    ONE,
+    TWO
+  }
+
   @Override
   public long solvePart01() {
+    return solve(ONE);
+  }
+
+  private Integer solve(Parts parts) {
     Position startPosition = Position.of(0, 0);
     log.info("startPosition {} value {} ", startPosition, value(startPosition));
 
     Position endPosition = Position.of(charGrid.getWidth() - 1, charGrid.getHeight() - 1);
     log.info("endPosition {} value {} ", endPosition, value(endPosition));
 
-    Integer shortestPath = shortestPath(startPosition, endPosition);
+    Integer shortestPath = shortestPath(startPosition, endPosition, parts);
     log.info("shortestPath: {}", shortestPath);
 
     return shortestPath;
@@ -49,10 +59,10 @@ public class Day17 extends DaySolver<String> {
     }
   }
 
-  Integer shortestPath(Position src, Position dest) {
+  Integer shortestPath(Position src, Position dest, Parts part) {
     PriorityQueue<VertexPair> pq = new PriorityQueue<>();
     Map<Crucible, Integer> dist = new HashMap<>();
-    Crucible start = new Crucible(new Rover(Direction.NORTH, src), 0);
+    Crucible start = fromDirection(new Rover(Direction.NORTH, src), 0);
     pq.add(new VertexPair(start, 0));
     dist.put(start, 0);
     Set<Integer> set = new TreeSet<>();
@@ -65,7 +75,7 @@ public class Day17 extends DaySolver<String> {
         log.debug("distance: {}", distance);
         set.add(distance);
       }
-      neighbors(crucible)
+      neighbors(crucible, part)
           .forEach(
               neighbor -> {
                 Position neighborPosition = neighbor.rover().position();
@@ -83,7 +93,7 @@ public class Day17 extends DaySolver<String> {
     return set.iterator().next();
   }
 
-  Stream<Crucible> neighbors(Crucible crucible) {
+  Stream<Crucible> neighbors(Crucible crucible, Parts parts) {
     Rover rover = crucible.rover();
     Rover same = rover.move(FORWARD, true);
     Direction sameDirection = same.direction();
@@ -91,11 +101,22 @@ public class Day17 extends DaySolver<String> {
     Stream<Crucible> others =
         Arrays.stream(Direction.values())
             .filter(direction -> !direction.equals(inverse) && !direction.equals(sameDirection))
-            .map(
-                direction ->
-                    new Crucible(new Rover(direction, rover.position()).move(FORWARD, true), 1));
-      return (crucible.previous() + 1 > 3 ? others : Stream.concat(others, Stream.of(new Crucible(same, crucible.previous() + 1))))
-        .filter(this::isPositionInTheGrid);
+            .map(direction -> fromNewDirection(direction, rover));
+    return findNeighbors(crucible, others, same, parts).filter(this::isPositionInTheGrid);
+  }
+
+  private Crucible fromNewDirection(Direction direction, Rover rover) {
+    return fromDirection(new Rover(direction, rover.position()).move(FORWARD, true), 1);
+  }
+
+  private Crucible fromDirection(Rover direction, int previous) {
+    return new Crucible(direction, previous);
+  }
+
+  private Stream<Crucible> findNeighbors(Crucible crucible, Stream<Crucible> others, Rover same, Parts part) {
+    return crucible.previous() + 1 > 3
+        ? others
+        : Stream.concat(others, Stream.of(fromDirection(same, crucible.previous() + 1)));
   }
 
   private boolean isPositionInTheGrid(Crucible crucible2) {
@@ -109,7 +130,7 @@ public class Day17 extends DaySolver<String> {
 
   @Override
   public long solvePart02() {
-    return 999;
+    return solve(TWO);
   }
 
   public static void main(String[] args) {
