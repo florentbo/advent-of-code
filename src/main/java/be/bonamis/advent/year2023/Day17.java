@@ -94,8 +94,7 @@ public class Day17 extends DaySolver<String> {
             .map(
                 direction ->
                     new Crucible(new Rover(direction, rover.position()).move(FORWARD, true), 1));
-    int previous = crucible.previous() + 1;
-    return (previous > 3 ? others : Stream.concat(others, Stream.of(new Crucible(same, previous))))
+      return (crucible.previous() + 1 > 3 ? others : Stream.concat(others, Stream.of(new Crucible(same, crucible.previous() + 1))))
         .filter(this::isPositionInTheGrid);
   }
 
