@@ -62,9 +62,8 @@ public class Day17 extends DaySolver<String> {
   Integer shortestPath(Position src, Position dest, Parts part) {
     PriorityQueue<VertexPair> pq = new PriorityQueue<>();
     Map<Crucible, Integer> dist = new HashMap<>();
-    Crucible start = fromDirection(new Rover(Direction.NORTH, src), 0);
-    pq.add(new VertexPair(start, 0));
-    dist.put(start, 0);
+    Crucible start = fromDirection(new Rover(Direction.EAST, src), 0);
+    addToQueue(start, dist, 0, pq, 0);
     Set<Integer> set = new TreeSet<>();
     while (!pq.isEmpty()) {
       VertexPair vertexPair = pq.poll();
@@ -85,12 +84,21 @@ public class Day17 extends DaySolver<String> {
                 int newDistance = actualDistance + weight;
 
                 if (dist.getOrDefault(neighbor, Integer.MAX_VALUE) > newDistance) {
-                  dist.put(neighbor, newDistance);
-                  pq.add(new VertexPair(neighbor, weight));
+                  addToQueue(neighbor, dist, newDistance, pq, weight);
                 }
               });
     }
     return set.iterator().next();
+  }
+
+  private void addToQueue(
+      Crucible neighbor,
+      Map<Crucible, Integer> dist,
+      int newDistance,
+      PriorityQueue<VertexPair> pq,
+      int weight) {
+    dist.put(neighbor, newDistance);
+    pq.add(new VertexPair(neighbor, weight));
   }
 
   Stream<Crucible> neighbors(Crucible crucible, Parts parts) {
