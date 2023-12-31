@@ -15,7 +15,7 @@ class Day17Test {
   void solvePart01() {
     String content = FileHelper.content("2023/17/2023_17_00_code.txt");
     Day17 day17 = new Day17(Arrays.asList(content.split("\n")));
-    assertThat(day17.solvePart01()).isEqualTo(80);
+    assertThat(day17.solvePart01()).isEqualTo(102);
   }
   @Test
   void solvePart01Test() {

@@ -34,25 +34,24 @@ public class Day17 extends DaySolver<String> {
     Position endPosition = Position.of(charGrid.getWidth() - 1, charGrid.getHeight() - 1);
     log.info("endPosition {} value {} ", endPosition, value(endPosition));
 
-    Crucible src = new Crucible(new Rover(Direction.EAST, startPosition), new ArrayList<>());
-    Crucible dest = new Crucible(new Rover(Direction.EAST, endPosition), new ArrayList<>());
-    return shortestPath(src, dest);
+    Crucible src = new Crucible(new Rover(Direction.NORTH, startPosition), new ArrayList<>());
+    return shortestPath(src, endPosition);
   }
 
   record Crucible(Rover rover, List<Rover> previous) {}
 
-  Integer shortestPath(Crucible src, Crucible dest) {
+  Integer shortestPath(Crucible src, Position dest) {
     PriorityQueue<Crucible> pq =
         new PriorityQueue<>(
             (r1, r2) ->
-                Integer.compare(value(r1.rover().position()), value(r2.rover().position())));
+                Integer.compare(value(r2.rover().position()), value(r1.rover().position())));
     Map<Position, Integer> dist =
         this.charGrid.stream().collect(toMap(Position::of, p -> Integer.MAX_VALUE));
     pq.add(src);
     dist.put(src.rover().position(), value(src.rover().position()));
     while (!pq.isEmpty()) {
       Crucible polled = pq.poll();
-      if (polled.rover().position().equals(dest.rover().position())) {
+      if (polled.rover().position().equals(dest)) {
         log.info("found shortest path");
         Integer dist01 = dist.get(polled.rover().position());
         log.info("dist 01: {}", dist01);
@@ -77,8 +76,7 @@ public class Day17 extends DaySolver<String> {
       }
     }
     // dist.forEach((k, v) -> log.info("key {} value {} ", k, v));
-    Position endPosition = dest.rover().position();
-    return dist.get(endPosition);
+    return dist.get(dest);
   }
 
   List<Rover> neighbors(Crucible crucible) {
@@ -88,15 +86,18 @@ public class Day17 extends DaySolver<String> {
     List<Position> positions = previous.stream().map(Rover::position).toList();
 
     Rover same = rover.move(FORWARD, true);
-    Direction inverse = same.direction().inverse();
+    Direction sameDirection = same.direction();
+    Direction inverse = sameDirection.inverse();
     Stream<Rover> others =
         Arrays.stream(Direction.values())
-            .filter(direction -> !direction.equals(inverse) && !direction.equals(same.direction()))
+            .filter(direction -> !direction.equals(inverse) && !direction.equals(sameDirection))
             .map(direction -> new Rover(direction, rover.position()).move(FORWARD, true));
 
     int size = 3;
 
-    return Stream.concat(others, Stream.of(same))
+    return (previous.size() >= size && allTheSame(previous, size)
+            ? others
+            : Stream.concat(others, Stream.of(same)))
         .filter(charGrid::isPositionInTheGrid)
         .filter(r -> !positions.contains(r.position()))
         .toList();
