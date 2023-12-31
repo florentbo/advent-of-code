@@ -5,6 +5,7 @@ import be.bonamis.advent.common.CharGrid;
 import be.bonamis.advent.utils.FileHelper;
 
 import java.util.*;
+import java.util.HashMap;
 import java.util.stream.Stream;
 
 import be.bonamis.advent.utils.marsrover.*;
@@ -34,11 +35,55 @@ public class Day17 extends DaySolver<String> {
     Position endPosition = Position.of(charGrid.getWidth() - 1, charGrid.getHeight() - 1);
     log.info("endPosition {} value {} ", endPosition, value(endPosition));
 
-    Crucible src = new Crucible(new Rover(Direction.NORTH, startPosition), new ArrayList<>());
-    return shortestPath(src, endPosition);
+    //    Crucible src = new Crucible(new Rover(Direction.NORTH, startPosition), new ArrayList<>());
+
+    Integer shortestPath = shortestPath(startPosition, endPosition);
+    log.info("shortestPath: {}", shortestPath);
+
+    return shortestPath;
   }
 
   record Crucible(Rover rover, List<Rover> previous) {}
+
+  record Crucible2(Rover rover, int previous) {}
+
+  Integer shortestPath(Position src, Position dest) {
+    PriorityQueue<Crucible2> pq =
+        new PriorityQueue<>(
+            (r1, r2) ->
+                Integer.compare(value(r2.rover().position()), value(r1.rover().position())));
+    Map<Crucible2, Integer> dist = new HashMap<>();
+    Crucible2 start = new Crucible2(new Rover(Direction.NORTH, src), 0);
+    pq.add(start);
+    dist.put(start, value(src));
+    while (!pq.isEmpty()) {
+      Crucible2 polled = pq.poll();
+      if (polled.rover().position().equals(dest)) {
+        log.info("found shortest path");
+        Integer dist01 = dist.get(polled);
+        log.info("dist 01: {}", dist01);
+      }
+      Stream<Crucible2> neighbors = neighbors(polled);
+      neighbors.forEach(
+          neighbor -> {
+            Position neighborPosition = neighbor.rover().position();
+
+            int weight = value(neighborPosition);
+            Integer actualDistance = dist.get(polled);
+            int newDistance = actualDistance + weight;
+
+            if (dist.getOrDefault(neighbor, Integer.MAX_VALUE) > newDistance) {
+              dist.put(neighbor, newDistance);
+              pq.add(neighbor);
+            }
+          });
+    }
+    return dist.entrySet().stream()
+        .filter(e -> e.getKey().rover().position().equals(dest))
+        .findFirst()
+        .map(Map.Entry::getValue)
+        .orElseThrow();
+  }
 
   Integer shortestPath(Crucible src, Position dest) {
     PriorityQueue<Crucible> pq =
@@ -63,7 +108,8 @@ public class Day17 extends DaySolver<String> {
         Position neighborPosition = neighbor.position();
 
         int weight = value(neighborPosition);
-        int newDistance = dist.get(polledRover.position()) + weight;
+        Integer actualDistance = dist.get(polledRover.position());
+        int newDistance = actualDistance + weight;
 
         if (dist.get(neighborPosition) > newDistance) {
           dist.put(neighborPosition, newDistance);
@@ -77,6 +123,26 @@ public class Day17 extends DaySolver<String> {
     }
     // dist.forEach((k, v) -> log.info("key {} value {} ", k, v));
     return dist.get(dest);
+  }
+
+  Stream<Crucible2> neighbors(Crucible2 crucible) {
+    Rover rover = crucible.rover();
+    Rover same = rover.move(FORWARD, true);
+    Direction sameDirection = same.direction();
+    Direction inverse = sameDirection.inverse();
+    Stream<Crucible2> others =
+        Arrays.stream(Direction.values())
+            .filter(direction -> !direction.equals(inverse) && !direction.equals(sameDirection))
+            .map(
+                direction ->
+                    new Crucible2(new Rover(direction, rover.position()).move(FORWARD, true), 1));
+    int previous = crucible.previous() + 1;
+    return (previous > 3 ? others : Stream.concat(others, Stream.of(new Crucible2(same, previous))))
+        .filter(this::isPositionInTheGrid);
+  }
+
+  private boolean isPositionInTheGrid(Crucible2 crucible2) {
+    return charGrid.isPositionInTheGrid(crucible2.rover());
   }
 
   List<Rover> neighbors(Crucible crucible) {
