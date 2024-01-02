@@ -6,6 +6,7 @@ import be.bonamis.advent.utils.FileHelper;
 
 import java.awt.*;
 import java.util.*;
+import java.util.Comparator;
 
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
@@ -33,7 +34,6 @@ public class Day10 extends TextDaySolver {
   }
 
   static Set<Direction> allowedDirections(Character value) {
-    // log.debug("checking allowed directions for {}", value);
     return switch (value) {
       case '|' -> Set.of(NORTH, SOUTH);
       case '-' -> Set.of(EAST, WEST);
@@ -41,7 +41,6 @@ public class Day10 extends TextDaySolver {
       case 'J' -> Set.of(NORTH, WEST);
       case '7' -> Set.of(SOUTH, WEST);
       case 'F' -> Set.of(SOUTH, EAST);
-        // case 'S' -> Arrays.stream(values()).collect(Collectors.toSet());
       default -> throw new NoSuchElementException();
     };
   }
@@ -49,8 +48,10 @@ public class Day10 extends TextDaySolver {
   @Override
   public long solvePart01() {
     log.debug("startingPoint: {}", startingPoint);
-    Rover rover = loopStarts().stream().findFirst().orElseThrow();
-    log.debug("loopStart: {}", rover);
+    return loopStarts().stream().map(this::loopCount).max(Comparator.naturalOrder()).orElseThrow();
+  }
+
+  private int loopCount(Rover rover) {
     Character c = grid.get(rover.position().toPoint());
     log.debug("c: {}", c);
     int count = 1;
