@@ -7,6 +7,7 @@ import be.bonamis.advent.utils.FileHelper;
 import java.awt.*;
 import java.util.*;
 import java.util.Comparator;
+import java.util.List;
 
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
@@ -48,24 +49,30 @@ public class Day10 extends TextDaySolver {
   @Override
   public long solvePart01() {
     log.debug("startingPoint: {}", startingPoint);
-    return loopStarts().stream().map(this::loopCount).max(Comparator.naturalOrder()).orElseThrow();
+    return loopStarts().stream()
+        .map(this::loopCount)
+        .map(characters -> characters.size() / 2)
+        .max(Comparator.naturalOrder())
+        .orElseThrow();
   }
 
-  private int loopCount(Rover rover) {
+  private List<Character> loopCount(Rover rover) {
     Character c = grid.get(rover.position().toPoint());
     log.debug("c: {}", c);
     int count = 1;
+    List<Character> loopPoints = new ArrayList<>();
+    loopPoints.add(c);
     while (c != START) {
       rover = move(rover, c);
       Point point = rover.position().toPoint();
       log.debug("newPoint: {}", point);
       c = grid.get(point);
       log.debug("c: {}", c);
+      loopPoints.add(c);
       count++;
     }
     log.debug("count: {}", count);
-
-    return count / 2;
+    return loopPoints;
   }
 
   private Rover move(Rover rover, Character c) {
