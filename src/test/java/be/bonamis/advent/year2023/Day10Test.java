@@ -34,10 +34,16 @@ class Day10Test {
 
   @Test
   void solvePart01() {
-    CharGrid grid = new CharGrid(Arrays.asList(squareLoopText.split("\n")));
+    Day10 day = new Day10(squareLoopText);
+    assertThat(day.solvePart01()).isEqualTo(4);
+  }
 
-    int result = solvePart01(grid);
-    assertThat(result).isEqualTo(4);
+  @Test
+  void loopStarts() {
+    Day10 day = new Day10(squareLoopText);
+    assertThat(day.loopStarts())
+        .containsExactlyInAnyOrder(
+            new Rover(EAST, Position.of(2, 1)), new Rover(SOUTH, Position.of(1, 2)));
   }
 
   @Test
@@ -96,7 +102,7 @@ class Day10Test {
   static void addEdge(
       Graph<Point, DefaultEdge> graph, Point point, CharGrid grid, Point source, Point sink) {
     if (isNotDot(point, grid)) {
-      Set<Direction> allowedDirections = allowedDirections(grid.get(point));
+      Set<Direction> allowedDirections = Day10.allowedDirections(grid.get(point));
       Direction[] directions = allowedDirections.toArray(new Direction[0]);
       for (Point neighbour : allowedPoints(point, grid, directions)) {
         boolean start = point.equals(source) && neighbour.equals(sink);
@@ -129,20 +135,6 @@ class Day10Test {
   F is a 90-degree bend connecting south and east.
      */
 
-  static Set<Direction> allowedDirections(Character value) {
-    // log.debug("checking allowed directions for {}", value);
-    return switch (value) {
-      case '|' -> Set.of(NORTH, SOUTH);
-      case '-' -> Set.of(EAST, WEST);
-      case 'L' -> Set.of(NORTH, EAST);
-      case 'J' -> Set.of(NORTH, WEST);
-      case '7' -> Set.of(SOUTH, WEST);
-      case 'F' -> Set.of(SOUTH, EAST);
-      case 'S' -> Arrays.stream(values()).collect(Collectors.toSet());
-      default -> throw new NoSuchElementException();
-    };
-  }
-
   private static Position position(Point point, Direction direction) {
     return new Rover(direction, new Position(point.x, point.y)).move(FORWARD).position();
   }
@@ -172,16 +164,5 @@ class Day10Test {
 
   private static Stream<Point> filter(CharGrid grid, char c) {
     return grid.stream().filter(point -> grid.get(point) == c);
-  }
-
-  @Test
-  void solvePart02() {
-    String text = """
-0 3 6 9 12 15
-1 3 6 10 15 21
-10 13 16 21 30 45
-""";
-    Day10 day10 = new Day10(Arrays.asList(text.split("\n")));
-    assertThat(day10.solvePart02()).isEqualTo(4);
   }
 }
