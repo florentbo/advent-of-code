@@ -8,6 +8,7 @@ import java.awt.*;
 import java.util.*;
 import java.util.Comparator;
 import java.util.List;
+import java.util.stream.Stream;
 
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
@@ -56,19 +57,20 @@ public class Day10 extends TextDaySolver {
         .orElseThrow();
   }
 
-  private List<Character> loopCount(Rover rover) {
-    Character c = grid.get(rover.position().toPoint());
+  private List<Point> loopCount(Rover rover) {
+    Point point = rover.position().toPoint();
+    Character c = grid.get(point);
     log.debug("c: {}", c);
     int count = 1;
-    List<Character> loopPoints = new ArrayList<>();
-    loopPoints.add(c);
+    List<Point> loopPoints = new ArrayList<>();
+    loopPoints.add(point);
     while (c != START) {
       rover = move(rover, c);
-      Point point = rover.position().toPoint();
+      point = rover.position().toPoint();
       log.debug("newPoint: {}", point);
       c = grid.get(point);
       log.debug("c: {}", c);
-      loopPoints.add(c);
+      loopPoints.add(point);
       count++;
     }
     log.debug("count: {}", count);
@@ -92,7 +94,15 @@ public class Day10 extends TextDaySolver {
 
   @Override
   public long solvePart02() {
-    return this.puzzle.size() + 1;
+    Stream<List<Point>> listStream = loopStarts().stream().map(this::loopCount);
+    List<Point> longest = listStream.max(Comparator.comparing(List::size)).orElseThrow();
+    List<Day18.Point> list =
+        longest.stream().map(point -> new Day18.Point(point.x, point.y)).toList();
+    Day18.Polygon poly = new Day18.Polygon(list);
+
+    long area = new Day18(List.of()).polyArea(poly);
+    log.debug("area: {}", area);
+    return area - longest.size();
   }
 
   public static void main(String[] args) {
