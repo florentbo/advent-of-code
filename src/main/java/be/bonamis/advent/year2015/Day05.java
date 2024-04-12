@@ -9,7 +9,10 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+import java.util.AbstractMap.SimpleEntry;
 import java.util.stream.IntStream;
+import java.util.stream.Stream;
+
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -29,7 +32,7 @@ public class Day05 extends TextDaySolver {
 
   static boolean twiceInaRow(String input) {
     return IntStream.range(0, input.length() - 1)
-        .mapToObj(i -> new AbstractMap.SimpleEntry<>(input.charAt(i), input.charAt(i + 1)))
+        .mapToObj(i -> new SimpleEntry<>(input.charAt(i), input.charAt(i + 1)))
         .anyMatch(
             entry -> {
               char key = entry.getKey();
@@ -49,15 +52,51 @@ public class Day05 extends TextDaySolver {
     return containsThreeVowels(input) && twiceInaRow(input) && notContainForbidden(input);
   }
 
+  static boolean containsPair(String input) {
+    int inputLength = input.length();
+    Stream<Pair> pairs =
+        IntStream.range(0, inputLength - 1)
+            .mapToObj(i -> new Pair(input.charAt(i), input.charAt(i + 1), i));
+    // pairs.forEach(pair -> log.info("pair: {}", pair));
+    boolean b =
+        pairs.anyMatch(
+            pair -> {
+              log.info("pair: {}", pair);
+              String letters = pair.letters();
+              return IntStream.range(pair.startIndex() + 2, inputLength - 1)
+                  .mapToObj(ii -> new Pair(input.charAt(ii), input.charAt(ii + 1), ii))
+                  .anyMatch(iii -> letters.equals(iii.letters()));
+              // return false;
+            });
+    log.info("b: {}", b);
+    return b; /*pairs
+              .anyMatch(
+                      entry -> {
+                        char key = entry.getKey();
+                        char value = entry.getValue();
+                        // log.info("key: {}, value: {}", key, value);
+                        return key == value;
+                      });*/
+  }
+
+  static boolean containsOneLetterBetweenOther(String input) {
+    return IntStream.range(0, input.length() - 2)
+        .mapToObj(i -> new Pair(input.charAt(i), input.charAt(i + 2), i))
+        .anyMatch(pair -> pair.first == pair.second);
+  }
+
+  static boolean solve02(String input) {
+    return containsPair(input) && containsOneLetterBetweenOther(input);
+  }
+
   @Override
   public long solvePart01() {
-    String s = this.puzzle.get(0);
     return this.puzzle.stream().filter(Day05::solve).count();
   }
 
   @Override
   public long solvePart02() {
-    return 99;
+    return this.puzzle.stream().filter(Day05::solve02).count();
   }
 
   public static void main(String[] args) {
@@ -74,6 +113,12 @@ public class Day05 extends TextDaySolver {
       return new Scanner(is, StandardCharsets.UTF_8).useDelimiter("\\A").next().lines().toList();
     } catch (IOException e) {
       throw new RuntimeException(e);
+    }
+  }
+
+  record Pair(Character first, Character second, int startIndex) {
+    String letters() {
+      return first + String.valueOf(second);
     }
   }
 }
