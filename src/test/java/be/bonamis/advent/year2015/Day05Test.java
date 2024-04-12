@@ -1,5 +1,6 @@
 package be.bonamis.advent.year2015;
 
+import static be.bonamis.advent.year2015.Day05.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import lombok.extern.slf4j.Slf4j;
@@ -32,10 +33,34 @@ class Day05Test {
 
   @Test
   void solvePart01() {
-    assertThat(Day05.solve("ugknbfddgicrmopn")).isTrue();
-    assertThat(Day05.solve("aaa")).isTrue();
-    assertThat(Day05.solve("jchzalrnumimnmhp")).isFalse();
-    assertThat(Day05.solve("haegwjzuvuyypxyu")).isFalse();
-    assertThat(Day05.solve("dvszwmarrgswjxmb")).isFalse();
+    assertThat(solve("ugknbfddgicrmopn")).isTrue();
+    assertThat(solve("aaa")).isTrue();
+    assertThat(solve("jchzalrnumimnmhp")).isFalse();
+    assertThat(solve("haegwjzuvuyypxyu")).isFalse();
+    assertThat(solve("dvszwmarrgswjxmb")).isFalse();
   }
+
+  @Test
+  void twoPairs() {
+    assertThat(containsPair("xyxy")).isTrue();
+    assertThat(containsPair("aabcdefgaa")).isTrue();
+    assertThat(containsPair("aaa")).isFalse();
+  }
+
+  @Test
+  void oneLetterBetweenOther() {
+    assertThat(containsOneLetterBetweenOther("xyx")).isTrue();
+    assertThat(containsOneLetterBetweenOther("abcdefeghi")).isTrue();
+    assertThat(containsOneLetterBetweenOther("aaa")).isTrue();
+    assertThat(containsOneLetterBetweenOther("xyz")).isFalse();
+  }
+
+  @Test
+  void solvePart02() {
+    assertThat(solve02("qjhvhtzxzqqjkmpb")).isTrue();
+    assertThat(solve02("xxyxx")).isTrue();
+    assertThat(solve02("uurcxstgmygtbstg")).isFalse();
+    assertThat(solve02("ieodomkazucvgmuy")).isFalse();
+  }
+
 }
