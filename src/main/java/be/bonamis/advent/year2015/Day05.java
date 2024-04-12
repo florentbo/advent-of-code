@@ -37,7 +37,6 @@ public class Day05 extends TextDaySolver {
             entry -> {
               char key = entry.getKey();
               char value = entry.getValue();
-              // log.info("key: {}, value: {}", key, value);
               return key == value;
             });
   }
@@ -57,26 +56,14 @@ public class Day05 extends TextDaySolver {
     Stream<Pair> pairs =
         IntStream.range(0, inputLength - 1)
             .mapToObj(i -> new Pair(input.charAt(i), input.charAt(i + 1), i));
-    // pairs.forEach(pair -> log.info("pair: {}", pair));
-    boolean b =
-        pairs.anyMatch(
-            pair -> {
-              log.info("pair: {}", pair);
-              String letters = pair.letters();
-              return IntStream.range(pair.startIndex() + 2, inputLength - 1)
-                  .mapToObj(ii -> new Pair(input.charAt(ii), input.charAt(ii + 1), ii))
-                  .anyMatch(iii -> letters.equals(iii.letters()));
-              // return false;
-            });
-    log.info("b: {}", b);
-    return b; /*pairs
-              .anyMatch(
-                      entry -> {
-                        char key = entry.getKey();
-                        char value = entry.getValue();
-                        // log.info("key: {}, value: {}", key, value);
-                        return key == value;
-                      });*/
+    return pairs.anyMatch(
+        pair -> {
+          log.debug("pair: {}", pair);
+          String letters = pair.letters();
+          return IntStream.range(pair.startIndex() + 2, inputLength - 1)
+              .mapToObj(ii -> new Pair(input.charAt(ii), input.charAt(ii + 1), ii))
+              .anyMatch(iii -> letters.equals(iii.letters()));
+        });
   }
 
   static boolean containsOneLetterBetweenOther(String input) {
