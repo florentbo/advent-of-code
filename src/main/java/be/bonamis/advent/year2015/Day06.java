@@ -32,13 +32,13 @@ public class Day06 extends TextDaySolver {
                     .mapToObj(y -> Light.of(x, y)));
   }
 
-  static Map<Light, Boolean> init(Point end) {
+  static Map<Light, Integer> init(Point end) {
     Limits limits = new Limits(Point.of(0, 0), end);
-    return lights(limits).collect(Collectors.toMap(l -> l, l -> false));
+    return lights(limits).collect(Collectors.toMap(l -> l, l -> 0));
   }
 
-  static Map<Light, Boolean> execute(List<String> instructions, Point end) {
-    Map<Light, Boolean> startingLights = init(end);
+  static Map<Light, Integer> execute(List<String> instructions, Point end) {
+    Map<Light, Integer> startingLights = init(end);
     for (String instruction : instructions) {
       Instruction parsed = parseLightInstruction(instruction);
       switch (parsed.action) {
@@ -50,29 +50,29 @@ public class Day06 extends TextDaySolver {
     return startingLights;
   }
 
-  static long countLightsOn(Map<Light, Boolean> lights) {
-    return lights.values().stream().filter(b -> b).count();
+  static long countLightsOn(Map<Light, Integer> lights) {
+    return lights.values().stream().reduce(0, Integer::sum);
   }
 
-  static Map<Light, Boolean> toggle(Map<Light, Boolean> lights, Limits limits) {
+  static Map<Light, Integer> toggle(Map<Light, Integer> lights, Limits limits) {
     Stream<Light> limitLights = lights(limits);
-    limitLights.forEach(l -> lights.put(l, !lights.get(l)));
+    limitLights.forEach(l -> lights.put(l, lights.get(l) == 1 ? 0 : 1));
 
     return lights;
   }
 
-  static Map<Light, Boolean> turnOf(Map<Light, Boolean> lights, Limits limits) {
+  static Map<Light, Integer> turnOf(Map<Light, Integer> lights, Limits limits) {
     return switchLights(lights, limits, false);
   }
 
-  static Map<Light, Boolean> turnOn(Map<Light, Boolean> lights, Limits limits) {
+  static Map<Light, Integer> turnOn(Map<Light, Integer> lights, Limits limits) {
     return switchLights(lights, limits, true);
   }
 
-  private static Map<Light, Boolean> switchLights(
-      Map<Light, Boolean> lights, Limits limits, boolean state) {
+  private static Map<Light, Integer> switchLights(
+      Map<Light, Integer> lights, Limits limits, boolean state) {
     Stream<Light> limitLights = lights(limits);
-    lights.putAll(limitLights.collect(Collectors.toMap(l -> l, l -> state)));
+    lights.putAll(limitLights.collect(Collectors.toMap(l -> l, l -> state ? 1 : 0)));
     return lights;
   }
 
@@ -99,7 +99,7 @@ public class Day06 extends TextDaySolver {
   }
 
   long solve(Point end) {
-    Map<Light, Boolean> execute = execute(this.puzzle, end);
+    Map<Light, Integer> execute = execute(this.puzzle, end);
     return countLightsOn(execute);
   }
 
