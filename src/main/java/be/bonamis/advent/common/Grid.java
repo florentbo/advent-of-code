@@ -20,9 +20,11 @@ public class Grid {
         this.width = input[0].length;
     }
 
-    public Stream<Point> stream() {
-        return IntStream.range(0, data.length).boxed().flatMap(x -> IntStream.range(0, data[x].length).mapToObj(y -> new Point(x, y)));
-    }
+  public Stream<Point> stream() {
+    return IntStream.range(0, data.length)
+        .boxed()
+        .flatMap(x -> IntStream.range(0, data[x].length).mapToObj(y -> new Point(x, y)));
+  }
 
     public Integer get(Point p) {
         if (p.x >= 0 && p.x < data.length && p.y >= 0 && p.y < data[0].length) {
