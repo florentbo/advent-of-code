@@ -1,10 +1,11 @@
 package be.bonamis.advent;
 
+import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.List;
-
-import static be.bonamis.advent.year2015.Day05.lines;
+import java.util.Scanner;
 
 public abstract class TextDaySolver extends DaySolver<String> {
 
@@ -18,5 +19,13 @@ public abstract class TextDaySolver extends DaySolver<String> {
 
   protected TextDaySolver(InputStream input) {
     super(lines(input));
+  }
+
+  private static List<String> lines(InputStream inputStream) {
+    try (InputStream is = inputStream) {
+      return new Scanner(is, StandardCharsets.UTF_8).useDelimiter("\\A").next().lines().toList();
+    } catch (IOException e) {
+      throw new RuntimeException(e);
+    }
   }
 }
