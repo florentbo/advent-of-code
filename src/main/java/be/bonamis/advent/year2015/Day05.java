@@ -5,9 +5,7 @@ import static be.bonamis.advent.DayDataRetriever.downloadInput;
 
 import be.bonamis.advent.TextDaySolver;
 
-import java.io.IOException;
 import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.*;
 import java.util.AbstractMap.SimpleEntry;
 import java.util.stream.IntStream;
@@ -20,7 +18,7 @@ import lombok.extern.slf4j.Slf4j;
 @Getter
 public class Day05 extends TextDaySolver {
 
-  public Day05(List<String> sample) {
+  public Day05(InputStream sample) {
     super(sample);
   }
 
@@ -89,18 +87,10 @@ public class Day05 extends TextDaySolver {
   public static void main(String[] args) {
     String puzzleInputUrl = dayUrl(2015, 5) + "/input";
     InputStream inputStream = downloadInput(puzzleInputUrl);
-    Day05 day05 = new Day05(lines(inputStream));
+    Day05 day05 = new Day05(inputStream);
     System.out.println("Day 05");
     System.out.println("Part 1: " + day05.solvePart01());
     System.out.println("Part 2: " + day05.solvePart02());
-  }
-
-  public static List<String> lines(InputStream inputStream) {
-    try (InputStream is = inputStream) {
-      return new Scanner(is, StandardCharsets.UTF_8).useDelimiter("\\A").next().lines().toList();
-    } catch (IOException e) {
-      throw new RuntimeException(e);
-    }
   }
 
   record Pair(Character first, Character second, int startIndex) {
