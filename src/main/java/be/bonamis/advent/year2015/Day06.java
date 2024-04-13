@@ -1,17 +1,13 @@
 package be.bonamis.advent.year2015;
 
-import static be.bonamis.advent.DayDataRetriever.dayUrl;
-import static be.bonamis.advent.DayDataRetriever.downloadInput;
+import static be.bonamis.advent.DayDataRetriever.*;
 
 import be.bonamis.advent.TextDaySolver;
 
 import java.io.InputStream;
 import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
-import java.util.stream.Stream;
+import java.util.regex.*;
+import java.util.stream.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,8 +51,14 @@ public class Day06 extends TextDaySolver {
   }
 
   static Map<Light, Integer> toggle(Map<Light, Integer> lights, Limits limits) {
-    Stream<Light> limitLights = lights(limits);
-    limitLights.forEach(l -> lights.put(l, lights.get(l) == 1 ? 0 : 1));
+    lights(limits).forEach(l -> lights.put(l, lights.get(l) == 1 ? 0 : 1));
+
+    return lights;
+  }
+
+  private static Map<Light, Integer> switchLights(
+      Map<Light, Integer> lights, Limits limits, boolean state) {
+    lights(limits).forEach(l -> lights.put(l, state ? 1 : 0));
 
     return lights;
   }
@@ -69,11 +71,12 @@ public class Day06 extends TextDaySolver {
     return switchLights(lights, limits, true);
   }
 
-  private static Map<Light, Integer> switchLights(
-      Map<Light, Integer> lights, Limits limits, boolean state) {
-    Stream<Light> limitLights = lights(limits);
-    lights.putAll(limitLights.collect(Collectors.toMap(l -> l, l -> state ? 1 : 0)));
-    return lights;
+  interface LightState {
+    int turnOn(int actualValue);
+
+    int turnOff(int actualValue);
+
+    int toggle(int actualValue);
   }
 
   static Instruction parseLightInstruction(String input) {
