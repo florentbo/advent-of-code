@@ -74,7 +74,7 @@ class Day06Test {
     Map<Light, Integer> startingLights = new HashMap<>(startingLightWithOneTurnedOn());
 
     Map<Light, Integer> turnedOnLights =
-        toggle(startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
+        toggle(startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)), new FirstPart().toggle());
 
     assertThat(turnedOnLights)
         .isEqualTo(
@@ -95,7 +95,7 @@ class Day06Test {
                 toggle 1,1 through 1,1
                 """;
     List<String> instructions = Arrays.asList(input.split("\\n"));
-    Map<Light, Integer> lights = execute(instructions, Point.of(1, 1));
+    Map<Light, Integer> lights = execute(instructions, Point.of(1, 1), new FirstPart());
     assertThat(lights)
         .isEqualTo(
             Map.of(

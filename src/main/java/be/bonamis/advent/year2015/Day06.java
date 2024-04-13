@@ -6,6 +6,7 @@ import be.bonamis.advent.TextDaySolver;
 
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Function;
 import java.util.regex.*;
 import java.util.stream.*;
 import lombok.*;
@@ -33,14 +34,14 @@ public class Day06 extends TextDaySolver {
     return lights(limits).collect(Collectors.toMap(l -> l, l -> 0));
   }
 
-  static Map<Light, Integer> execute(List<String> instructions, Point end) {
+  static Map<Light, Integer> execute(List<String> instructions, Point end, LightAction action) {
     Map<Light, Integer> startingLights = init(end);
     for (String instruction : instructions) {
       Instruction parsed = parseLightInstruction(instruction);
       switch (parsed.action) {
-        case "turn on" -> turnOn(startingLights, parsed.limits());
-        case "turn off" -> turnOf(startingLights, parsed.limits());
-        case "toggle" -> toggle(startingLights, parsed.limits());
+        case "turn on" -> switchLights(startingLights, parsed.limits(), action.turnOn());
+        case "turn off" -> switchLights(startingLights, parsed.limits(), action.turnOff());
+        case "toggle" -> toggle(startingLights, parsed.limits(), action.toggle());
       }
     }
     return startingLights;
@@ -50,33 +51,60 @@ public class Day06 extends TextDaySolver {
     return lights.values().stream().reduce(0, Integer::sum);
   }
 
-  static Map<Light, Integer> toggle(Map<Light, Integer> lights, Limits limits) {
-    lights(limits).forEach(l -> lights.put(l, lights.get(l) == 1 ? 0 : 1));
-
+  static Map<Light, Integer> toggle(
+      Map<Light, Integer> lights, Limits limits, Function<Integer, Integer> toggle) {
+    lights(limits).forEach(l -> lights.put(l, toggle.apply(lights.get(l))));
     return lights;
   }
 
   private static Map<Light, Integer> switchLights(
-      Map<Light, Integer> lights, Limits limits, boolean state) {
-    lights(limits).forEach(l -> lights.put(l, state ? 1 : 0));
-
+      Map<Light, Integer> lights, Limits limits, Function<Integer, Integer> turn) {
+    lights(limits).forEach(l -> lights.put(l, turn.apply(8888)));
     return lights;
   }
 
-  static Map<Light, Integer> turnOf(Map<Light, Integer> lights, Limits limits) {
-    return switchLights(lights, limits, false);
-  }
-
   static Map<Light, Integer> turnOn(Map<Light, Integer> lights, Limits limits) {
-    return switchLights(lights, limits, true);
+    return switchLights(lights, limits, new FirstPart().turnOn());
   }
 
-  interface LightState {
-    int turnOn(int actualValue);
+  static Map<Light, Integer> turnOf(Map<Light, Integer> lights, Limits limits) {
+    return switchLights(lights, limits, new FirstPart().turnOff());
+  }
 
-    int turnOff(int actualValue);
+  interface LightAction {
+    Function<Integer, Integer> turnOn();
 
-    int toggle(int actualValue);
+    Function<Integer, Integer> turnOff();
+
+    Function<Integer, Integer> toggle();
+  }
+
+  static class FirstPart implements LightAction {
+    public Function<Integer, Integer> turnOn() {
+      return i -> 1;
+    }
+
+    public Function<Integer, Integer> turnOff() {
+      return i -> 0;
+    }
+
+    public Function<Integer, Integer> toggle() {
+      return i -> i == 1 ? 0 : 1;
+    }
+  }
+
+  static class SecondPart implements LightAction {
+    public Function<Integer, Integer> turnOn() {
+      return i -> i + 1;
+    }
+
+    public Function<Integer, Integer> turnOff() {
+      return i -> i - 1;
+    }
+
+    public Function<Integer, Integer> toggle() {
+      return i -> i + 2;
+    }
   }
 
   static Instruction parseLightInstruction(String input) {
@@ -102,7 +130,7 @@ public class Day06 extends TextDaySolver {
   }
 
   long solve(Point end) {
-    Map<Light, Integer> execute = execute(this.puzzle, end);
+    Map<Light, Integer> execute = execute(this.puzzle, end, new FirstPart());
     return countLightsOn(execute);
   }
 
