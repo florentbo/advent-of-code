@@ -35,54 +35,54 @@ class Day06Test {
 
   @Test
   void turnOn_one_light() {
-    Map<Light, Boolean> startingLights = init(Point.of(1, 1));
+    Map<Light, Integer> startingLights = init(Point.of(1, 1));
 
-    Map<Light, Boolean> turnedOnLights =
+    Map<Light, Integer> turnedOnLights =
         turnOn(startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
 
-    assertThat(turnedOnLights).containsEntry(new Light(1, 1), true);
+    assertThat(turnedOnLights).containsEntry(new Light(1, 1), 1);
 
     assertThat(turnedOnLights).isEqualTo(startingLightWithOneTurnedOn());
   }
 
-  private Map<Light, Boolean> startingLightWithOneTurnedOn() {
+  private Map<Light, Integer> startingLightWithOneTurnedOn() {
     return Map.of(
-        new Light(0, 0), false,
-        new Light(1, 0), false,
-        new Light(0, 1), false,
-        new Light(1, 1), true);
+        new Light(0, 0), 0,
+        new Light(1, 0), 0,
+        new Light(0, 1), 0,
+        new Light(1, 1), 1);
   }
 
   @Test
   void turnOf_one_light() {
-    Map<Light, Boolean> startingLights = new HashMap<>(startingLightWithOneTurnedOn());
+    Map<Light, Integer> startingLights = new HashMap<>(startingLightWithOneTurnedOn());
 
-    Map<Light, Boolean> turnedOffLights =
+    Map<Light, Integer> turnedOffLights =
         turnOf(startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
 
     assertThat(turnedOffLights)
         .isEqualTo(
             Map.of(
-                new Light(0, 0), false,
-                new Light(1, 0), false,
-                new Light(0, 1), false,
-                new Light(1, 1), false));
+                new Light(0, 0), 0,
+                new Light(1, 0), 0,
+                new Light(0, 1), 0,
+                new Light(1, 1), 0));
   }
 
   @Test
   void toggle_one_light() {
-    Map<Light, Boolean> startingLights = new HashMap<>(startingLightWithOneTurnedOn());
+    Map<Light, Integer> startingLights = new HashMap<>(startingLightWithOneTurnedOn());
 
-    Map<Light, Boolean> turnedOnLights =
+    Map<Light, Integer> turnedOnLights =
         toggle(startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
 
     assertThat(turnedOnLights)
         .isEqualTo(
             Map.of(
-                new Light(0, 0), false,
-                new Light(1, 0), false,
-                new Light(0, 1), false,
-                new Light(1, 1), false));
+                new Light(0, 0), 0,
+                new Light(1, 0), 0,
+                new Light(0, 1), 0,
+                new Light(1, 1), 0));
   }
 
   @Test
@@ -94,14 +94,14 @@ class Day06Test {
                 toggle 1,1 through 1,1
                 """;
     List<String> instructions = Arrays.asList(input.split("\\n"));
-    Map<Light, Boolean> lights = execute(instructions, Point.of(1, 1));
+    Map<Light, Integer> lights = execute(instructions, Point.of(1, 1));
     assertThat(lights)
         .isEqualTo(
             Map.of(
-                new Light(0, 0), false,
-                new Light(1, 0), false,
-                new Light(0, 1), false,
-                new Light(1, 1), true));
+                new Light(0, 0), 0,
+                new Light(1, 0), 0,
+                new Light(0, 1), 0,
+                new Light(1, 1), 1));
   }
 
   @Test
