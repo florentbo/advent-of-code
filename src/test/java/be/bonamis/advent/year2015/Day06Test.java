@@ -91,6 +91,7 @@ class Day06Test {
         """
                 turn on 1,1 through 1,1
                 turn off 1,1 through 1,1
+                turn off 1,1 through 1,1
                 toggle 1,1 through 1,1
                 """;
     List<String> instructions = Arrays.asList(input.split("\\n"));
