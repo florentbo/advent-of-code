@@ -38,7 +38,7 @@ class Day06Test {
     Map<Light, Integer> startingLights = init(Point.of(1, 1));
 
     Map<Light, Integer> turnedOnLights =
-        turnOn(new FirstPart(), startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
+        turnOn(firstPart(), startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
 
     assertThat(turnedOnLights).containsEntry(new Light(1, 1), 1);
 
@@ -58,7 +58,23 @@ class Day06Test {
     Map<Light, Integer> startingLights = new HashMap<>(startingLightWithOneTurnedOn());
 
     Map<Light, Integer> turnedOffLights =
-            turnOf(new FirstPart(), startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
+        turnOf(firstPart(), startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
+
+    assertThat(turnedOffLights)
+        .isEqualTo(
+            Map.of(
+                new Light(0, 0), 0,
+                new Light(1, 0), 0,
+                new Light(0, 1), 0,
+                new Light(1, 1), 0));
+  }
+
+  @Test
+  void turnOf_one_light_second_part() {
+    Map<Light, Integer> startingLights = new HashMap<>(startingLightWithOneTurnedOn());
+
+    Map<Light, Integer> turnedOffLights =
+        turnOf(new SecondPart(), startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
 
     assertThat(turnedOffLights)
         .isEqualTo(
@@ -74,7 +90,7 @@ class Day06Test {
     Map<Light, Integer> startingLights = new HashMap<>(startingLightWithOneTurnedOn());
 
     Map<Light, Integer> turnedOnLights =
-        toggle(startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)), new FirstPart().toggle());
+        toggle(firstPart(), startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
 
     assertThat(turnedOnLights)
         .isEqualTo(
@@ -95,7 +111,7 @@ class Day06Test {
                 toggle 1,1 through 1,1
                 """;
     List<String> instructions = Arrays.asList(input.split("\\n"));
-    Map<Light, Integer> lights = execute(instructions, Point.of(1, 1), new FirstPart());
+    Map<Light, Integer> lights = execute(instructions, Point.of(1, 1), firstPart());
     assertThat(lights)
         .isEqualTo(
             Map.of(
@@ -119,6 +135,18 @@ class Day06Test {
                     toggle 1,1 through 1,1
                     """;
     InputStream inputStream = new ByteArrayInputStream(input.getBytes());
-    assertThat(new Day06(inputStream).solve(Point.of(1, 1))).isEqualTo(1);
+    assertThat(new Day06(inputStream).solve(Point.of(1, 1), firstPart())).isEqualTo(1);
+  }
+
+  @Test
+  void secondPartLightAction() {
+    LightAction lightAction = secondPart();
+    assertThat(lightAction.turnOn().apply(0)).isEqualTo(1);
+    assertThat(lightAction.turnOn().apply(1)).isEqualTo(2);
+
+    assertThat(lightAction.turnOff().apply(1)).isEqualTo(0);
+    assertThat(lightAction.turnOff().apply(0)).isEqualTo(0);
+
+    assertThat(lightAction.toggle().apply(0)).isEqualTo(2);
   }
 }
