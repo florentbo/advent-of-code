@@ -41,7 +41,7 @@ public class Day06 extends TextDaySolver {
       switch (parsed.action) {
         case "turn on" -> turnOn(action, startingLights, parsed.limits());
         case "turn off" -> turnOf(action, startingLights, parsed.limits());
-        case "toggle" -> toggle(startingLights, parsed.limits(), action.toggle());
+        case "toggle" -> toggle(action, startingLights, parsed.limits());
       }
     }
     return startingLights;
@@ -57,20 +57,19 @@ public class Day06 extends TextDaySolver {
     return switchLights(startingLights, limits, action.turnOff());
   }
 
-  static long countLightsOn(Map<Light, Integer> lights) {
-    return lights.values().stream().reduce(0, Integer::sum);
-  }
-
   static Map<Light, Integer> toggle(
-      Map<Light, Integer> lights, Limits limits, Function<Integer, Integer> toggle) {
-    lights(limits).forEach(l -> lights.put(l, toggle.apply(lights.get(l))));
-    return lights;
+      LightAction action, Map<Light, Integer> startingLights, Limits limits) {
+    return switchLights(startingLights, limits, action.toggle());
   }
 
   private static Map<Light, Integer> switchLights(
       Map<Light, Integer> lights, Limits limits, Function<Integer, Integer> turn) {
-    lights(limits).forEach(l -> lights.put(l, turn.apply(8888)));
+    lights(limits).forEach(l -> lights.put(l, turn.apply(lights.get(l))));
     return lights;
+  }
+
+  static long countLightsOn(Map<Light, Integer> lights) {
+    return lights.values().stream().reduce(0, Integer::sum);
   }
 
   interface LightAction {
@@ -101,12 +100,20 @@ public class Day06 extends TextDaySolver {
     }
 
     public Function<Integer, Integer> turnOff() {
-      return i -> i - 1;
+      return i -> i > 0 ? i - 1 : 0;
     }
 
     public Function<Integer, Integer> toggle() {
       return i -> i + 2;
     }
+  }
+
+  static LightAction firstPart() {
+    return new FirstPart();
+  }
+
+  static LightAction secondPart() {
+    return new SecondPart();
   }
 
   static Instruction parseLightInstruction(String input) {
@@ -128,17 +135,17 @@ public class Day06 extends TextDaySolver {
 
   @Override
   public long solvePart01() {
-    return solve(Point.of(999, 999));
+    return solve(Point.of(999, 999), firstPart());
   }
 
-  long solve(Point end) {
-    Map<Light, Integer> execute = execute(this.puzzle, end, new FirstPart());
+  long solve(Point end, LightAction action) {
+    Map<Light, Integer> execute = execute(this.puzzle, end, action);
     return countLightsOn(execute);
   }
 
   @Override
   public long solvePart02() {
-    return 777;
+    return solve(Point.of(999, 999), secondPart());
   }
 
   public static void main(String[] args) {
@@ -150,11 +157,7 @@ public class Day06 extends TextDaySolver {
     System.out.println("Part 2: " + day05.solvePart02());
   }
 
-  record Instruction(String action, Limits limits) {
-    static Instruction of(String action, Limits limits) {
-      return new Instruction(action, limits);
-    }
-  }
+  record Instruction(String action, Limits limits) {}
 
   record Light(int x, int y) {
     static Light of(int x, int y) {
