@@ -38,7 +38,7 @@ class Day06Test {
     Map<Light, Integer> startingLights = init(Point.of(1, 1));
 
     Map<Light, Integer> turnedOnLights =
-        turnOn(startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
+        turnOn(new FirstPart(), startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
 
     assertThat(turnedOnLights).containsEntry(new Light(1, 1), 1);
 
@@ -58,7 +58,7 @@ class Day06Test {
     Map<Light, Integer> startingLights = new HashMap<>(startingLightWithOneTurnedOn());
 
     Map<Light, Integer> turnedOffLights =
-        turnOf(startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
+            turnOf(new FirstPart(), startingLights, Limits.of(Point.of(1, 1), Point.of(1, 1)));
 
     assertThat(turnedOffLights)
         .isEqualTo(
