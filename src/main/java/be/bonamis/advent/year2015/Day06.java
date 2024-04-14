@@ -39,12 +39,22 @@ public class Day06 extends TextDaySolver {
     for (String instruction : instructions) {
       Instruction parsed = parseLightInstruction(instruction);
       switch (parsed.action) {
-        case "turn on" -> switchLights(startingLights, parsed.limits(), action.turnOn());
-        case "turn off" -> switchLights(startingLights, parsed.limits(), action.turnOff());
+        case "turn on" -> turnOn(action, startingLights, parsed.limits());
+        case "turn off" -> turnOf(action, startingLights, parsed.limits());
         case "toggle" -> toggle(startingLights, parsed.limits(), action.toggle());
       }
     }
     return startingLights;
+  }
+
+  static Map<Light, Integer> turnOn(
+      LightAction action, Map<Light, Integer> startingLights, Limits limits) {
+    return switchLights(startingLights, limits, action.turnOn());
+  }
+
+  static Map<Light, Integer> turnOf(
+      LightAction action, Map<Light, Integer> startingLights, Limits limits) {
+    return switchLights(startingLights, limits, action.turnOff());
   }
 
   static long countLightsOn(Map<Light, Integer> lights) {
@@ -61,14 +71,6 @@ public class Day06 extends TextDaySolver {
       Map<Light, Integer> lights, Limits limits, Function<Integer, Integer> turn) {
     lights(limits).forEach(l -> lights.put(l, turn.apply(8888)));
     return lights;
-  }
-
-  static Map<Light, Integer> turnOn(Map<Light, Integer> lights, Limits limits) {
-    return switchLights(lights, limits, new FirstPart().turnOn());
-  }
-
-  static Map<Light, Integer> turnOf(Map<Light, Integer> lights, Limits limits) {
-    return switchLights(lights, limits, new FirstPart().turnOff());
   }
 
   interface LightAction {
@@ -148,7 +150,11 @@ public class Day06 extends TextDaySolver {
     System.out.println("Part 2: " + day05.solvePart02());
   }
 
-  record Instruction(String action, Limits limits) {}
+  record Instruction(String action, Limits limits) {
+    static Instruction of(String action, Limits limits) {
+      return new Instruction(action, limits);
+    }
+  }
 
   record Light(int x, int y) {
     static Light of(int x, int y) {
