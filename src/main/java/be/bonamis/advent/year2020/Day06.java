@@ -5,6 +5,7 @@ import static be.bonamis.advent.DayDataRetriever.*;
 import be.bonamis.advent.TextDaySolver;
 import java.io.InputStream;
 import java.util.*;
+import java.util.function.Function;
 import java.util.stream.*;
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -37,12 +38,14 @@ public class Day06 extends TextDaySolver {
   @Override
   public long solvePart01() {
     Groups groups = groups(this.puzzle);
-    return groups.sumCounts();
+    return groups.sumAnyOneSayYesCounts();
   }
 
   @Override
   public long solvePart02() {
-    return 777;
+    Groups groups = groups(this.puzzle);
+    return groups.sumEveryOneSayYesCounts();
+
   }
 
   record Group(List<String> answers) {
@@ -50,9 +53,13 @@ public class Day06 extends TextDaySolver {
       return new Group(input);
     }
 
-    public int countAnswers() {
-      Stream<IntStream> intStreamStream = this.answers.stream().map(String::chars);
-      return merge(intStreamStream).size();
+    public int countAnyOneSayYes() {
+      Stream<IntStream> allAnswers = allAnswers();
+      return merge(allAnswers).size();
+    }
+
+    private Stream<IntStream> allAnswers() {
+      return this.answers.stream().map(String::chars);
     }
 
     private Set<Integer> merge(Stream<IntStream> intStreamStream) {
@@ -65,6 +72,32 @@ public class Day06 extends TextDaySolver {
 
       return merge;
     }
+
+    public int countEveryOneSayYes() {
+      Stream<IntStream> allAnswers = allAnswers();
+      return intersection(allAnswers).size();
+    }
+
+    private Collection<Integer> intersection(Stream<IntStream> allAnswers) {
+      Stream<Set<Integer>> sets = allAnswers.map(toSet());
+      return intersect(sets);
+    }
+
+    private Function<IntStream, Set<Integer>> toSet() {
+      return intStream -> intStream.boxed().collect(Collectors.toSet());
+    }
+  }
+
+  public static <T, C extends Collection<T>> Collection<T> intersect(Stream<C> stream) {
+    final Iterator<C> allLists = stream.iterator();
+
+    if (!allLists.hasNext()) return Collections.emptySet();
+
+    final Set<T> result = new HashSet<>(allLists.next());
+    while (allLists.hasNext()) {
+      result.retainAll(new HashSet<>(allLists.next()));
+    }
+    return result;
   }
 
   record Groups(List<Group> groups) {
@@ -72,8 +105,12 @@ public class Day06 extends TextDaySolver {
       return new Groups(groups);
     }
 
-    int sumCounts() {
-      return this.groups.stream().mapToInt(Group::countAnswers).sum();
+    int sumAnyOneSayYesCounts() {
+      return this.groups.stream().mapToInt(Group::countAnyOneSayYes).sum();
+    }
+
+    int sumEveryOneSayYesCounts() {
+      return this.groups.stream().mapToInt(Group::countEveryOneSayYes).sum();
     }
   }
 

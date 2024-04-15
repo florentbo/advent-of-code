@@ -36,13 +36,24 @@ class Day06Test {
               Day06.Group.of(List.of("ab", "ac"))));
 
   @Test
-  void countAnswers() {
+  void countAnyOneSayYes() {
     Day06.Group group = Day06.Group.of(List.of("ab", "ac"));
-    assertThat(group.countAnswers()).isEqualTo(3);
+    assertThat(group.countAnyOneSayYes()).isEqualTo(3);
   }
 
   @Test
-  void sumCounts() {
-    assertThat(GROUPS.sumCounts()).isEqualTo(9);
+  void countEveryOneSayYes() {
+    Day06.Group group = Day06.Group.of(List.of("ab", "ac"));
+    assertThat(group.countEveryOneSayYes()).isEqualTo(1);
+  }
+
+  @Test
+  void sumAnyOneSayYesCounts() {
+    assertThat(GROUPS.sumAnyOneSayYesCounts()).isEqualTo(9);
+  }
+
+  @Test
+  void sumEveryOneSayYesCounts() {
+    assertThat(GROUPS.sumEveryOneSayYesCounts()).isEqualTo(4);
   }
 }
