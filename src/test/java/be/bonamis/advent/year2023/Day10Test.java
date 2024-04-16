@@ -6,20 +6,13 @@ import static org.assertj.core.api.Assertions.*;
 
 import java.awt.*;
 import java.util.*;
-import java.util.List;
 import java.util.stream.*;
 
 import be.bonamis.advent.common.CharGrid;
-import be.bonamis.advent.utils.FileHelper;
 import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.utils.marsrover.Rover;
 import be.bonamis.advent.utils.marsrover.Rover.Direction;
 import lombok.extern.slf4j.*;
-import org.jgrapht.Graph;
-import org.jgrapht.GraphPath;
-import org.jgrapht.alg.shortestpath.DijkstraShortestPath;
-import org.jgrapht.graph.DefaultDirectedGraph;
-import org.jgrapht.graph.DefaultEdge;
 import org.junit.jupiter.api.*;
 
 @Slf4j
@@ -34,77 +27,71 @@ class Day10Test {
 
   @Test
   void solvePart01() {
-    CharGrid grid = new CharGrid(Arrays.asList(squareLoopText.split("\n")));
+    Day10 day = new Day10(squareLoopText);
+    assertThat(day.solvePart01()).isEqualTo(4);
+  }
 
-    int result = solvePart01(grid);
-    assertThat(result).isEqualTo(4);
+  @Test
+  void loopStarts() {
+    Day10 day = new Day10(squareLoopText);
+    assertThat(day.loopStarts())
+        .containsExactlyInAnyOrder(
+            new Rover(EAST, Position.of(2, 1)), new Rover(SOUTH, Position.of(1, 2)));
   }
 
   @Test
   void solvePart01Example2() {
     String text = """
-  ..F7.
-  .FJ|.
-  SJ.L7
-  |F--J
-  LJ...
+  ...F7.
+  ..FJ|.
+  .SJ.L7
+  .|F--J
+  .LJ...
   """;
-    CharGrid grid = new CharGrid(Arrays.asList(text.split("\n")));
 
-    int result = solvePart01(grid);
-    assertThat(result).isEqualTo(8);
+    Day10 day = new Day10(text);
+    assertThat(day.solvePart01()).isEqualTo(8);
   }
 
-  public static void main(String[] args) {
-    String content = FileHelper.content("2023/10/2023_10_input.txt");
-    CharGrid grid = new CharGrid(Arrays.asList(content.split("\n")));
+  @Test
+  void solvePart02() {
+    String text =
+        """
+  ...........
+  .S-------7.
+  .|F-----7|.
+  .||.....||.
+  .||.....||.
+  .|L-7.F-J|.
+  .|..|.|..|.
+  .L--J.L--J.
+  ...........
+  """;
 
-    int result = solvePart01(grid);
-    log.info("solution part 1: {}", result);
+    Day10 day = new Day10(text);
+    assertThat(day.solvePart01()).isEqualTo(23);
+    assertThat(day.solvePart02()).isEqualTo(4);
   }
 
-  private static int solvePart01(CharGrid grid) {
-    final var source = getPoint(grid, 'S');
-    log.debug("source {}", source);
-    List<Point> neighbours = grid.neighbours(source, false);
-    Stream<Point> sinks = neighbours.stream().filter(p -> grid.get(p) != '.');
+  @Test
+  void solvePart02OtherExample() {
+    String text =
+            """
+      .F----7F7F7F7F-7....
+      .|F--7||||||||FJ....
+      .||.FJ||||||||L7....
+      FJL7L7LJLJ||LJ.L-7..
+      L--J.L7...LJS7F-7L7.
+      ....F-J..F7FJ|L7L7L7
+      ....L7.F7||L7|.L7L7|
+      .....|FJLJ|FJ|F7|.LJ
+      ....FJL-7.||.||||...
+      ....L---J.LJ.LJLJ...
+      """;
 
-    List<Integer> results = sinks.map(sink -> result(grid, sink, source)).toList();
-    log.debug("results {}", results);
-    return results.get(0);
-  }
-
-  private static int result(CharGrid grid, Point sink, Point source) {
-    log.debug("sink {} value {}", sink, grid.get(sink));
-
-    Graph<Point, DefaultEdge> graph = new DefaultDirectedGraph<>(DefaultEdge.class);
-    grid.consume(graph::addVertex);
-    grid.consume(point -> addEdge(graph, point, grid, source, sink));
-
-    List<Point> vertexList = vertexList(sink, source, graph);
-    int result = vertexList.size() / 2;
-    log.debug("solution size: {}", result);
-    return result;
-  }
-
-  private static List<Point> vertexList(Point sink, Point source, Graph<Point, DefaultEdge> graph) {
-    DijkstraShortestPath<Point, DefaultEdge> shortestPath = new DijkstraShortestPath<>(graph);
-    GraphPath<Point, DefaultEdge> path = shortestPath.getPath(source, sink);
-    return path.getVertexList();
-  }
-
-  static void addEdge(
-      Graph<Point, DefaultEdge> graph, Point point, CharGrid grid, Point source, Point sink) {
-    if (isNotDot(point, grid)) {
-      Set<Direction> allowedDirections = allowedDirections(grid.get(point));
-      Direction[] directions = allowedDirections.toArray(new Direction[0]);
-      for (Point neighbour : allowedPoints(point, grid, directions)) {
-        boolean start = point.equals(source) && neighbour.equals(sink);
-        if (!start) {
-          graph.addEdge(point, neighbour);
-        }
-      }
-    }
+    Day10 day = new Day10(text);
+    assertThat(day.solvePart01()).isEqualTo(70);
+    assertThat(day.solvePart02()).isEqualTo(8);
   }
 
   static Set<Point> allowedPoints(Point point, CharGrid grid, Direction... directions) {
@@ -129,20 +116,6 @@ class Day10Test {
   F is a 90-degree bend connecting south and east.
      */
 
-  static Set<Direction> allowedDirections(Character value) {
-    // log.debug("checking allowed directions for {}", value);
-    return switch (value) {
-      case '|' -> Set.of(NORTH, SOUTH);
-      case '-' -> Set.of(EAST, WEST);
-      case 'L' -> Set.of(NORTH, EAST);
-      case 'J' -> Set.of(NORTH, WEST);
-      case '7' -> Set.of(SOUTH, WEST);
-      case 'F' -> Set.of(SOUTH, EAST);
-      case 'S' -> Arrays.stream(values()).collect(Collectors.toSet());
-      default -> throw new NoSuchElementException();
-    };
-  }
-
   private static Position position(Point point, Direction direction) {
     return new Rover(direction, new Position(point.x, point.y)).move(FORWARD).position();
   }
@@ -164,24 +137,5 @@ class Day10Test {
 
   public static boolean isNotDot(Point point, CharGrid grid) {
     return grid.get(point) != '.';
-  }
-
-  private static Point getPoint(CharGrid grid, char c) {
-    return filter(grid, c).findFirst().orElseThrow();
-  }
-
-  private static Stream<Point> filter(CharGrid grid, char c) {
-    return grid.stream().filter(point -> grid.get(point) == c);
-  }
-
-  @Test
-  void solvePart02() {
-    String text = """
-0 3 6 9 12 15
-1 3 6 10 15 21
-10 13 16 21 30 45
-""";
-    Day10 day10 = new Day10(Arrays.asList(text.split("\n")));
-    assertThat(day10.solvePart02()).isEqualTo(4);
   }
 }

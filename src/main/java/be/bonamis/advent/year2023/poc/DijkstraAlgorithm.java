@@ -21,12 +21,11 @@ public class DijkstraAlgorithm<T> {
       unsettledNodes.remove(currentSourceNode);
 
       if (currentSourceNode.equals(destination)) {
-        // If the destination node is reached, return the result
         return new Result<>(destination.getDistance(), destination.getShortestPath());
       }
 
-      for (Map.Entry<Node<T>, Integer> adjacencyPair :
-          adjacentNodes(currentSourceNode).entrySet()) {
+      Set<Map.Entry<Node<T>, Integer>> adjacentNodes = adjacentNodes(currentSourceNode).entrySet();
+      for (Map.Entry<Node<T>, Integer> adjacencyPair : adjacentNodes) {
         Node<T> evaluationAdjacentNode = adjacencyPair.getKey();
         Integer edgeWeight = adjacencyPair.getValue();
 

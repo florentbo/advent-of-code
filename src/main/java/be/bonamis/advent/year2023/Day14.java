@@ -23,7 +23,6 @@ import static be.bonamis.advent.utils.marsrover.Rover.Direction.EAST;
 public class Day14 extends DaySolver<String> {
 
   private static final char ROCK = 'O';
-  private static final char DOT = '.';
 
   private final CharGrid grid;
 
@@ -121,7 +120,7 @@ public class Day14 extends DaySolver<String> {
               if (canMove) {
                 grid.set(movedPoint, ROCK);
                 Position position = rover.position();
-                grid.set(new Point((int) position.x(), (int) position.y()), DOT);
+                grid.set(new Point((int) position.x(), (int) position.y()), CharGrid.DOT);
                 rover = rover.move(Rover.Command.FORWARD);
               }
             }
@@ -138,7 +137,7 @@ public class Day14 extends DaySolver<String> {
   }
 
   private boolean isDot(Point movedPoint) {
-    return grid.get(movedPoint).equals(DOT);
+    return grid.get(movedPoint).equals(CharGrid.DOT);
   }
 
   private boolean isInTheGrid(Point movedPoint) {
