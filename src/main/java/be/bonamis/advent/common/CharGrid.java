@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class CharGrid {
 
+  public static final char DOT = '.';
   private final char[][] data;
   private final int width;
   private final int height;

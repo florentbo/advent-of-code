@@ -51,10 +51,15 @@ public class DayDataRetriever {
         }
     }
 
-    private static InputStream downloadInput(String puzzleInputUrl) throws IOException {
-        HttpURLConnection con = (HttpURLConnection) new URL(puzzleInputUrl).openConnection();
-        con.addRequestProperty("Cookie", "session=53616c7465645f5fb0257638a20fe79e95186d1af2f30cab360a6018f0a719a788f3c55045e9c14db5e32cddfb5d6e63161804eb820ab766cda88a7a1d2cd1f1");
-        return con.getInputStream();
+    public static InputStream downloadInput(String puzzleInputUrl)  {
+        try {
+            HttpURLConnection con = (HttpURLConnection) new URL(puzzleInputUrl).openConnection();
+            String cookie = System.getenv("ADVENT_SESSION");
+            con.addRequestProperty("Cookie", "session=" + cookie);
+            return con.getInputStream();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     static Document getDocument(String url) throws IOException {
@@ -66,7 +71,7 @@ public class DayDataRetriever {
                 .parse();
     }
 
-    private static String dayUrl(int year, int day) {
+    public static String dayUrl(int year, int day) {
         return "https://adventofcode.com/" + year + "/day/" + day;
     }
 }

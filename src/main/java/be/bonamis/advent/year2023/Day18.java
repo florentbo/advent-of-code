@@ -36,9 +36,13 @@ public class Day18 extends DaySolver<String> {
     return solvePoly();
   }
 
-  private long solvePoly() {
-    long a = calculateArea(poly);
-    long perimeter = calculatePerimeter(this.poly.points());
+  long solvePoly() {
+    return polyArea(this.poly);
+  }
+
+  long polyArea(Polygon polygon) {
+    long a = calculateArea(polygon);
+    long perimeter = calculatePerimeter(polygon.points());
 
     perimeter /= 2;
     log.debug("area {} half {}", a, perimeter);
