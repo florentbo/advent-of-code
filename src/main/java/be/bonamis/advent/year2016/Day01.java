@@ -7,7 +7,6 @@ import static be.bonamis.advent.utils.marsrover.Rover.Direction.NORTH;
 import be.bonamis.advent.TextDaySolver;
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.*;
 
 import be.bonamis.advent.utils.marsrover.*;
 import lombok.*;
@@ -51,9 +50,9 @@ public class Day01 extends TextDaySolver {
   public static void main(String[] args) {
     String puzzleInputUrl = dayUrl(2016, 1) + "/input";
     InputStream inputStream = downloadInput(puzzleInputUrl);
-    Day01 day05 = new Day01(inputStream);
-    System.out.println("Part 1: " + day05.solvePart01());
-    System.out.println("Part 2: " + day05.solvePart02());
+    Day01 day = new Day01(inputStream);
+    log.info("Part 1: {}", day.solvePart01());
+    log.info("Part 2: {}", day.solvePart02());
   }
 
   record Moves(List<Move> moves) {
@@ -63,7 +62,7 @@ public class Day01 extends TextDaySolver {
           Arrays.stream(commands.split(","))
               .map(String::trim)
               .map(Move::from)
-              .collect(Collectors.toList()));
+              .toList());
     }
 
     Position lastRoverPosition() {
