@@ -18,7 +18,7 @@ class Day01Test {
   @Test
   void solvePart01() {
     String input = "(())";
-    assertThat(new Day01(List.of(input)).solvePart01()).isEqualTo(0);
+    assertThat(new Day01(List.of(input)).solvePart01()).isZero();
   }
 
   @Test
@@ -26,7 +26,7 @@ class Day01Test {
     String input = "()())";
     String substring = input.substring(0, 2);
     log.info("{}", substring);
-    assertThat(new Day01(List.of(substring)).solvePart01()).isEqualTo(0);
+    assertThat(new Day01(List.of(substring)).solvePart01()).isZero();
 
     assertThat(new Day01(List.of(input)).solvePart02()).isEqualTo(5);
   }
