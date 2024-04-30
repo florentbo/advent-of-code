@@ -52,12 +52,16 @@ public class DayDataRetriever {
 
       Method solvePart01Method = clazz.getMethod("solvePart01");
       Method solvePart02Method = clazz.getMethod("solvePart02");
+      Method solvePart02StringMethod = clazz.getMethod("solvePart02String");
 
       Object resultPart01 = solvePart01Method.invoke(instance);
       Object resultPart02 = solvePart02Method.invoke(instance);
+      Object resultPart03 = solvePart02StringMethod.invoke(instance);
 
       log.info("Part 1: {}", resultPart01);
       log.info("Part 2: {}", resultPart02);
+      log.info("Part 3: {}", resultPart03);
+
     } catch (Exception e) {
       throw new IllegalArgumentException(e);
     }
