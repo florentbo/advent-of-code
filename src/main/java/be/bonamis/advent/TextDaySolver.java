@@ -25,7 +25,7 @@ public abstract class TextDaySolver extends DaySolver<String> {
     try (InputStream is = inputStream) {
       return new Scanner(is, StandardCharsets.UTF_8).useDelimiter("\\A").next().lines().toList();
     } catch (IOException e) {
-      throw new RuntimeException(e);
+      throw new IllegalArgumentException(e);
     }
   }
 }
