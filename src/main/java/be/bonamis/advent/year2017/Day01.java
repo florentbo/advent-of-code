@@ -30,14 +30,6 @@ public class Day01 extends TextDaySolver {
     return halfwayAroundMatches(digits).stream().mapToInt(Integer::intValue).sum();
   }
 
-  public static void main(String[] args) {
-    String puzzleInputUrl = dayUrl(2017, 1) + "/input";
-    InputStream inputStream = downloadInput(puzzleInputUrl);
-    Day01 day = new Day01(inputStream);
-    log.info("Part 1: {}", day.solvePart01());
-    log.info("Part 2: {}", day.solvePart02());
-  }
-
   static List<Integer> digits(String input) {
     return input.chars().mapToObj(Character::getNumericValue).toList();
   }
