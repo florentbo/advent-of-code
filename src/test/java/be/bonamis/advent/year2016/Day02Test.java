@@ -1,12 +1,11 @@
 package be.bonamis.advent.year2016;
 
+import static be.bonamis.advent.utils.FileHelper.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
-import java.io.ByteArrayInputStream;
 import java.util.stream.Stream;
 
 import lombok.extern.slf4j.Slf4j;
-import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -17,8 +16,7 @@ class Day02Test {
   @ParameterizedTest
   @MethodSource("part01TestCases")
   void lineMoves(String input, int expected) {
-    assertThat(new Day02(new ByteArrayInputStream(input.getBytes())).solvePart01())
-        .isEqualTo(expected);
+    assertThat(new Day02(inputStream(input)).solvePart01()).isEqualTo(expected);
   }
 
   static String text =
@@ -57,8 +55,7 @@ class Day02Test {
   @ParameterizedTest
   @MethodSource("part02TestCases")
   void lineMoves2(String input, String expected) {
-    assertThat(new Day02(new ByteArrayInputStream(input.getBytes())).solvePart02String())
-        .isEqualTo(expected);
+    assertThat(new Day02(inputStream(input)).solvePart02String()).isEqualTo(expected);
   }
 
   private static Stream<Arguments> part02TestCases() {
