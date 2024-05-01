@@ -1,19 +1,20 @@
 package be.bonamis.advent.utils;
 
-import static java.util.stream.Collectors.toList;
+import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
+
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 import java.lang.invoke.MethodHandles;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+import java.util.*;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
+@Slf4j
 public class FileHelper {
 
     private FileHelper() {
@@ -26,11 +27,10 @@ public class FileHelper {
     public static List<String> getLines(String name) {
         try {
             try (Stream<String> lines = Files.lines(getPath(name))) {
-                return lines.collect(toList());
+                return lines.toList();
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            return Collections.emptyList();
+            throw new IllegalArgumentException();
         }
     }
 
@@ -38,18 +38,17 @@ public class FileHelper {
         try {
             return Files.readString(getPath(name));
         } catch (Exception e) {
-            throw new RuntimeException(e);
+            throw new IllegalArgumentException();
         }
     }
 
     public static List<Integer> getIntegers(String name) {
         try {
             try (Stream<String> lines = Files.lines(getPath(name))) {
-                return lines.map(Integer::parseInt).collect(toList());
+                return lines.map(Integer::parseInt).toList();
             }
         } catch (Exception e) {
-            e.printStackTrace();
-            return Collections.emptyList();
+           throw new IllegalArgumentException();
         }
     }
 
@@ -67,5 +66,9 @@ public class FileHelper {
       String year = packageName.substring(packageLength - 4, packageLength);
 
       return content(String.format("%1$s/%2$s/%1$s_%2$s_input.txt", year, dayAsString));
+    }
+
+    public static InputStream inputStream(String input) {
+      return new ByteArrayInputStream(input.getBytes());
     }
 }
