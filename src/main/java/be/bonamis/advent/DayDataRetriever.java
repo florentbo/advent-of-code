@@ -16,13 +16,12 @@ import java.text.NumberFormat;
 public class DayDataRetriever {
 
   public static void main(String[] args) {
-    runCode();
+    runCode(System.getenv("YEAR"), System.getenv("DAY"), System.getenv("ADVENT_SESSION"));
   }
 
-  public static InputStream downloadInput(String puzzleInputUrl) {
+  public static InputStream downloadInput(String puzzleInputUrl, String cookie) {
     try {
       HttpURLConnection con = (HttpURLConnection) new URL(puzzleInputUrl).openConnection();
-      String cookie = System.getenv("ADVENT_SESSION");
       con.addRequestProperty("Cookie", "session=" + cookie);
       return con.getInputStream();
     } catch (IOException e) {
@@ -34,14 +33,14 @@ public class DayDataRetriever {
     return "https://adventofcode.com/" + year + "/day/" + day;
   }
 
-  public static void runCode() {
+  public static void runCode(String inputYear, String inputDay, String cookie) {
     try {
-      int year = Integer.parseInt(System.getenv("YEAR"));
-      int dayNumber = Integer.parseInt(System.getenv("DAY"));
+      int year = Integer.parseInt(inputYear);
+      int dayNumber = Integer.parseInt(inputDay);
 
       NumberFormat formatter = new DecimalFormat("00");
       String puzzleInputUrl = dayUrl(year, dayNumber) + "/input";
-      InputStream inputStream = downloadInput(puzzleInputUrl);
+      InputStream inputStream = downloadInput(puzzleInputUrl, cookie);
 
       Class<?> clazz =
           Class.forName(

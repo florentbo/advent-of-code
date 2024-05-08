@@ -86,7 +86,7 @@ public class Day05 extends TextDaySolver {
 
   public static void main(String[] args) {
     String puzzleInputUrl = dayUrl(2015, 5) + "/input";
-    InputStream inputStream = downloadInput(puzzleInputUrl);
+    InputStream inputStream = downloadInput(puzzleInputUrl, System.getenv("ADVENT_SESSION"));
     Day05 day05 = new Day05(inputStream);
     System.out.println("Day 05");
     System.out.println("Part 1: " + day05.solvePart01());
