@@ -49,7 +49,7 @@ public class Day01 extends TextDaySolver {
 
   public static void main(String[] args) {
     String puzzleInputUrl = dayUrl(2016, 1) + "/input";
-    InputStream inputStream = downloadInput(puzzleInputUrl);
+    InputStream inputStream = downloadInput(puzzleInputUrl, System.getenv("ADVENT_SESSION"));
     Day01 day = new Day01(inputStream);
     log.info("Part 1: {}", day.solvePart01());
     log.info("Part 2: {}", day.solvePart02());
