@@ -5,6 +5,9 @@ import lombok.Getter;
 import lombok.ToString;
 
 import java.util.*;
+import java.util.function.BiFunction;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 @Getter
 @ToString
@@ -20,6 +23,10 @@ public class InfiniteGrid {
     return data.getOrDefault(new Point(x, y), 0);
   }
 
+  public int get(Point point) {
+    return data.getOrDefault(point, 0);
+  }
+
   public Optional<Integer> find(int x, int y) {
     Point point = Point.of(x, y);
     return data.get(point) == null ? Optional.empty() : Optional.of(data.get(point));
@@ -27,6 +34,37 @@ public class InfiniteGrid {
 
   public Point last() {
     return data.keySet().stream().reduce((first, second) -> second).orElse(Point.of(0, 0));
+  }
+
+  /*public Set<Point> neighbors(Point point) {
+    return Stream.of(
+        Point.of(point.x() - 1, point.y()),
+        Point.of(point.x() + 1, point.y()),
+        Point.of(point.x(), point.y() - 1),
+        Point.of(point.x(), point.y() + 1))
+       .filter(data::containsKey)
+       .collect(Collectors.toSet());
+  }*/
+
+  public Set<Point> neighbors(Point point) {
+    return Stream.of(
+            Point.of(point.x() - 1, point.y() - 1),
+            Point.of(point.x() - 1, point.y()),
+            Point.of(point.x() - 1, point.y() + 1),
+            Point.of(point.x(), point.y() - 1),
+            Point.of(point.x(), point.y() + 1),
+            Point.of(point.x() + 1, point.y() - 1),
+            Point.of(point.x() + 1, point.y()),
+            Point.of(point.x() + 1, point.y() + 1))
+        .filter(data::containsKey)
+        .collect(Collectors.toSet());
+  }
+
+  public BiFunction<Integer, Point, Integer> addNeighborsSum =
+      (x, point) -> x + neighborsSum(point);
+
+  public int neighborsSum(Point point) {
+    return neighbors(point).stream().mapToInt(this::get).sum();
   }
 
   public record Point(int x, int y) {
