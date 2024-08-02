@@ -1,5 +1,6 @@
 package be.bonamis.advent;
 
+import be.bonamis.advent.year2017.Day04;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -33,6 +34,12 @@ public class DayDataRetriever {
     return "https://adventofcode.com/" + year + "/day/" + day;
   }
 
+  public static void runCode(Class<Day04> day04Class) {
+    String year = String.valueOf(extractYear(day04Class));
+    String dayNumber = String.valueOf(extractDay(day04Class));
+    runCode(year, dayNumber, System.getenv("ADVENT_SESSION"));
+  }
+
   public static void runCode(String inputYear, String inputDay, String cookie) {
     try {
       int year = Integer.parseInt(inputYear);
@@ -64,5 +71,18 @@ public class DayDataRetriever {
     } catch (Exception e) {
       throw new IllegalArgumentException(e);
     }
+  }
+
+  public static int extractYear(Class<?> clazz) {
+    Package pkg = clazz.getPackage();
+    String packageName = pkg.getName();
+    String yearPart = packageName.replaceAll("[^0-9]", "");
+    return Integer.parseInt(yearPart);
+  }
+
+  public static int extractDay(Class<?> clazz) {
+    String className = clazz.getSimpleName();
+    String dayPart = className.replaceAll("[^0-9]", "");
+    return Integer.parseInt(dayPart);
   }
 }
