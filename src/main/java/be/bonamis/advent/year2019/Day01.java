@@ -30,8 +30,22 @@ public class Day01 extends TextDaySolver {
         return (mass / 3) - 2;
     }
 
+    static int totalFuel(int mass) {
+        int sum = 0;
+        int requiredFuel = requiredFuel(mass);
+        while (requiredFuel > 0) {
+            sum += requiredFuel;
+            requiredFuel = requiredFuel(requiredFuel);
+        }
+        return sum;
+    }
+
     @Override
     public long solvePart02() {
-        return 118;
+        return this.puzzle.stream().mapToInt(Day01::totalFuel).sum();
+    }
+
+    private static int totalFuel(String s) {
+        return totalFuel(Integer.parseInt(s));
     }
 }
