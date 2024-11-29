@@ -1,6 +1,5 @@
 package be.bonamis.advent;
 
-import be.bonamis.advent.year2017.Day04;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
@@ -34,7 +33,7 @@ public class DayDataRetriever {
     return "https://adventofcode.com/" + year + "/day/" + day;
   }
 
-  public static void runCode(Class<Day04> day04Class) {
+  public static void runCode(Class<? extends TextDaySolver> day04Class) {
     String year = String.valueOf(extractYear(day04Class));
     String dayNumber = String.valueOf(extractDay(day04Class));
     runCode(year, dayNumber, System.getenv("ADVENT_SESSION"));
