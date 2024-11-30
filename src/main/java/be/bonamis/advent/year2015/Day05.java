@@ -1,7 +1,5 @@
 package be.bonamis.advent.year2015;
 
-import static be.bonamis.advent.DayDataRetriever.dayUrl;
-import static be.bonamis.advent.DayDataRetriever.downloadInput;
 
 import be.bonamis.advent.TextDaySolver;
 
@@ -82,15 +80,6 @@ public class Day05 extends TextDaySolver {
   @Override
   public long solvePart02() {
     return this.puzzle.stream().filter(Day05::solve02).count();
-  }
-
-  public static void main(String[] args) {
-    String puzzleInputUrl = dayUrl(2015, 5) + "/input";
-    InputStream inputStream = downloadInput(puzzleInputUrl, System.getenv("ADVENT_SESSION"));
-    Day05 day05 = new Day05(inputStream);
-    System.out.println("Day 05");
-    System.out.println("Part 1: " + day05.solvePart01());
-    System.out.println("Part 2: " + day05.solvePart02());
   }
 
   record Pair(Character first, Character second, int startIndex) {

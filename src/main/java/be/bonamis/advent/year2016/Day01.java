@@ -1,6 +1,5 @@
 package be.bonamis.advent.year2016;
 
-import static be.bonamis.advent.DayDataRetriever.*;
 import static be.bonamis.advent.utils.marsrover.Rover.Command.*;
 import static be.bonamis.advent.utils.marsrover.Rover.Direction.NORTH;
 
@@ -45,14 +44,6 @@ public class Day01 extends TextDaySolver {
     Moves moves = Moves.from(this.puzzle.get(0));
     return distance(moves.firstLocationVisitedTwice());
 
-  }
-
-  public static void main(String[] args) {
-    String puzzleInputUrl = dayUrl(2016, 1) + "/input";
-    InputStream inputStream = downloadInput(puzzleInputUrl, System.getenv("ADVENT_SESSION"));
-    Day01 day = new Day01(inputStream);
-    log.info("Part 1: {}", day.solvePart01());
-    log.info("Part 2: {}", day.solvePart02());
   }
 
   record Moves(List<Move> moves) {

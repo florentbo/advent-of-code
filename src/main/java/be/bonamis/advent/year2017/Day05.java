@@ -1,6 +1,5 @@
 package be.bonamis.advent.year2017;
 
-import be.bonamis.advent.DayDataRetriever;
 import be.bonamis.advent.TextDaySolver;
 import java.io.InputStream;
 import java.util.*;
@@ -37,7 +36,6 @@ public class Day05 extends TextDaySolver {
 
       log.debug("actualCursor: {} offset: {}", actualCursor, offset);
 
-
       int newCursor = actualCursor + offset;
       log.debug("actualCursor: {} offset: {} newCursor: {}", actualCursor, offset, newCursor);
       log.debug("numbers before: {}", numbers);
@@ -58,9 +56,5 @@ public class Day05 extends TextDaySolver {
   @Override
   public long solvePart02() {
     return 100;
-  }
-
-  public static void main(String[] args) {
-    DayDataRetriever.runCode(Day05.class);
   }
 }

@@ -1,6 +1,5 @@
 package be.bonamis.advent.year2017;
 
-import be.bonamis.advent.DayDataRetriever;
 import be.bonamis.advent.TextDaySolver;
 import java.io.InputStream;
 import java.util.*;
@@ -24,10 +23,6 @@ public class Day04 extends TextDaySolver {
   @Override
   public long solvePart02() {
     return this.puzzle.stream().filter(this::isPart02PassphraseValid).count();
-  }
-
-  public static void main(String[] args) {
-    DayDataRetriever.runCode(Day04.class);
   }
 
   public boolean isPassphraseValid(String input) {
