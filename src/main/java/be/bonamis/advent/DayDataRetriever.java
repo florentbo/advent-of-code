@@ -2,52 +2,69 @@ package be.bonamis.advent;
 
 import lombok.extern.slf4j.Slf4j;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.Method;
+import java.io.*;
+import java.lang.reflect.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
 
-import java.text.DecimalFormat;
-import java.text.NumberFormat;
+import java.nio.file.*;
+import java.text.*;
 
 @Slf4j
 public class DayDataRetriever {
 
   public static void main(String[] args) {
-    runCode(System.getenv("YEAR"), System.getenv("DAY"), System.getenv("ADVENT_SESSION"));
+    runCode(System.getenv("YEAR"), System.getenv("DAY"));
   }
 
-  public static InputStream downloadInput(String puzzleInputUrl, String cookie) {
+  private static InputStream downloadInput(int year, int dayNumber) {
+    String puzzleInputUrl = dayUrl(year, dayNumber) + "/input";
+    log.info("downloading input from: {}", puzzleInputUrl);
     try {
       HttpURLConnection con = (HttpURLConnection) new URL(puzzleInputUrl).openConnection();
-      con.addRequestProperty("Cookie", "session=" + cookie);
+      con.addRequestProperty("Cookie", "session=" + System.getenv("ADVENT_SESSION"));
       return con.getInputStream();
     } catch (IOException e) {
       throw new IllegalArgumentException(e);
     }
   }
 
-  public static String dayUrl(int year, int day) {
+  static InputStream inputFile(int year, int dayNumber) {
+    try {
+      Path homeDir = Path.of(System.getProperty("user.home") + "/personal-dev/advent-inputs");
+      String inputFileName = String.format("input-%02d-%02d.txt", year, dayNumber);
+      File inputFile = new File(homeDir + "/" + inputFileName);
+      log.info("Looking for input file: {}", inputFile);
+
+      if (inputFile.exists()) {
+        log.info("Reading existing input from file: {}", inputFile.getPath());
+        return Files.newInputStream(inputFile.toPath());
+      } else {
+        log.info("No input file found: {}", inputFile.getPath());
+        InputStream inputStream = downloadInput(year, dayNumber);
+        Path path = Paths.get(inputFile.getPath());
+        Files.copy(inputStream, path);
+        log.info("Writing input to file: {}", path);
+        return Files.newInputStream(path);
+      }
+    } catch (Exception e) {
+      log.error("Error reading input file", e);
+      throw new RuntimeException(e);
+    }
+  }
+
+  private static String dayUrl(int year, int day) {
     return "https://adventofcode.com/" + year + "/day/" + day;
   }
 
-  public static void runCode(Class<? extends TextDaySolver> day04Class) {
-    String year = String.valueOf(extractYear(day04Class));
-    String dayNumber = String.valueOf(extractDay(day04Class));
-    runCode(year, dayNumber, System.getenv("ADVENT_SESSION"));
-  }
-
-  public static void runCode(String inputYear, String inputDay, String cookie) {
+  public static void runCode(String inputYear, String inputDay) {
     try {
       int year = Integer.parseInt(inputYear);
       int dayNumber = Integer.parseInt(inputDay);
 
-      NumberFormat formatter = new DecimalFormat("00");
-      String puzzleInputUrl = dayUrl(year, dayNumber) + "/input";
-      InputStream inputStream = downloadInput(puzzleInputUrl, cookie);
+      InputStream inputStream = inputFile(year, dayNumber);
 
+      NumberFormat formatter = new DecimalFormat("00");
       Class<?> clazz =
           Class.forName(
               "be.bonamis.advent.year" + year + "." + "Day" + formatter.format(dayNumber));
@@ -70,18 +87,5 @@ public class DayDataRetriever {
     } catch (Exception e) {
       throw new IllegalArgumentException(e);
     }
-  }
-
-  public static int extractYear(Class<?> clazz) {
-    Package pkg = clazz.getPackage();
-    String packageName = pkg.getName();
-    String yearPart = packageName.replaceAll("[^0-9]", "");
-    return Integer.parseInt(yearPart);
-  }
-
-  public static int extractDay(Class<?> clazz) {
-    String className = clazz.getSimpleName();
-    String dayPart = className.replaceAll("[^0-9]", "");
-    return Integer.parseInt(dayPart);
   }
 }

@@ -1,7 +1,5 @@
 package be.bonamis.advent.year2020;
 
-import static be.bonamis.advent.DayDataRetriever.*;
-
 import be.bonamis.advent.TextDaySolver;
 import java.io.InputStream;
 import java.util.*;
@@ -45,7 +43,6 @@ public class Day06 extends TextDaySolver {
   public long solvePart02() {
     Groups groups = groups(this.puzzle);
     return groups.sumEveryOneSayYesCounts();
-
   }
 
   record Group(List<String> answers) {
@@ -112,14 +109,5 @@ public class Day06 extends TextDaySolver {
     int sumEveryOneSayYesCounts() {
       return this.groups.stream().mapToInt(Group::countEveryOneSayYes).sum();
     }
-  }
-
-  public static void main(String[] args) {
-    String puzzleInputUrl = dayUrl(2020, 6) + "/input";
-    InputStream inputStream = downloadInput(puzzleInputUrl, System.getenv("ADVENT_SESSION"));
-    Day06 day05 = new Day06(inputStream);
-    System.out.println("Day 06");
-    System.out.println("Part 1: " + day05.solvePart01());
-    System.out.println("Part 2: " + day05.solvePart02());
   }
 }
