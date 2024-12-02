@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.IntStream;
+
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
@@ -54,18 +55,16 @@ public class Day02 extends TextDaySolver {
     List<Integer> numbersList =
         new java.util.ArrayList<>(Arrays.stream(numbers).map(Integer::parseInt).toList());
 
-    return isSafe(line) || (!isSafe(line) && isSafeRemovingOneLevel(numbersList));
+    return isSafe(line) || isSafeRemovingOneLevel(numbersList);
   }
 
   private static boolean isSafeRemovingOneLevel(List<Integer> numbersList) {
-    return partialListIsSage(numbersList, 0)
-        || partialListIsSage(numbersList, 1)
-        || partialListIsSage(numbersList, 2)
-        || partialListIsSage(numbersList, 3)
-        || partialListIsSage(numbersList, 4);
+    return IntStream.range(0, numbersList.size())
+        .mapToObj(i -> partialListIsSafe(numbersList, i))
+        .anyMatch(Boolean::booleanValue);
   }
 
-  private static boolean partialListIsSage(List<Integer> numbersList, int index) {
+  private static boolean partialListIsSafe(List<Integer> numbersList, int index) {
     List<Integer> initialList = new java.util.ArrayList<>(numbersList);
     initialList.remove(index);
     return listIsSafe(initialList);
