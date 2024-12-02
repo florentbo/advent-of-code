@@ -37,8 +37,8 @@ public class ShowResult {
 		log.info("Day06 part 02 result: {}", new Day06(day06Data).solvePart02());
 
 		final var day07Data = getLines("2021_day07_prod.txt");
-		log.info("Day07 part 01 result: {}", new Day07(day07Data).solvePart01());
-		log.info("Day07 part 02 result: {}", new Day07(day07Data).solvePart02());
+		log.info("Day04 part 01 result: {}", new Day04(day07Data).solvePart01());
+		log.info("Day04 part 02 result: {}", new Day04(day07Data).solvePart02());
 
 		final var day08Data = getLines("2021_day08_prod.txt");
 		log.info("Day08 part 01 result: {}", new Day08(day08Data).solvePart01());
