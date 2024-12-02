@@ -13,9 +13,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class Day02Test {
 
-  @Test
-  void solvePart01() {
-    String input = """
+  private static final String INPUT =
+      """
 7 6 4 2 1
 1 2 7 8 9
 9 7 6 2 1
@@ -23,28 +22,17 @@ class Day02Test {
 8 6 4 4 1
 1 3 6 7 9
 """;
+  private static final List<String> LIST = List.of(INPUT.split("\n"));
 
-    List<String> lines = List.of(input.split("\n"));
-
-    assertThat(new Day02(lines).solvePart01()).isEqualTo(2);
+  @Test
+  void solvePart01() {
+    assertThat(new Day02(LIST).solvePart01()).isEqualTo(2);
   }
 
   @Test
   void solvePart02() {
-    String input = """
-7 6 4 2 1
-1 2 7 8 9
-9 7 6 2 1
-1 3 2 4 5
-8 6 4 4 1
-1 3 6 7 9
-""";
-
-    List<String> lines = List.of(input.split("\n"));
-
-    assertThat(new Day02(lines).solvePart02()).isEqualTo(4);
+    assertThat(new Day02(LIST).solvePart02()).isEqualTo(4);
   }
-
 
   @ParameterizedTest
   @MethodSource("isSafeTestCases")
@@ -55,12 +43,11 @@ class Day02Test {
   private static Stream<Arguments> isSafeTestCases() {
     return Stream.of(
         Arguments.of("7 6 4 2 1", true),
-            Arguments.of("1 2 7 8 9", false),
-            Arguments.of("9 7 6 2 1", false),
-            Arguments.of("1 3 2 4 5", false),
-            Arguments.of("8 6 4 4 1", false),
-            Arguments.of("1 3 6 7 9", true)
-        );
+        Arguments.of("1 2 7 8 9", false),
+        Arguments.of("9 7 6 2 1", false),
+        Arguments.of("1 3 2 4 5", false),
+        Arguments.of("8 6 4 4 1", false),
+        Arguments.of("1 3 6 7 9", true));
   }
 
   @ParameterizedTest
@@ -71,12 +58,11 @@ class Day02Test {
 
   private static Stream<Arguments> isSafeWithToleranceTestCases() {
     return Stream.of(
-            Arguments.of("7 6 4 2 1", true),
-            Arguments.of("1 2 7 8 9", false),
-            Arguments.of("9 7 6 2 1", false),
-            Arguments.of("1 3 2 4 5", true),
-            Arguments.of("8 6 4 4 1", true),
-            Arguments.of("1 3 6 7 9", true)
-    );
+        Arguments.of("7 6 4 2 1", true),
+        Arguments.of("1 2 7 8 9", false),
+        Arguments.of("9 7 6 2 1", false),
+        Arguments.of("1 3 2 4 5", true),
+        Arguments.of("8 6 4 4 1", true),
+        Arguments.of("1 3 6 7 9", true));
   }
 }

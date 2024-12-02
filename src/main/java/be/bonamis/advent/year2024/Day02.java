@@ -25,9 +25,21 @@ public class Day02 extends TextDaySolver {
   }
 
   static boolean isSafe(String line) {
-    String[] numbers = line.split(" ");
-    List<Integer> numbersList = Arrays.stream(numbers).map(Integer::parseInt).toList();
+    List<Integer> numbersList = Arrays.stream(line.split(" ")).map(Integer::parseInt).toList();
     return listIsSafe(numbersList);
+  }
+
+  @Override
+  public long solvePart02() {
+    return this.puzzle.stream().filter(Day02::isSafeWithTolerance).count();
+  }
+
+  static boolean isSafeWithTolerance(String line) {
+    String[] numbers = line.split(" ");
+    List<Integer> numbersList =
+            new java.util.ArrayList<>(Arrays.stream(numbers).map(Integer::parseInt).toList());
+
+    return isSafe(line) || isSafeRemovingOneLevel(numbersList);
   }
 
   private static boolean listIsSafe(List<Integer> numbersList) {
@@ -36,7 +48,7 @@ public class Day02 extends TextDaySolver {
             .allMatch(
                 i -> {
                   int diff = numbersList.get(i) - numbersList.get(i + 1);
-                  return diff == 1 || diff == 2 || diff == 3;
+                  return diff >= 1 && diff <= 3;
                 });
 
     boolean isIncreasing =
@@ -44,18 +56,10 @@ public class Day02 extends TextDaySolver {
             .allMatch(
                 i -> {
                   int diff = numbersList.get(i + 1) - numbersList.get(i);
-                  return diff == 1 || diff == 2 || diff == 3;
+                  return diff >= 1 && diff <= 3;
                 });
 
     return isDecreasing || isIncreasing;
-  }
-
-  static boolean isSafeWithTolerance(String line) {
-    String[] numbers = line.split(" ");
-    List<Integer> numbersList =
-        new java.util.ArrayList<>(Arrays.stream(numbers).map(Integer::parseInt).toList());
-
-    return isSafe(line) || isSafeRemovingOneLevel(numbersList);
   }
 
   private static boolean isSafeRemovingOneLevel(List<Integer> numbersList) {
@@ -68,10 +72,5 @@ public class Day02 extends TextDaySolver {
     List<Integer> initialList = new java.util.ArrayList<>(numbersList);
     initialList.remove(index);
     return listIsSafe(initialList);
-  }
-
-  @Override
-  public long solvePart02() {
-    return this.puzzle.stream().filter(Day02::isSafeWithTolerance).count();
   }
 }
