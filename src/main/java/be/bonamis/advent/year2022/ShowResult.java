@@ -24,7 +24,7 @@ public class ShowResult {
 		log.info("Day05 part 01 result: {}", new Day05(getLines("2022/05/2022_05_input.txt")).solvePart01String());
 		//log.info("Day05 part 02 result: {}", new Day04(getLines("2022/05/2022_05_input.txt")).solvePart02());
 
-		log.info("Day07 part 01 result: {}", new Day07(getLines("2022/07/2022_07_input.txt")).solvePart01());
+		log.info("Day04 part 01 result: {}", new Day07(getLines("2022/07/2022_07_input.txt")).solvePart01());
 
 		log.info("Day08 part 01 result: {}", new Day08(getLines("2022/08/2022_08_input.txt")).solvePart01());
 		log.info("Day08 part 02 result: {}", new Day08(getLines("2022/08/2022_08_input.txt")).solvePart02());
