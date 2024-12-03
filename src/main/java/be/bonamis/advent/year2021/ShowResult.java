@@ -1,6 +1,5 @@
 package be.bonamis.advent.year2021;
 
-import static be.bonamis.advent.utils.FileHelper.getIntegers;
 import static be.bonamis.advent.utils.FileHelper.getLines;
 
 import be.bonamis.advent.year2022.Day01;
