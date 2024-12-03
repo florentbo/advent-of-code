@@ -24,6 +24,8 @@ public class Day03 extends TextDaySolver {
     for (String input : this.puzzle) {
       log.info("s={}", input);
 
+      // basic regex: mul\(\d+,\d+\)
+      // regex with groups: mul\((\d+),(\d+)\)
       Pattern pattern = Pattern.compile("mul\\((\\d+),(\\d+)\\)");
       Matcher matcher = pattern.matcher(input);
 
