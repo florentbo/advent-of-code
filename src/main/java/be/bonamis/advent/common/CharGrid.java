@@ -118,19 +118,6 @@ public class CharGrid {
     return ret;
   }
 
-  private char[][] rotateCounterClockWise(char[][] matrix) {
-    int size = matrix.length;
-    char[][] ret = new char[size][size];
-
-    for (int i = 0; i < size; ++i) {
-      for (int j = 0; j < size; ++j) {
-        ret[i][j] = matrix[j][size - i - 1];
-      }
-    }
-
-    return ret;
-  }
-
   public String toLine(List<Point> line) {
     Stream<Character> characterStream = line.stream().map(this::get);
     return characterStream.map(String::valueOf).collect(Collectors.joining());
@@ -154,17 +141,6 @@ public class CharGrid {
 
   public Long number(Point p) {
     return (long) Character.getNumericValue(get(p));
-  }
-
-  public void printArray() {
-    System.out.println("start");
-    for (char[] ints : this.data) {
-      for (char anInt : ints) {
-        System.out.print(anInt);
-      }
-      System.out.println();
-    }
-    System.out.println("end");
   }
 
   public void set(Point point, char i) {
@@ -211,9 +187,7 @@ public class CharGrid {
     return neighbours.stream().filter(isInTheGrid()).toList();
   }
 
-  public List<Point> neighbours(Point point) {
-    return neighbours(point, false);
-  }
+
 
   public Predicate<Point> isInTheGrid() {
     return p ->
@@ -222,7 +196,10 @@ public class CharGrid {
 
   public boolean isPositionInTheGrid(Rover rover) {
     Position p = rover.position();
-    return (int) p.x() >= 0 && (int) p.y() >= 0 && (int) p.x() < this.height && (int) p.y() < this.width;
+    return (int) p.x() >= 0
+        && (int) p.y() >= 0
+        && (int) p.x() < this.height
+        && (int) p.y() < this.width;
   }
 
   public Point find(int i) {
@@ -241,12 +218,68 @@ public class CharGrid {
     return IntStream.range(0, getWidth()).mapToObj(this::column).toList();
   }
 
+  public List<List<Point>> diagonals() {
+    List<List<Point>> allDiagonals = new ArrayList<>();
+
+    // Main diagonals (top-left to bottom-right)
+    allDiagonals.addAll(
+        IntStream.range(0, width)
+            .mapToObj(
+                startCol ->
+                    IntStream.range(0, Math.min(height, width - startCol))
+                        .mapToObj(i -> new Point(i, startCol + i))
+                        .toList())
+            .filter(list -> list.size() > 1)
+            .toList());
+
+    allDiagonals.addAll(
+        IntStream.range(1, height)
+            .mapToObj(
+                startRow ->
+                    IntStream.range(0, Math.min(width, height - startRow))
+                        .mapToObj(i -> new Point(startRow + i, i))
+                        .toList())
+            .filter(list -> list.size() > 1)
+            .toList());
+
+    // Anti-diagonals (top-right to bottom-left)
+    allDiagonals.addAll(
+        IntStream.range(0, width)
+            .mapToObj(
+                startCol ->
+                    IntStream.range(0, Math.min(height, startCol + 1))
+                        .mapToObj(i -> new Point(i, startCol - i))
+                        .toList())
+            .filter(list -> list.size() > 1)
+            .toList());
+
+    allDiagonals.addAll(
+        IntStream.range(1, height)
+            .mapToObj(
+                startRow ->
+                    IntStream.range(0, Math.min(width - startRow, height))
+                        .mapToObj(i -> new Point(startRow + i, width - 1 - i))
+                        .toList())
+            .filter(list -> list.size() > 1)
+            .toList());
+
+    return allDiagonals;
+  }
+
   public List<Point> column(int w) {
     return IntStream.range(0, getHeight()).mapToObj(h -> new Point(w, h)).toList();
   }
 
   public List<String> rowsAsLines() {
     return rows().stream().map(this::toLine).toList();
+  }
+
+  public List<String> columnsAsLines() {
+    return columns().stream().map(this::toLine).toList();
+  }
+
+  public List<String> diagonalsAsLines() {
+    return diagonals().stream().map(this::toLine).toList();
   }
 
   public List<String> rowsAsLines2() {
@@ -259,5 +292,21 @@ public class CharGrid {
 
   public char get(Position position) {
     return get(new Point((int) position.x(), (int) position.y()));
+  }
+
+  public List<CharGrid> subGrids(int size) {
+    List<CharGrid> subGrids = new ArrayList<>();
+
+    for (int startX = 0; startX <= height - size; startX++) {
+      for (int startY = 0; startY <= width - size; startY++) {
+        char[][] subgrid = new char[size][size];
+        for (int i = 0; i < size; i++) {
+            System.arraycopy(data[startX + i], startY, subgrid[i], 0, size);
+        }
+        subGrids.add(new CharGrid(subgrid));
+      }
+    }
+
+    return subGrids;
   }
 }
