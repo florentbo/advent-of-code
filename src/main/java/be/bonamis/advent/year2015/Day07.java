@@ -24,7 +24,14 @@ public class Day07 extends TextDaySolver {
 
   @Override
   public long solvePart01() {
-    return runInstructions().get("a");
+    Map<String, Integer> run = runInstructions(new HashMap<>());
+    boolean containsKey = run.containsKey("a");
+    while (!containsKey) {
+      run = runInstructions(run);
+      log.info("run: {}", run);
+      containsKey = run.containsKey("a");
+    }
+    return run.get("a");
   }
 
   @Override
@@ -32,34 +39,59 @@ public class Day07 extends TextDaySolver {
     return 2024;
   }
 
-  Map<String, Integer> runInstructions() {
-    Map<String, Integer> map = new HashMap<>();
+  Map<String, Integer> runInstructions(Map<String, Integer> map) {
     for (Instruction instruction : this.instructions) {
-      log.info("map before: {}", map);
-      log.info("instruction={}", instruction);
+      log.debug("map before: {}", map);
+      log.debug("instruction={}", instruction);
       instruction
           .operation()
           .gate()
           .ifPresentOrElse(
               gate -> {
                 String right = instruction.operation().right();
-                int result =
-                    switch (gate) {
-                      case AND -> map.get(left(instruction)) & map.get(right);
-                      case OR -> map.get(left(instruction)) | map.get(right);
-                      case LSHIFT -> map.get(left(instruction)) << Integer.parseInt(right);
-                      case RSHIFT -> map.get(left(instruction)) >> Integer.parseInt(right);
-                      case NOT -> bitwiseComplement(map.get(right));
-                    };
-                map.put(instruction.output(), result);
+                Optional<Integer> result = result(instruction, gate, map, right);
+                result.ifPresent(value -> map.put(instruction.output(), value));
               },
               () -> {
-                int result = Integer.parseInt(instruction.operation().right());
-                map.put(instruction.output(), result);
+                Optional<Integer> result = result(instruction);
+                result.ifPresent(value -> map.put(instruction.output(), value));
               });
-      log.info("map after: {}", map);
+      log.debug("map after: {}", map);
     }
     return map;
+  }
+
+  private Optional<Integer> result(Instruction instruction) {
+    try {
+      return Optional.of(Integer.parseInt(instruction.operation().right()));
+    } catch (Exception e) {
+      return Optional.empty();
+    }
+  }
+
+  private Optional<Integer> result(
+      Instruction instruction, Gate gate, Map<String, Integer> map, String right) {
+    try {
+      int result =
+          switch (gate) {
+            case AND -> map.get(left(instruction)) & map.get(right);
+            case OR -> map.get(left(instruction)) | map.get(right);
+            case LSHIFT -> map.get(left(instruction)) << parse(right, map);
+            case RSHIFT -> map.get(left(instruction)) >> parse(right, map);
+            case NOT -> bitwiseComplement(map.get(right));
+          };
+      return Optional.of(result);
+    } catch (Exception e) {
+      return Optional.empty();
+    }
+  }
+
+  private int parse(String right, Map<String, Integer> map) {
+    try {
+      return map.get(right);
+    } catch (Exception e) {
+      return Integer.parseInt(right);
+    }
   }
 
   private String left(Instruction instruction) {

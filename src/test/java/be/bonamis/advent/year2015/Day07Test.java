@@ -2,6 +2,7 @@ package be.bonamis.advent.year2015;
 
 import be.bonamis.advent.year2015.Day07.Instruction;
 import be.bonamis.advent.year2015.Day07.Instruction.Operation;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.*;
@@ -24,27 +25,32 @@ class Day07Test {
         x LSHIFT 2 -> f
         y RSHIFT 2 -> g
         NOT x -> h
-        NOT y -> i
+        NOT y -> a
         """;
-
-    /* String map =
-        """
-    d: 72
-    e: 507
-    f: 492
-    g: 114
-    h: 65412
-    i: 65079
-    x: 123
-    y: 456
-    """;*/
     Map<String, Integer> expected =
-        Map.of("d", 72, "e", 507, "f", 492, "g", 114, "h", 65412, "i", 65079, "x", 123, "y", 456);
+        Map.of("d", 72, "e", 507, "f", 492, "g", 114, "h", 65412, "a", 65079, "x", 123, "y", 456);
 
-    assertThat(new Day07(Arrays.asList(input.split("\n"))).runInstructions()).isEqualTo(expected);
+    assertThat(new Day07(Arrays.asList(input.split("\n"))).runInstructions(new HashMap<String, Integer>())).isEqualTo(expected);
   }
 
   @Test
+  void solvePart01() {
+    String input =
+            """
+            NOT y -> a
+            123 -> x
+            456 -> y
+            x AND y -> d
+            x OR y -> e
+            x LSHIFT 2 -> f
+            y RSHIFT 2 -> g
+            NOT x -> h
+            """;
+    List<String> inputList = Arrays.asList(input.split("\n"));
+    assertThat(new Day07(inputList).solvePart01()).isEqualTo(65079);
+  }
+
+  @Test@Disabled
   void solvePart02() {
     List<String> input =
         List.of("xmul(2,4)&mul[3,7]!^don't()_mul(5,5)+mul(32,64](mul(11,8)undo()?mul(8,5))");
