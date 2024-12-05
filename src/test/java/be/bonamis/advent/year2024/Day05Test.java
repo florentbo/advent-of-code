@@ -54,7 +54,7 @@ class Day05Test {
 
     @Test
     void solvePart02() {
-        assertThat(new Day05(LIST).solvePart02()).isEqualTo(2);
+        assertThat(new Day05(LIST).solvePart02()).isEqualTo(123);
     }
 
 
