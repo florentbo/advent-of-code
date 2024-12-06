@@ -89,9 +89,11 @@ public class Day05 extends TextDaySolver {
       List<Integer> collectGet = collect.get(number);
       List<Integer> nextNumbers =
           IntStream.range(i + 1, updates2.size()).mapToObj(updates2::get).toList();
-      if (nextNumbers.stream()
-          .anyMatch(nextNumber -> collectGet == null || !collectGet.contains(nextNumber))) {
-        return false;
+
+      for (Integer nextNumber : nextNumbers) {
+        if (collectGet == null || !collectGet.contains(nextNumber)) {
+          return false;
+        }
       }
     }
     return true;
@@ -130,10 +132,8 @@ public class Day05 extends TextDaySolver {
 
   private Updates reOrder(Updates updates, Rule rule) {
     List<Integer> updates2 = new ArrayList<>(updates.updates());
-    int first = updates2.indexOf(rule.a);
-    int second = updates2.indexOf(rule.b);
-    updates2.set(first, rule.b);
-    updates2.set(second, rule.a);
+    updates2.set(updates2.indexOf(rule.a), rule.b);
+    updates2.set(updates2.indexOf(rule.b), rule.a);
     return new Updates(updates2);
   }
 
