@@ -59,7 +59,7 @@ public class Day06 extends TextDaySolver {
         // grid.printLines();
         //log.debug("turning right  done +++++++++++++++++++++++++++++++++++++++++++");
       } else {
-        grid.set(rover.position(), 'X');
+        //grid.set(rover.position(), 'X');
         visited.add(rover.position().toPoint());
       }
       rover = rover.move(FORWARD, true);
@@ -82,17 +82,15 @@ public class Day06 extends TextDaySolver {
   @Override
   public long solvePart02() {
     Point start = grid.stream().filter(p -> grid.get(p).equals('^')).findFirst().orElseThrow();
-    //log.debug("start: {}", start);
-    // grid.printLines();
 
-    //Set<Point> dots = getVisited(start);
-    var dots = grid.stream().filter(p -> grid.get(p).equals('.')).toList();
     int count = 0;
+
+    var dots = grid.stream().filter(p -> grid.get(p).equals('.')).toList();
     for (Point dot : dots) {
       grid.set(dot, '#');
       boolean b = searchStart(start, dot);
       count += b ? 1 : 0;
-      log.debug("b: {}", b);
+      //log.debug("b: {}", b);
       grid.set(dot, '.');
     }
     return count;
@@ -118,7 +116,7 @@ public class Day06 extends TextDaySolver {
         rover = rover.move(LEFT);
         //log.debug("movedRover after RIGHT: {}", rover);
         //grid.printLines();
-        log.debug("dot: {}", dot);
+        //log.debug("dot: {}", dot);
         //log.debug("turning right  done +++++++++++++++++++++++++++++++++++++++++++");
       } else {
         visited.add(rover);
@@ -128,7 +126,12 @@ public class Day06 extends TextDaySolver {
       point = toPoint(rover);
       //log.debug("movedRover: {}", rover);
     }
+    boolean notVisited = !visited.contains(rover);
+    if (!notVisited) {
+      log.debug("notVisited: {}", notVisited);
+    }
+    //log.debug("notVisited: {}", notVisited);
     //log.debug("rover: {}", rover);
-    return startFound;
+    return !notVisited;
   }
 }
