@@ -33,25 +33,31 @@ public class Day06 extends TextDaySolver {
   @Override
   public long solvePart01() {
     Point start = grid.stream().filter(p -> grid.get(p).equals('^')).findFirst().orElseThrow();
-    log.debug("start: {}", start);
-    grid.printLines();
+    //log.debug("start: {}", start);
+    // grid.printLines();
 
+    Set<Point> visited = getVisited(start);
+
+    return visited.size();
+  }
+
+  private Set<Point> getVisited(Point start) {
     Rover rover = new Rover(NORTH, Position.of(start));
     Point point = toPoint(rover);
     Set<Point> visited = new HashSet<>();
     while (isInTheGrid(point)) {
       char value = grid.get(rover.position());
-      log.debug("grid value: {}", value);
+      //log.debug("grid value: {}", value);
       if (value == '#') {
-        log.debug("turning right +++++++++++++++++++++++++++++++++++++++++++");
+        //log.debug("turning right +++++++++++++++++++++++++++++++++++++++++++");
         rover = rover.move(RIGHT);
         rover = rover.move(RIGHT);
         rover = rover.move(FORWARD, true);
-        log.debug("movedRover after BACKWARD: {}", rover);
+        //log.debug("movedRover after BACKWARD: {}", rover);
         rover = rover.move(LEFT);
-        log.debug("movedRover after RIGHT: {}", rover);
-        grid.printLines();
-        log.debug("turning right  done +++++++++++++++++++++++++++++++++++++++++++");
+        //log.debug("movedRover after RIGHT: {}", rover);
+        // grid.printLines();
+        //log.debug("turning right  done +++++++++++++++++++++++++++++++++++++++++++");
       } else {
         grid.set(rover.position(), 'X');
         visited.add(rover.position().toPoint());
@@ -59,11 +65,10 @@ public class Day06 extends TextDaySolver {
       rover = rover.move(FORWARD, true);
 
       point = toPoint(rover);
-      log.debug("movedRover: {}", rover);
+      //log.debug("movedRover: {}", rover);
     }
-    log.debug("rover: {}", rover);
-
-    return visited.size();
+    //log.debug("rover: {}", rover);
+    return visited;
   }
 
   private Point toPoint(Rover rover) {
@@ -76,6 +81,51 @@ public class Day06 extends TextDaySolver {
 
   @Override
   public long solvePart02() {
-    return 1;
+    Point start = grid.stream().filter(p -> grid.get(p).equals('^')).findFirst().orElseThrow();
+    //log.debug("start: {}", start);
+    // grid.printLines();
+
+    Set<Point> dots = getVisited(start);
+    //var dots = grid.stream().filter(p -> grid.get(p).equals('.')).toList();
+    int count = 0;
+    for (Point dot : dots) {
+      grid.set(dot, '#');
+      boolean b = searchStart(start);
+      count += b ? 1 : 0;
+      log.debug("b: {}", b);
+      grid.set(dot, '.');
+    }
+    return count;
+  }
+
+  private boolean searchStart(Point start) {
+    Rover rover = new Rover(NORTH, Position.of(start));
+    Point point = toPoint(rover);
+    boolean startFound = false;
+    while (isInTheGrid(point) && !startFound) {
+      char value = grid.get(rover.position());
+      //log.debug("grid value: {}", value);
+      if (value == '#') {
+        //log.debug("turning right +++++++++++++++++++++++++++++++++++++++++++");
+        rover = rover.move(RIGHT);
+        rover = rover.move(RIGHT);
+        rover = rover.move(FORWARD, true);
+        if (rover.position().toPoint().equals(start)) {
+          startFound = true;
+        }
+        //log.debug("movedRover after BACKWARD: {}", rover);
+        rover = rover.move(LEFT);
+        //log.debug("movedRover after RIGHT: {}", rover);
+        //grid.printLines();
+        //log.debug("turning right  done +++++++++++++++++++++++++++++++++++++++++++");
+      } else {
+        grid.set(rover.position(), '|');
+      }
+      rover = rover.move(FORWARD, true);
+      point = toPoint(rover);
+      //log.debug("movedRover: {}", rover);
+    }
+    //log.debug("rover: {}", rover);
+    return startFound;
   }
 }
