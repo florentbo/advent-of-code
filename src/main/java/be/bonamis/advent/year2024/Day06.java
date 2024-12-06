@@ -22,19 +22,19 @@ public class Day06 extends TextDaySolver {
 
   public Day06(InputStream inputStream) {
     super(inputStream);
-    grid = new CharGrid(this.puzzle);
+    grid = new CharGrid(this.puzzle, true);
   }
 
   public Day06(List<String> puzzle) {
     super(puzzle);
-    grid = new CharGrid(this.puzzle);
+    grid = new CharGrid(this.puzzle, true);
   }
 
   @Override
   public long solvePart01() {
     Point start = grid.stream().filter(p -> grid.get(p).equals('^')).findFirst().orElseThrow();
-    //log.debug("start: {}", start);
-    // grid.printLines();
+    log.debug("start: {}", start);
+    grid.printLines();
 
     Set<Point> visited = getVisited(start);
 
@@ -47,27 +47,18 @@ public class Day06 extends TextDaySolver {
     Set<Point> visited = new HashSet<>();
     while (isInTheGrid(point)) {
       char value = grid.get(rover.position());
-      //log.debug("grid value: {}", value);
       if (value == '#') {
-        //log.debug("turning right +++++++++++++++++++++++++++++++++++++++++++");
+        rover = rover.move(BACKWARD);
         rover = rover.move(RIGHT);
-        rover = rover.move(RIGHT);
-        rover = rover.move(FORWARD, true);
-        //log.debug("movedRover after BACKWARD: {}", rover);
-        rover = rover.move(LEFT);
-        //log.debug("movedRover after RIGHT: {}", rover);
         // grid.printLines();
-        //log.debug("turning right  done +++++++++++++++++++++++++++++++++++++++++++");
       } else {
-        //grid.set(rover.position(), 'X');
+        // grid.set(rover.position(), 'X');
         visited.add(rover.position().toPoint());
       }
-      rover = rover.move(FORWARD, true);
-
+      rover = rover.move(FORWARD);
       point = toPoint(rover);
-      //log.debug("movedRover: {}", rover);
+      log.debug("movedRover: {}", rover);
     }
-    //log.debug("rover: {}", rover);
     return visited;
   }
 
@@ -88,50 +79,36 @@ public class Day06 extends TextDaySolver {
     var dots = grid.stream().filter(p -> grid.get(p).equals('.')).toList();
     for (Point dot : dots) {
       grid.set(dot, '#');
-      boolean b = searchStart(start, dot);
+      boolean b = searchStart(start);
       count += b ? 1 : 0;
-      //log.debug("b: {}", b);
+      // log.debug("b: {}", b);
       grid.set(dot, '.');
     }
     return count;
   }
 
-  private boolean searchStart(Point start, Point dot) {
+  private boolean searchStart(Point start) {
     Rover rover = new Rover(NORTH, Position.of(start));
     Set<Rover> visited = new HashSet<>();
     Point point = toPoint(rover);
     boolean startFound = false;
     while (isInTheGrid(point) && !startFound && !visited.contains(rover)) {
       char value = grid.get(rover.position());
-      //log.debug("grid value: {}", value);
+      // log.debug("grid value: {}", value);
       if (value == '#') {
-        //log.debug("turning right +++++++++++++++++++++++++++++++++++++++++++");
+        rover = rover.move(BACKWARD);
         rover = rover.move(RIGHT);
-        rover = rover.move(RIGHT);
-        rover = rover.move(FORWARD, true);
         if (rover.position().toPoint().equals(start)) {
           startFound = true;
         }
-        //log.debug("movedRover after BACKWARD: {}", rover);
-        rover = rover.move(LEFT);
-        //log.debug("movedRover after RIGHT: {}", rover);
-        //grid.printLines();
-        //log.debug("dot: {}", dot);
-        //log.debug("turning right  done +++++++++++++++++++++++++++++++++++++++++++");
       } else {
         visited.add(rover);
         grid.set(rover.position(), '|');
       }
-      rover = rover.move(FORWARD, true);
+      rover = rover.move(FORWARD);
       point = toPoint(rover);
-      //log.debug("movedRover: {}", rover);
     }
     boolean notVisited = !visited.contains(rover);
-    if (!notVisited) {
-      log.debug("notVisited: {}", notVisited);
-    }
-    //log.debug("notVisited: {}", notVisited);
-    //log.debug("rover: {}", rover);
     return !notVisited;
   }
 }

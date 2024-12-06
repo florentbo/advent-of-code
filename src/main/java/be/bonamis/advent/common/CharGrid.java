@@ -3,6 +3,7 @@ package be.bonamis.advent.common;
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
@@ -42,6 +43,16 @@ public class CharGrid {
     this.data = grid.getData();
     this.height = grid.getHeight();
     this.width = grid.getWidth();
+  }
+
+  public CharGrid(List<String> text, boolean builtFromBottom) {
+    this(builtFromBottom ? reverseList(text) : text);
+  }
+
+  private static List<String> reverseList(List<String> text) {
+    List<String> textReversed = new ArrayList<>(text);
+    Collections.reverse(textReversed);
+    return textReversed;
   }
 
   private CharGrid grid(List<String> text) {
@@ -97,11 +108,12 @@ public class CharGrid {
   }
 
   public void printLines() {
-    this.rows().forEach(line -> log.info(toLine(line)));
+    List<List<Point>> rows = new ArrayList<>(this.rows());
+    Collections.reverse(rows);
+    rows.forEach(line -> log.info(toLine(line)));
   }
 
   public CharGrid rotateCounterClockwise() {
-    // yes strange char init probably
     return new CharGrid(rotateClockWise(this.data));
   }
 
