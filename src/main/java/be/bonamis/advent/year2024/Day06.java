@@ -117,7 +117,7 @@ public class Day06 extends TextDaySolver {
         //log.debug("movedRover after BACKWARD: {}", rover);
         rover = rover.move(LEFT);
         //log.debug("movedRover after RIGHT: {}", rover);
-        grid.printLines();
+        //grid.printLines();
         log.debug("dot: {}", dot);
         //log.debug("turning right  done +++++++++++++++++++++++++++++++++++++++++++");
       } else {
