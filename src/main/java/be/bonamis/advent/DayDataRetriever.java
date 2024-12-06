@@ -58,6 +58,9 @@ public class DayDataRetriever {
   }
 
   public static void runCode(String inputYear, String inputDay) {
+    log.info("runCode input from day: {} and year: {}", inputDay, inputYear);
+    long startTime = System.nanoTime();
+
     try {
       int year = Integer.parseInt(inputYear);
       int dayNumber = Integer.parseInt(inputDay);
@@ -77,12 +80,15 @@ public class DayDataRetriever {
       Method solvePart02StringMethod = clazz.getMethod("solvePart02String");
 
       Object resultPart01 = solvePart01Method.invoke(instance);
+      log.info("Execution time: {} ms", (System.nanoTime() - startTime) / 1000000);
       Object resultPart02 = solvePart02Method.invoke(instance);
+      log.info("Execution time: {} ms", (System.nanoTime() - startTime) / 1000000);
       Object resultPart03 = solvePart02StringMethod.invoke(instance);
 
       log.info("Part 1: {}", resultPart01);
       log.info("Part 2: {}", resultPart02);
       log.info("Part 3: {}", resultPart03);
+      log.info("Done Execution time: {} ms", (System.nanoTime() - startTime) / 1000000);
 
     } catch (Exception e) {
       throw new IllegalArgumentException(e);
