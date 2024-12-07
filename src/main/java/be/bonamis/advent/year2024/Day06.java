@@ -34,7 +34,7 @@ public class Day06 extends TextDaySolver {
   public long solvePart01() {
     Point start = grid.stream().filter(p -> grid.get(p).equals('^')).findFirst().orElseThrow();
     log.debug("start: {}", start);
-    grid.printLines();
+    //grid.printLines();
 
     Set<Point> visited = getVisited(start);
 
