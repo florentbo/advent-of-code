@@ -32,38 +32,31 @@ public class Day07 extends TextDaySolver {
   }
 
   private static boolean check(Equation input, List<List<String>> combinations) {
-    log.debug("input: {}", input);
-    List<Long> numbers = input.numbers();
+    return combinations.stream()
+        .anyMatch(
+            operators -> {
+              long result = input.numbers().get(0);
+              for (int i = 0; i < operators.size(); i++) {
+                result = calculateOperation(result, input.numbers().get(i + 1), operators.get(i));
+              }
+              return result == input.result();
+            });
+  }
 
-    for (List<String> operators : combinations) {
-      log.debug("operators: {}", operators);
-
-      long calculusResult = numbers.get(0);
-      for (int i = 0; i < operators.size(); i++) {
-        String op = operators.get(i);
-        long nextNum = numbers.get(i + 1);
-
-        switch (op) {
-          case "+" -> calculusResult += nextNum;
-          case "*" -> calculusResult *= nextNum;
-          case "||" -> calculusResult = concat(calculusResult, nextNum);
-        }
-      }
-
-      if (calculusResult == input.result()) {
-        return true;
-      }
-    }
-
-    return false;
+  private static long calculateOperation(long a, long b, String operator) {
+    return switch (operator) {
+      case "+" -> a + b;
+      case "*" -> a * b;
+      case "||" -> concat(a, b);
+      default -> throw new IllegalArgumentException("Unknown operator: " + operator);
+    };
   }
 
   private static long concat(long calculusResult, long nextNum) {
     String part0 = String.valueOf(calculusResult);
     String part1 = String.valueOf(nextNum);
     String concatenation = part0 + part1;
-    calculusResult = Long.parseLong(concatenation);
-    return calculusResult;
+    return Long.parseLong(concatenation);
   }
 
   static List<List<String>> generateOperatorCombinations(int positions, List<String> operators) {
@@ -74,7 +67,6 @@ public class Day07 extends TextDaySolver {
 
   private static final List<String> OPERATORS = List.of("+", "*");
 
-  // The concatenation operator (||)
   private static final List<String> OPERATORS_PART2 = List.of("+", "*", "||");
 
   private static void generateCombinations(
