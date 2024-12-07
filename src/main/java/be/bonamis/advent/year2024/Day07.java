@@ -17,11 +17,17 @@ public class Day07 extends TextDaySolver {
     super(puzzle);
   }
 
-  private static final List<String> OPERATORS = List.of("+", "*");
-
   public static boolean canBeMade(Equation input) {
+    return canBeMade(input, OPERATORS);
+  }
+
+  public static boolean canBeMadeWithConcatenation(Equation input) {
+    return canBeMade(input, OPERATORS_PART2);
+  }
+
+  public static boolean canBeMade(Equation input, List<String> operators) {
     int positions = input.numbers().size() - 1;
-    List<List<String>> lists = generateOperatorCombinations(positions);
+    List<List<String>> lists = generateOperatorCombinations(positions, operators);
     return check(input, lists);
   }
 
@@ -37,10 +43,10 @@ public class Day07 extends TextDaySolver {
         String op = operators.get(i);
         long nextNum = numbers.get(i + 1);
 
-        if (op.equals("+")) {
-          calculusResult += nextNum;
-        } else if (op.equals("*")) {
-          calculusResult *= nextNum;
+        switch (op) {
+          case "+" -> calculusResult += nextNum;
+          case "*" -> calculusResult *= nextNum;
+          case "||" -> calculusResult = concat(calculusResult, nextNum);
         }
       }
 
@@ -52,22 +58,35 @@ public class Day07 extends TextDaySolver {
     return false;
   }
 
-  static List<List<String>> generateOperatorCombinations(int positions) {
+  private static long concat(long calculusResult, long nextNum) {
+    String part0 = String.valueOf(calculusResult);
+    String part1 = String.valueOf(nextNum);
+    String concatenation = part0 + part1;
+    calculusResult = Long.parseLong(concatenation);
+    return calculusResult;
+  }
+
+  static List<List<String>> generateOperatorCombinations(int positions, List<String> operators) {
     List<List<String>> result = new ArrayList<>();
-    generateCombinations(new ArrayList<>(), positions, result);
+    generateCombinations(new ArrayList<>(), positions, result, operators);
     return result;
   }
 
+  private static final List<String> OPERATORS = List.of("+", "*");
+
+  // The concatenation operator (||)
+  private static final List<String> OPERATORS_PART2 = List.of("+", "*", "||");
+
   private static void generateCombinations(
-      List<String> current, int remaining, List<List<String>> result) {
+      List<String> current, int remaining, List<List<String>> result, List<String> operators) {
     if (remaining == 0) {
       result.add(new ArrayList<>(current));
       return;
     }
 
-    for (String op : OPERATORS) {
+    for (String op : operators) {
       current.add(op);
-      generateCombinations(current, remaining - 1, result);
+      generateCombinations(current, remaining - 1, result, operators);
       current.remove(current.size() - 1);
     }
   }
@@ -99,6 +118,10 @@ public class Day07 extends TextDaySolver {
 
   @Override
   public long solvePart02() {
-    return 1;
+    Equations equations = Equations.of(this.puzzle);
+    return equations.equations().stream()
+        .filter(Day07::canBeMadeWithConcatenation)
+        .map(Equation::result)
+        .reduce(0L, Long::sum);
   }
 }
