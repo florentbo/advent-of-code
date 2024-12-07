@@ -33,29 +33,32 @@ class Day07Test {
 
   @Test
   void solvePart02() {
-    assertThat(new Day07(LIST).solvePart02()).isEqualTo(1);
+    assertThat(new Day07(LIST).solvePart02()).isEqualTo(11387);
   }
 
   @ParameterizedTest
-  @MethodSource("isSafeTestCases")
+  @MethodSource("canBeMadeTestCases")
   void canBeMadeTest(Equation input, boolean expected) {
     assertThat(Day07.canBeMade(input)).isEqualTo(expected);
   }
 
-  private static Stream<Arguments> isSafeTestCases() {
+  private static Stream<Arguments> canBeMadeTestCases() {
     return Stream.of(
         Arguments.of(Equation.of("190: 10 19"), true),
         Arguments.of(Equation.of("292: 11 6 16 20"), true),
         Arguments.of(Equation.of("83: 17 5"), false));
   }
 
-  @Test
-  void generateOperatorCombinationsTest() {
-    assertThat(Day07.generateOperatorCombinations(1)).hasSize(2);
-    assertThat(Day07.generateOperatorCombinations(1)).containsExactly(List.of("+"), List.of("*"));
-    assertThat(Day07.generateOperatorCombinations(2)).hasSize(4);
-    assertThat(Day07.generateOperatorCombinations(2))
-        .containsExactlyInAnyOrder(
-            List.of("+", "*"), List.of("+", "+"), List.of("*", "*"), List.of("*", "+"));
+  @ParameterizedTest
+  @MethodSource("canBeMadeWithConcatenationTestCases")
+  void canBeMadeWithConcatenationTest(Equation input, boolean expected) {
+    assertThat(Day07.canBeMadeWithConcatenation(input)).isEqualTo(expected);
+  }
+
+  private static Stream<Arguments> canBeMadeWithConcatenationTestCases() {
+    return Stream.of(
+        Arguments.of(Equation.of("156: 15 6"), true),
+        Arguments.of(Equation.of("7290: 6 8 6 15"), true))
+        ;
   }
 }
