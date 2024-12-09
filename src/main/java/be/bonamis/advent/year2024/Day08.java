@@ -42,10 +42,7 @@ public class Day08 extends TextDaySolver {
   public long solvePart01() {
     List<Pair<Point, Point>> pairs = pairs();
 
-    List<Point> opposites = opposites(pairs, grid, chars);
-    log.debug("opposites size: {}", opposites.size());
-
-    return opposites.size();
+    return opposites(pairs, grid, chars).size();
   }
 
   List<Pair<Point, Point>> pairs() {
@@ -55,8 +52,7 @@ public class Day08 extends TextDaySolver {
     return pairs;
   }
 
-  private Function<Map.Entry<Character, List<Point>>, Stream<? extends Pair<Point, Point>>>
-      combinations() {
+  private Function<Map.Entry<Character, List<Point>>, Stream<Pair<Point, Point>>> combinations() {
     return e -> pairCombinations(e.getValue()).stream();
   }
 
@@ -70,17 +66,12 @@ public class Day08 extends TextDaySolver {
     return point;
   }
 
-  static List<Point> opposites(
+  static Set<Point> opposites(
       List<Pair<Point, Point>> pairs, CharGrid grid, Map<Character, List<Point>> chars) {
     return pairs.stream()
         .map(Day08::opposite)
         .filter(p -> isInTheGrid(p, grid))
-        .filter(p -> isNotAnotherLetter(p, chars))
-        .collect(Collectors.toList());
-  }
-
-  private static boolean isNotAnotherLetter(Point p, Map<Character, List<Point>> chars) {
-    return chars.values().stream().noneMatch(list -> list.contains(p));
+        .collect(Collectors.toSet());
   }
 
   private static boolean isInTheGrid(Point p, CharGrid grid) {
