@@ -55,6 +55,10 @@ public class CharGrid {
     return textReversed;
   }
 
+  public static CharGrid of(List<String> puzzle) {
+    return new CharGrid(puzzle, false);
+  }
+
   private CharGrid grid(List<String> text) {
     char[][] grid = text.stream().map(String::toCharArray).toArray(char[][]::new);
 
