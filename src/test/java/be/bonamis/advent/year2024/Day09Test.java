@@ -37,4 +37,12 @@ class Day09Test {
     assertThat(String.join("", compact("2333133121414131402")))
         .isEqualTo("0099811188827773336446555566..............");
   }
+
+  @Test
+  void righterNumberPosition2() {
+    Day09Input[] array =
+            List.of(Day09.Number.of(1), new Dot(), Day09.Number.of(2), new Dot())
+                    .toArray(new Day09Input[0]);
+    assertThat(Day09.righterNumberPosition(array)).isEqualTo(2);
+  }
 }

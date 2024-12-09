@@ -27,10 +27,6 @@ public class Day09 extends TextDaySolver {
     int length = line.length();
     log.info("line length: {}", length);
 
-    List<String> compacted = compact(line);
-    log.info("compacted: {}", compacted);
-    log.debug("compacted size: {}", compacted.size());
-
     Day09Input[] day09Inputs = compactToArray(line);
     int lefterDotPosition2 = lefterDotPosition(day09Inputs);
 
@@ -127,22 +123,16 @@ public class Day09 extends TextDaySolver {
 
     Day09Input[] inputsArray = inputs.toArray(new Day09Input[0]);
 
-    int left = 0;
-    int right = inputsArray.length - 1;
+    int lefterDotPosition = lefterDotPosition(inputsArray);
+    int righterNumberPosition = righterNumberPosition(inputsArray);
 
-    while (left < inputsArray.length && inputsArray[left].isNumber()) left++;
-    while (right >= 0 && inputsArray[right].isDot()) right--;
-
-    while (left < right) {
-      if (inputsArray[left].isDot() && inputsArray[right].isNumber()) {
-        inputsArray[left] = inputsArray[right];
-        inputsArray[right] = new Dot();
-        left++;
-        right--;
-      }
-      while (left < inputsArray.length && inputsArray[left].isNumber()) left++;
-      while (right >= 0 && inputsArray[right].isDot()) right--;
+    while (lefterDotPosition < righterNumberPosition) {
+      inputsArray[lefterDotPosition] = inputsArray[righterNumberPosition];
+      inputsArray[righterNumberPosition] = new Dot();
+      lefterDotPosition = lefterDotPosition(inputsArray);
+      righterNumberPosition = righterNumberPosition(inputsArray);
     }
+
     return inputsArray;
   }
 
@@ -150,6 +140,14 @@ public class Day09 extends TextDaySolver {
     return IntStream.range(0, line.length)
         .boxed()
         .filter(i -> line[i].isDot())
+        .findFirst()
+        .orElseThrow();
+  }
+
+  static int righterNumberPosition(Day09Input[] line) {
+    return IntStream.range(0, line.length)
+        .mapToObj(i -> line.length - 1 - i) // reverse indices
+        .filter(i -> line[i].isNumber())
         .findFirst()
         .orElseThrow();
   }
