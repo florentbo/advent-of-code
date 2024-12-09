@@ -26,25 +26,27 @@ public class Day09 extends TextDaySolver {
     String line = this.puzzle.get(0);
     log.info("line: {}", line);
     int length = line.length();
-    log.debug("line length: {}", length);
+    log.info("line length: {}", length);
 
     List<String> compacted = compact(line);
     log.info("compacted: {}", compacted);
-    log.info("compacted size: {}", compacted.size());
-
+    log.debug("compacted size: {}", compacted.size());
 
     String joined = String.join("", compacted);
     int lefterDotPosition = lefterDotPosition(joined);
     log.debug("multiplying:+++++++++++ till lefterDotPosition: {}", lefterDotPosition);
-    var list = IntStream.range(0, lefterDotPosition).mapToObj(i -> {
-      int value = Integer.parseInt(String.valueOf(joined.charAt(i)));
-      log.debug("value: {}", value);
-        //log.debug("result: {}", result);
-      return value * i;
-    }).reduce(0, Integer::sum);
-    log.debug("list: {}", list);
+    Long sum =
+        IntStream.range(0, lefterDotPosition)
+            .mapToObj(
+                i -> {
+                  long value = Character.getNumericValue(joined.charAt(i));
+                  log.info("value: {} at index: {}", value, i);
+                  return value * i;
+                })
+            .reduce(0L, Long::sum);
+    log.debug("list: {}", sum);
 
-    return list;
+    return sum;
   }
 
   static List<String> compact(String line) {
@@ -55,45 +57,48 @@ public class Day09 extends TextDaySolver {
             .mapToObj(
                 index -> {
                   Integer value = list.get(index);
-                  //log.debug("value: {}", value);
+                  // log.debug("value: {}", value);
                   if (index % 2 == 0) {
                     int evenValueIndex = index / 2;
-                    //log.debug("evenValueIndex: {}", evenValueIndex);
+                    // log.debug("evenValueIndex: {}", evenValueIndex);
                     String numbers =
                         String.join("", Collections.nCopies(value, evenValueIndex + ""));
-                    //log.debug("numbers: {}", numbers);
+                    // log.debug("numbers: {}", numbers);
                     return numbers;
                   } else {
                     String dots = String.join("", Collections.nCopies(value, "."));
-                    //log.debug("dots: {}", dots);
+                    // log.debug("dots: {}", dots);
                     return dots;
                   }
                 })
             .toList();
-    log.info("list1: {}", list1);
-/*
-0..111....22222
- */
+    log.debug("list1: {}", list1);
+    /*
+    0..111....22222
+     */
     String joined = String.join("", list1);
     log.debug("joined: {}", joined);
-    List<String> list2 = Arrays.asList(joined.split(""));
-    int righterNumberPosition = righterNumberPosition(joined);
-    log.debug("righterNumberPosition: {}", righterNumberPosition);
-    int lefterDotPosition = lefterDotPosition(joined);
-    log.debug("lefterDotPosition: {}", lefterDotPosition);
-    while (righterNumberPosition > lefterDotPosition) {
-      String element = list2.get(righterNumberPosition);
-      list2.set(lefterDotPosition, element);
-      list2.set(righterNumberPosition, ".");
-      joined = String.join("", list2);
-      log.debug("joined: {}", joined);
-      righterNumberPosition = righterNumberPosition(joined);
-      log.info("righterNumberPosition: {}", righterNumberPosition);
-      lefterDotPosition = lefterDotPosition(joined);
-      log.info("lefterDotPosition: {}", lefterDotPosition);
+
+    char[] chars = joined.toCharArray();
+    int left = 0;
+    int right = chars.length - 1;
+
+
+    while (left < chars.length && chars[left] != '.') left++;
+    while (right >= 0 && chars[right] == '.') right--;
+
+    while (left < right) {
+      if (chars[left] == '.' && Character.isDigit(chars[right])) {
+        chars[left] = chars[right];
+        chars[right] = '.';
+        left++;
+        right--;
+      }
+      while (left < chars.length && chars[left] != '.') left++;
+      while (right >= 0 && chars[right] == '.') right--;
     }
 
-    return list2;
+    return Arrays.stream(new String(chars).split("")).toList();
   }
 
   static int righterNumberPosition(String line) {
