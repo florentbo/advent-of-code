@@ -24,15 +24,11 @@ class Day09Test {
   }
 
   @Test
-  void righterNumberPosition() {
-    assertThat(Day09.righterNumberPosition("12345678")).isEqualTo(7);
-    assertThat(Day09.righterNumberPosition("12345678.")).isEqualTo(7);
-  }
-
-  @Test
   void lefterDotPosition() {
-    assertThat(Day09.lefterDotPosition("12345678.")).isEqualTo(8);
-    assertThat(Day09.lefterDotPosition("1234.67.8")).isEqualTo(4);
+    Day09Input[] array =
+        List.of(Day09.Number.of(1), new Dot(), Day09.Number.of(2), new Dot())
+            .toArray(new Day09Input[0]);
+    assertThat(Day09.lefterDotPosition(array)).isEqualTo(1);
   }
 
   @Test
