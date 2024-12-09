@@ -4,8 +4,7 @@ import be.bonamis.advent.TextDaySolver;
 
 import java.io.InputStream;
 import java.util.*;
-import java.util.List;
-import java.util.stream.IntStream;
+import java.util.stream.*;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,7 +23,7 @@ public class Day09 extends TextDaySolver {
   public long solvePart01() {
     log.info("size: {}", this.puzzle.size());
     String line = this.puzzle.get(0);
-    log.info("line: {}", line);
+    log.debug("line: {}", line);
     int length = line.length();
     log.info("line length: {}", length);
 
@@ -32,87 +31,125 @@ public class Day09 extends TextDaySolver {
     log.info("compacted: {}", compacted);
     log.debug("compacted size: {}", compacted.size());
 
-    String joined = String.join("", compacted);
-    int lefterDotPosition = lefterDotPosition(joined);
-    log.debug("multiplying:+++++++++++ till lefterDotPosition: {}", lefterDotPosition);
-    Long sum =
-        IntStream.range(0, lefterDotPosition)
-            .mapToObj(
-                i -> {
-                  long value = Character.getNumericValue(joined.charAt(i));
-                  log.info("value: {} at index: {}", value, i);
-                  return value * i;
-                })
-            .reduce(0L, Long::sum);
-    log.debug("list: {}", sum);
+    Day09Input[] day09Inputs = compactToArray(line);
+    int lefterDotPosition2 = lefterDotPosition(day09Inputs);
 
-    return sum;
+    return IntStream.range(0, lefterDotPosition2)
+        .mapToObj(
+            i -> {
+              long value = day09Inputs[i].value();
+              log.debug("value: {} at index: {}", value, i);
+              return value * i;
+            })
+        .reduce(0L, Long::sum);
+  }
+
+  interface Day09Input {
+    boolean isDot();
+
+    boolean isNumber();
+
+    Long value();
+
+    String valueAsString();
+  }
+
+  record Number(Long value) implements Day09Input {
+
+    static Number of(int input) {
+      return new Number((long) input);
+    }
+
+    @Override
+    public boolean isDot() {
+      return false;
+    }
+
+    @Override
+    public boolean isNumber() {
+      return true;
+    }
+
+    @Override
+    public String valueAsString() {
+      return value.toString();
+    }
+  }
+
+  static class Dot implements Day09Input {
+    @Override
+    public boolean isDot() {
+      return true;
+    }
+
+    @Override
+    public boolean isNumber() {
+      return false;
+    }
+
+    @Override
+    public Long value() {
+      return null;
+    }
+
+    @Override
+    public String valueAsString() {
+      return ".";
+    }
   }
 
   static List<String> compact(String line) {
+    Day09Input[] inputsArray = compactToArray(line);
+
+    return Arrays.stream(inputsArray).map(Day09Input::valueAsString).toList();
+  }
+
+  static Day09Input[] compactToArray(String line) {
     List<Integer> list = line.chars().mapToObj(Character::toString).map(Integer::parseInt).toList();
 
-    List<String> list1 =
+    var inputLists =
         IntStream.range(0, list.size())
             .mapToObj(
                 index -> {
                   Integer value = list.get(index);
-                  // log.debug("value: {}", value);
                   if (index % 2 == 0) {
                     int evenValueIndex = index / 2;
-                    // log.debug("evenValueIndex: {}", evenValueIndex);
-                    String numbers =
-                        String.join("", Collections.nCopies(value, evenValueIndex + ""));
-                    // log.debug("numbers: {}", numbers);
-                    return numbers;
+                    return IntStream.range(0, value)
+                        .mapToObj(i -> Number.of(evenValueIndex))
+                        .toList();
                   } else {
-                    String dots = String.join("", Collections.nCopies(value, "."));
-                    // log.debug("dots: {}", dots);
-                    return dots;
+                    return IntStream.range(0, value).mapToObj(i -> new Dot()).toList();
                   }
                 })
             .toList();
-    log.debug("list1: {}", list1);
-    /*
-    0..111....22222
-     */
-    String joined = String.join("", list1);
-    log.debug("joined: {}", joined);
 
-    char[] chars = joined.toCharArray();
+    List<? extends Day09Input> inputs = inputLists.stream().flatMap(List::stream).toList();
+
+    Day09Input[] inputsArray = inputs.toArray(new Day09Input[0]);
+
     int left = 0;
-    int right = chars.length - 1;
+    int right = inputsArray.length - 1;
 
-
-    while (left < chars.length && chars[left] != '.') left++;
-    while (right >= 0 && chars[right] == '.') right--;
+    while (left < inputsArray.length && inputsArray[left].isNumber()) left++;
+    while (right >= 0 && inputsArray[right].isDot()) right--;
 
     while (left < right) {
-      if (chars[left] == '.' && Character.isDigit(chars[right])) {
-        chars[left] = chars[right];
-        chars[right] = '.';
+      if (inputsArray[left].isDot() && inputsArray[right].isNumber()) {
+        inputsArray[left] = inputsArray[right];
+        inputsArray[right] = new Dot();
         left++;
         right--;
       }
-      while (left < chars.length && chars[left] != '.') left++;
-      while (right >= 0 && chars[right] == '.') right--;
+      while (left < inputsArray.length && inputsArray[left].isNumber()) left++;
+      while (right >= 0 && inputsArray[right].isDot()) right--;
     }
-
-    return Arrays.stream(new String(chars).split("")).toList();
+    return inputsArray;
   }
 
-  static int righterNumberPosition(String line) {
-    return IntStream.range(0, line.length())
-        .mapToObj(i -> line.length() - 1 - i) // reverse indices
-        .filter(i -> Character.isDigit(line.charAt(i)))
-        .findFirst()
-        .orElseThrow();
-  }
-
-  static int lefterDotPosition(String line) {
-    return IntStream.range(0, line.length())
+  static int lefterDotPosition(Day09Input[] line) {
+    return IntStream.range(0, line.length)
         .boxed()
-        .filter(i -> line.charAt(i) == '.')
+        .filter(i -> line[i].isDot())
         .findFirst()
         .orElseThrow();
   }
