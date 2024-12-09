@@ -37,7 +37,7 @@ class Day08Test {
 
   @Test
   void solvePart02() {
-    assertThat(new Day08(LIST).solvePart02()).isEqualTo(1);
+    assertThat(new Day08(List.of(THIRD_INPUT.split("\n"))).solvePart02()).isEqualTo(34);
   }
 
   @Test
@@ -76,7 +76,7 @@ class Day08Test {
     Day08 day08 = new Day08(LIST);
     List<Pair<Point, Point>> pairs = day08.pairs();
 
-    assertThat(Day08.opposites(pairs, day08.getGrid(), day08.getChars()))
+    assertThat(Day08.opposites(pairs, day08.getGrid()))
         .containsExactlyInAnyOrderElementsOf(expected);
   }
 
@@ -118,7 +118,7 @@ class Day08Test {
     Day08 day08 = new Day08(List.of(SECOND_INPUT.split("\n")));
     List<Pair<Point, Point>> pairs = day08.pairs();
 
-    assertThat(Day08.opposites(pairs, day08.getGrid(), day08.getChars()))
+    assertThat(Day08.opposites(pairs, day08.getGrid()))
         .containsAnyElementsOf(expected);
     log.info("chars: {}", expected);
   }
@@ -165,7 +165,7 @@ class Day08Test {
     Day08 day08 = new Day08(List.of(THIRD_INPUT.split("\n")));
     List<Pair<Point, Point>> pairs = day08.pairs();
 
-    assertThat(Day08.opposites(pairs, day08.getGrid(), day08.getChars()))
+    assertThat(Day08.opposites(pairs, day08.getGrid()))
             .containsAnyElementsOf(expected);
   }
 }

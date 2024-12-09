@@ -8,6 +8,7 @@ import java.util.*;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
 import be.bonamis.advent.common.CharGrid;
@@ -42,7 +43,7 @@ public class Day08 extends TextDaySolver {
   public long solvePart01() {
     List<Pair<Point, Point>> pairs = pairs();
 
-    return opposites(pairs, grid, chars).size();
+    return opposites(pairs, grid).size();
   }
 
   List<Pair<Point, Point>> pairs() {
@@ -56,20 +57,36 @@ public class Day08 extends TextDaySolver {
     return e -> pairCombinations(e.getValue()).stream();
   }
 
-  static Point opposite(Pair<Point, Point> pair) {
+  static Point opposite(Pair<Point, Point> pair, int factor) {
     Point left = pair.getLeft();
     Point right = pair.getRight();
     var xDelta = right.x - left.x;
     var yDelta = right.y - left.y;
-    Point point = new Point(left.x - xDelta, left.y - yDelta);
+    Point point = new Point(left.x - xDelta * factor, left.y - yDelta * factor);
     log.debug("opposite point: {} from pair {}", point, pair);
     return point;
   }
 
-  static Set<Point> opposites(
-      List<Pair<Point, Point>> pairs, CharGrid grid, Map<Character, List<Point>> chars) {
+  @Override
+  public long solvePart02() {
+    List<Pair<Point, Point>> pairs = pairs();
+    return oppositesPart2(pairs, grid).size();
+  }
+
+  static Set<Point> oppositesPart2(List<Pair<Point, Point>> pairs, CharGrid grid) {
     return pairs.stream()
-        .map(Day08::opposite)
+            .flatMap(pair -> multiplesOpposites(pair).stream())
+            .filter(p -> isInTheGrid(p, grid))
+            .collect(Collectors.toSet());
+  }
+
+  static List<Point> multiplesOpposites(Pair<Point, Point> pair) {
+    return IntStream.range(0, 50).mapToObj(i -> opposite(pair, i)).toList();
+  }
+
+  static Set<Point> opposites(List<Pair<Point, Point>> pairs, CharGrid grid) {
+    return pairs.stream()
+        .map(pair -> opposite(pair, 1))
         .filter(p -> isInTheGrid(p, grid))
         .collect(Collectors.toSet());
   }
@@ -90,10 +107,5 @@ public class Day08 extends TextDaySolver {
 
   CharGrid getGrid() {
     return grid;
-  }
-
-  @Override
-  public long solvePart02() {
-    return 1;
   }
 }
