@@ -41,8 +41,8 @@ class Day09Test {
   @Test
   void righterNumberPosition2() {
     Day09Input[] array =
-            List.of(Day09.Number.of(1), new Dot(), Day09.Number.of(2), new Dot())
-                    .toArray(new Day09Input[0]);
+        List.of(Day09.Number.of(1), new Dot(), Day09.Number.of(2), new Dot())
+            .toArray(new Day09Input[0]);
     assertThat(Day09.righterNumberPosition(array)).isEqualTo(2);
   }
 }
