@@ -97,7 +97,13 @@ public class Day09 extends TextDaySolver {
   static List<String> compact(String line) {
     Day09Input[] inputsArray = compactToArray(line);
 
-    return Arrays.stream(inputsArray).map(Day09Input::valueAsString).toList();
+    return print(inputsArray);
+  }
+
+  private static List<String> print(Day09Input[] inputsArray) {
+    List<String> list = Arrays.stream(inputsArray).map(Day09Input::valueAsString).toList();
+    log.debug("list: {}", list);
+    return list;
   }
 
   static Day09Input[] compactToArray(String line) {
@@ -127,8 +133,11 @@ public class Day09 extends TextDaySolver {
     int righterNumberPosition = righterNumberPosition(inputsArray);
 
     while (lefterDotPosition < righterNumberPosition) {
-      inputsArray[lefterDotPosition] = inputsArray[righterNumberPosition];
+      Day09Input day09Input = inputsArray[righterNumberPosition];
+      log.debug("day09Input: {}", day09Input);
+      inputsArray[lefterDotPosition] = day09Input;
       inputsArray[righterNumberPosition] = new Dot();
+      print(inputsArray);
       lefterDotPosition = lefterDotPosition(inputsArray);
       righterNumberPosition = righterNumberPosition(inputsArray);
     }
