@@ -35,16 +35,11 @@ public class Day10 extends TextDaySolver {
     List<Point> starts = grid.stream().filter(p -> grid.get(p) == '0').toList();
     List<Point> ends = grid.stream().filter(p -> grid.get(p) == '9').toList();
 
-    int count = 0;
-    for (Point startPoint : starts) {
-      for (Point endPoint : ends) {
-        List<List<Point>> allPaths = dfs(startPoint, endPoint, new HashMap<>());
-        if (!allPaths.isEmpty()) {
-          count++;
-        }
-      }
-    }
-    return count;
+    return starts.stream()
+        .flatMap(
+            startPoint -> ends.stream().map(endPoint -> dfs(startPoint, endPoint, new HashMap<>())))
+        .filter(i -> !i.isEmpty())
+        .count();
   }
 
   List<List<Point>> dfs(Point start, Point end, Map<Point, Boolean> visited) {
@@ -53,12 +48,13 @@ public class Day10 extends TextDaySolver {
       paths.add(new ArrayList<>());
       return paths;
     }
+
+    visited = new HashMap<>(visited);
     visited.put(start, true);
+
     Set<Position> allowedPositions = allowedPositions(Position.of(start));
 
-    log.debug("allowedPositions for start {}: value of start {}", start, value(Position.of(start)));
     for (var allowedPosition : allowedPositions) {
-      log.debug("allowedPosition {} and value {}", allowedPosition, value(allowedPosition));
       Point neighbor = allowedPosition.toPoint();
       if (!visited.getOrDefault(neighbor, false)) {
         List<List<Point>> neighborsPaths = dfs(neighbor, end, visited);
@@ -68,6 +64,7 @@ public class Day10 extends TextDaySolver {
         }
       }
     }
+
     return paths;
   }
 
@@ -82,7 +79,8 @@ public class Day10 extends TextDaySolver {
             .filter(rover -> value(rover.position()) - startPositionValue == 1);
 
     Set<Position> collect = rovers.map(Rover::position).collect(Collectors.toSet());
-    log.debug("allowedPositions for start {}: value of start {}", startPosition, startPositionValue);
+    log.debug(
+        "allowedPositions for start {}: value of start {}", startPosition, startPositionValue);
     return collect;
   }
 

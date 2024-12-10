@@ -4,8 +4,7 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-import org.junit.jupiter.api.Disabled;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 class Day10Test {
 
@@ -63,7 +62,7 @@ class Day10Test {
     assertThat(new Day10(LIST).solvePart01()).isEqualTo(36);
   }
 
-  @Test@Disabled
+  @Test
   void solvePart02() {
     final String INPUT =
         """
