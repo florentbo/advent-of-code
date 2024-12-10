@@ -36,10 +36,13 @@ public class Day10 extends TextDaySolver {
     List<Point> ends = grid.stream().filter(p -> grid.get(p) == '9').toList();
 
     return starts.stream()
-        .flatMap(
-            startPoint -> ends.stream().map(endPoint -> dfs(startPoint, endPoint, new HashMap<>())))
+        .flatMap(startPoint -> allPaths(startPoint, ends))
         .filter(i -> !i.isEmpty())
         .count();
+  }
+
+  private Stream<List<List<Point>>> allPaths(Point startPoint, List<Point> ends) {
+    return ends.stream().map(endPoint -> dfs(startPoint, endPoint, new HashMap<>()));
   }
 
   List<List<Point>> dfs(Point start, Point end, Map<Point, Boolean> visited) {
@@ -97,30 +100,9 @@ public class Day10 extends TextDaySolver {
     List<Point> starts = grid.stream().filter(p -> grid.get(p) == '0').toList();
     List<Point> ends = grid.stream().filter(p -> grid.get(p) == '9').toList();
 
-    int count = 0;
-    for (Point startPoint : starts) {
-      for (Point endPoint : ends) {
-        log.debug("startPoint: {}", startPoint);
-        log.debug("endPoint: {}", endPoint);
-        List<List<Point>> allPaths = dfs(startPoint, endPoint, new HashMap<>());
-        if (!allPaths.isEmpty()) {
-          count += allPaths.size();
-        }
-      }
-    }
-
-    Point startPoint = starts.get(0);
-    log.info("startPoint: {}", startPoint);
-    Point endPoint = ends.get(0);
-    log.info("endPoint: {}", endPoint);
-
-    List<List<Point>> allPaths = dfs(startPoint, endPoint, new HashMap<>());
-    allPaths.forEach(
-        path -> {
-          log.debug("path start ++++++++++++++++++++++");
-          path.forEach(p -> log.debug("path {} and value {}", p, grid.get(p)));
-          log.debug("path end ++++++++++++++++++++++");
-        });
-    return count;
+    return starts.stream()
+        .flatMap(startPoint -> allPaths(startPoint, ends))
+        .map(List::size)
+        .reduce(0, Integer::sum);
   }
 }
