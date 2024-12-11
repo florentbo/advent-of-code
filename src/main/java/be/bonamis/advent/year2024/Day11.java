@@ -19,10 +19,61 @@ public class Day11 extends TextDaySolver {
 
   @Override
   public long solvePart01() {
+    return solve(25);
+  }
+
+  private long solve(int times) {
     String input = this.puzzle.get(0);
-    List<Long> numbers = Stream.of(input.split("\\s+")).map(Long::parseLong).toList();
-    log.debug("numbers: {}", numbers);
-    return blink(numbers, 25).size();
+    List<Long> initial = Stream.of(input.split("\\s+")).map(Long::parseLong).toList();
+    log.debug("numbers: {}", initial);
+    return blinkWithCounter(initial, times);
+  }
+
+  static long blinkWithCounter(List<Long> input, int times) {
+    Map<Long, Long> counter = new HashMap<>();
+
+    for (Long num : input) {
+      counter.merge(num, 1L, Long::sum);
+    }
+
+    for (int i = 0; i < times; i++) {
+      counter = blinkCounter(counter);
+      log.debug(
+          "Step {}, total numbers: {}",
+          i,
+          counter.values().stream().mapToLong(Long::longValue).sum());
+    }
+
+    return counter.values().stream().mapToLong(Long::longValue).sum();
+  }
+
+  static Map<Long, Long> blinkCounter(Map<Long, Long> counter) {
+    Map<Long, Long> next = new HashMap<>();
+
+    for (var entry : counter.entrySet()) {
+      Long num = entry.getKey();
+      Long count = entry.getValue();
+
+      if (num == 0) {
+        next.merge(1L, count, Long::sum);
+        continue;
+      }
+
+      String numStr = String.valueOf(num);
+      int length = numStr.length();
+
+      if (length % 2 == 0) {
+        int middle = length / 2;
+        long left = Long.parseLong(numStr.substring(0, middle));
+        long right = Long.parseLong(numStr.substring(middle));
+        next.merge(left, count, Long::sum);
+        next.merge(right, count, Long::sum);
+      } else {
+        next.merge(num * 2024L, count, Long::sum);
+      }
+    }
+
+    return next;
   }
 
   static List<Long> blink(List<Long> input, int times) {
@@ -57,8 +108,6 @@ public class Day11 extends TextDaySolver {
 
   @Override
   public long solvePart02() {
-    String input = this.puzzle.get(0);
-    List<Long> numbers = Stream.of(input.split("\\s+")).map(Long::parseLong).toList();
-    return blink(numbers, 75).size();
+    return solve(75);
   }
 }
