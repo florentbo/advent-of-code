@@ -24,8 +24,6 @@ public class Day09 extends TextDaySolver {
     log.info("size: {}", this.puzzle.size());
     String line = this.puzzle.get(0);
     log.debug("line: {}", line);
-    int length = line.length();
-    log.info("line length: {}", length);
 
     Day09Input[] day09Inputs = compactToArray(line);
     int lefterDotPosition2 = lefterDotPosition(day09Inputs);
@@ -107,6 +105,25 @@ public class Day09 extends TextDaySolver {
   }
 
   static Day09Input[] compactToArray(String line) {
+    var inputsArray = parse(line);
+
+    int lefterDotPosition = lefterDotPosition(inputsArray);
+    int righterNumberPosition = righterNumberPosition(inputsArray);
+
+    while (lefterDotPosition < righterNumberPosition) {
+      Day09Input day09Input = inputsArray[righterNumberPosition];
+      log.debug("day09Input: {}", day09Input);
+      inputsArray[lefterDotPosition] = day09Input;
+      inputsArray[righterNumberPosition] = new Dot();
+      print(inputsArray);
+      lefterDotPosition = lefterDotPosition(inputsArray);
+      righterNumberPosition = righterNumberPosition(inputsArray);
+    }
+
+    return inputsArray;
+  }
+
+  private static Day09Input[] parse(String line) {
     List<Integer> list = line.chars().mapToObj(Character::toString).map(Integer::parseInt).toList();
 
     var inputLists =
@@ -125,23 +142,9 @@ public class Day09 extends TextDaySolver {
                 })
             .toList();
 
-    List<? extends Day09Input> inputs = inputLists.stream().flatMap(List::stream).toList();
+    var inputs = inputLists.stream().flatMap(List::stream).toList();
 
-    Day09Input[] inputsArray = inputs.toArray(new Day09Input[0]);
-
-    int lefterDotPosition = lefterDotPosition(inputsArray);
-    int righterNumberPosition = righterNumberPosition(inputsArray);
-
-    while (lefterDotPosition < righterNumberPosition) {
-      Day09Input day09Input = inputsArray[righterNumberPosition];
-      log.debug("day09Input: {}", day09Input);
-      inputsArray[lefterDotPosition] = day09Input;
-      inputsArray[righterNumberPosition] = new Dot();
-      print(inputsArray);
-      lefterDotPosition = lefterDotPosition(inputsArray);
-      righterNumberPosition = righterNumberPosition(inputsArray);
-    }
-
+    var inputsArray = inputs.toArray(new Day09Input[0]);
     return inputsArray;
   }
 
