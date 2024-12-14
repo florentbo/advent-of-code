@@ -112,9 +112,12 @@ public class CharGrid {
   }
 
   public void printLines() {
-    List<List<Point>> rows = new ArrayList<>(this.rows());
-    Collections.reverse(rows);
-    rows.forEach(line -> log.info(toLine(line)));
+    for (char[] datum : data) {
+      for (char c : datum) {
+        System.out.print(c);
+      }
+      System.out.println();
+    }
   }
 
   public CharGrid rotateCounterClockwise() {
