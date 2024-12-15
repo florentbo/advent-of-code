@@ -39,37 +39,12 @@ class Day15Test {
 
   @Test
   void solvePart01() {
-
     String input = FileHelper.content("2024/15/2024_15.txt");
-    /*final String input =
-        """
-      ##########
-      #..O..O.O#
-      #......O.#
-      #.OO..O.O#
-      #..O@..O.#
-      #O#..O...#
-      #O..O..O.#
-      #.OO.O.OO#
-      #....O...#
-      ##########
-
-      <vv>^<v^>v>^vv^v>v<>v^v<v<^vv<<<^><<><>>v<vvv<>^v^>^<<<><<v<<<v^vv^v>^
-      vvv<<^>^v^^><<>>><>^<<><^vv^^<>vvv<>><^^v>^>vv<>v<<<<v<^v>^<^^>>>^<v<v
-      ><>vv>v^v^<>><>>>><^^>vv>v<^^^>>v^v^<^^>v^^>v^<^v>v<>>v^v^<v>v^^<^^vv<
-      <<v<^>>^^^^>>>v^<>vvv^><v<<<>^^^vv^<vvv>^>v<^^^^v<>^>vvvv><>>v^<<^^^^^
-      ^><^><>>><>^^<<^^v>>><^<v>^<vv>>v>>>^v><>^v><<<<v>>v<v<v>vvv>^<><<>^><
-      ^>><>^v<><^vvv<^^<><v<<<<<><^v<<<><<<^^<v<^^^><^>>^<v^><<<^>>^v<v^v<v^
-      >^>>^v>vv>^<<^v<>><<><<v<<v><>v<^vv<<<>^^v^>^^>>><<^v>>v^v><^^>>^<>vv^
-      <><^^>^^^<><vvvvv^v<v<<>^v<v>v<<^><<><<><<<^^<<<^<<>><<><^^^>^^<>^>v<>
-      ^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>
-      v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
-      """;*/
-
     Day15 day15 = new Day15(List.of(input.split("\n")));
     Position start = day15.getInput().start();
     assertThat(start).isEqualTo(new Position(4, 4));
-    day15.solvePart01();
+    long l = day15.solvePart01();
+    assertThat(l).isEqualTo(10092);
   }
 
   @Test
