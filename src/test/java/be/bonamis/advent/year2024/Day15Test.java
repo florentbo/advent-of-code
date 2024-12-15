@@ -38,23 +38,41 @@ class Day15Test {
 
   @Test
   void solvePart01() {
+
+
+
+
+
+
+
     final String input =
         """
-      ########
-      #..O.O.#
-      ##@.O..#
-      #...O..#
-      #.#.O..#
-      #...O..#
-      #......#
-      ########
-
-      <^^>>>vv<v>>v<<
+      ##########
+      #..O..O.O#
+      #......O.#
+      #.OO..O.O#
+      #..O@..O.#
+      #O#..O...#
+      #O..O..O.#
+      #.OO.O.OO#
+      #....O...#
+      ##########
+      
+      <vv>^<v^>v>^vv^v>v<>v^v<v<^vv<<<^><<><>>v<vvv<>^v^>^<<<><<v<<<v^vv^v>^
+      vvv<<^>^v^^><<>>><>^<<><^vv^^<>vvv<>><^^v>^>vv<>v<<<<v<^v>^<^^>>>^<v<v
+      ><>vv>v^v^<>><>>>><^^>vv>v<^^^>>v^v^<^^>v^^>v^<^v>v<>>v^v^<v>v^^<^^vv<
+      <<v<^>>^^^^>>>v^<>vvv^><v<<<>^^^vv^<vvv>^>v<^^^^v<>^>vvvv><>>v^<<^^^^^
+      ^><^><>>><>^^<<^^v>>><^<v>^<vv>>v>>>^v><>^v><<<<v>>v<v<v>vvv>^<><<>^><
+      ^>><>^v<><^vvv<^^<><v<<<<<><^v<<<><<<^^<v<^^^><^>>^<v^><<<^>>^v<v^v<v^
+      >^>>^v>vv>^<<^v<>><<><<v<<v><>v<^vv<<<>^^v^>^^>>><<^v>>v^v><^^>>^<>vv^
+      <><^^>^^^<><vvvvv^v<v<<>^v<v>v<<^><<><<><<<^^<<<^<<>><<><^^^>^^<>^>v<>
+      ^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>
+      v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
       """;
 
     Day15 day15 = new Day15(List.of(input.split("\n")));
     Position start = day15.getInput().start();
-    assertThat(start).isEqualTo(new Position(2, 2));
+    assertThat(start).isEqualTo(new Position(4, 4));
     day15.solvePart01();
   }
 
@@ -69,14 +87,27 @@ class Day15Test {
     Day15 day15 = new Day15(List.of(input.split("\n")));
     var start = day15.getInput().start();
 
-    log.debug("boxMove test grid");
-    day15.getInput().grid().printLines2();
-    log.debug("------------------");
-
     assertThat(start).isEqualTo(new Position(2, 0));
     Pair<Rover, CharGrid> boxMoved =
         day15.boxMove(new Rover(EAST, start), day15.getInput().grid());
     assertThat(line(boxMoved)).isEqualTo("#..@OO.#");
+  }
+
+  @Test
+  void spaceMove() {
+    final String input =
+        """
+#@.O.O.#
+
+>
+""";
+    Day15 day15 = new Day15(List.of(input.split("\n")));
+    var start = day15.getInput().start();
+
+    assertThat(start).isEqualTo(new Position(1, 0));
+    Pair<Rover, CharGrid> boxMoved =
+        day15.spaceMove(new Rover(EAST, start), day15.getInput().grid());
+    assertThat(line(boxMoved)).isEqualTo("#.@O.O.#");
   }
 
   private String line(Pair<Rover, CharGrid> boxMoved) {
