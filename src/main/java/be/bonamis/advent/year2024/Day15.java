@@ -65,12 +65,11 @@ public class Day15 extends TextDaySolver {
 
   @Override
   public long solvePart01() {
-    run();
-
-    return 0;
+    CharGrid run = run();
+    return run.stream().filter(p -> run.get(p).equals(BOX)).mapToInt(p -> p.x + 100 * p.y).sum();
   }
 
-  void run() {
+  CharGrid run() {
     Rover rover = new Rover(NORTH, this.input.start());
     CharGrid grid = this.input.grid();
 
@@ -96,6 +95,7 @@ public class Day15 extends TextDaySolver {
       grid.printLines2();
       log.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++");
     }
+    return grid;
   }
 
   static Point findStart(CharGrid grid) {
@@ -163,10 +163,11 @@ public class Day15 extends TextDaySolver {
                 return Pair.of(actualRover, flo);
               }
             })
-        .orElseGet(() -> {
-            log.debug("No space found");
-            return Pair.of(actualRover, flo);
-        });
+        .orElseGet(
+            () -> {
+              log.debug("No space found");
+              return Pair.of(actualRover, flo);
+            });
   }
 
   private Direction direction(char move) {
