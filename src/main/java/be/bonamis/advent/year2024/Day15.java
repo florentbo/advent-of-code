@@ -54,12 +54,14 @@ public class Day15 extends TextDaySolver {
       Point start = findStart(grid);
       log.debug("start: {}", start);
 
-      List<String> moves = puzzle.subList(blank + 1, puzzle.size());
-      log.debug("moves : {}", moves);
+      List<String> moveLines = puzzle.subList(blank + 1, puzzle.size());
+      log.debug("moveLines size: {}", moveLines.size());
+      log.debug("moves : {}", moveLines);
 
-      char[] data2 = moves.stream().map(String::toCharArray).toList().get(0);
+      char[] moves = String.join("", moveLines).toCharArray();
+      log.debug("data2 size: {}", moves.length);
 
-      return new Input(grid, data2, Position.of(start));
+      return new Input(grid, moves, Position.of(start));
     }
   }
 
