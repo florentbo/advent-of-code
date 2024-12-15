@@ -12,6 +12,7 @@ import java.awt.*;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.IntStream;
 
 import lombok.Getter;
@@ -64,9 +65,17 @@ public class Day15 extends TextDaySolver {
 
   @Override
   public long solvePart01() {
+    run();
 
-    Rover rover = new Rover(Direction.NORTH, this.input.start());
+    return 0;
+  }
+
+  void run() {
+    Rover rover = new Rover(NORTH, this.input.start());
     CharGrid grid = this.input.grid();
+
+    log.debug("Initial state:");
+    grid.printLines2();
     char[] moves = this.input.moves();
     for (int i = 0; i < moves.length; i++) {
       char c = moves[i];
@@ -74,55 +83,52 @@ public class Day15 extends TextDaySolver {
       Direction direction = direction(c);
       log.debug("direction: {}", direction);
       Rover futureRover = new Rover(direction, rover.position());
-      var nextPosition = futureRover.move(FORWARD, true).position();
+      futureRover = futureRover.move(FORWARD, true);
+      var nextPosition = futureRover.position();
       log.debug("nextPosition: {}", nextPosition);
       char value = grid.get(nextPosition);
-      Pair<Rover, CharGrid> moved = move(value, futureRover, grid);
-      log.debug("move: {}", moved);
+      Pair<Rover, CharGrid> moved = move(value, futureRover, grid, rover);
       rover = moved.getLeft();
       grid = moved.getRight();
-    }
-    grid.printLines2();
+      log.debug("moved rover: {}", rover);
 
-    return 0;
+      log.debug("After move: {}", c);
+      grid.printLines2();
+      log.debug("++++++++++++++++++++++++++++++++++++++++++++++++++++");
+    }
   }
 
   static Point findStart(CharGrid grid) {
     return grid.stream().filter(p -> grid.get(p).equals(START)).findFirst().orElseThrow();
   }
 
-  private Pair<Rover, CharGrid> move(char value, Rover rover, CharGrid grid) {
-    switch (value) {
-      case SPACE -> spaceMove(rover, grid);
-      case BOX -> boxMove(rover, grid);
-    }
+  private Pair<Rover, CharGrid> move(char value, Rover rover, CharGrid grid, Rover actualRover) {
+    log.debug("move rover : {} with value: {}", rover, value);
+    return switch (value) {
+      case SPACE -> spaceMove(rover, grid, actualRover);
+      case BOX -> boxMove(rover, grid, actualRover);
+      case WALL -> Pair.of(actualRover, grid);
 
-    log.debug("move rover after: {}", rover);
-    return Pair.of(rover, grid);
+      default -> throw new IllegalStateException("Unexpected value: " + value);
+    };
   }
 
-  Pair<Rover, CharGrid> spaceMove(Rover rover, CharGrid grid) {
-    Position actualPosition = rover.position();
-    Position nextPosition = rover.move(FORWARD, true).position();
+  Pair<Rover, CharGrid> spaceMove(Rover next, CharGrid grid, Rover actualRover) {
+    Position actualPosition = actualRover.position();
     grid.set(actualPosition, SPACE);
-    grid.set(nextPosition, START);
-    return Pair.of(rover, grid);
+    grid.set(next.position(), START);
+    return Pair.of(next, grid);
   }
 
-  Pair<Rover, CharGrid> boxMove(Rover rover, CharGrid flo) {
-    log.debug("boxMove rover before: {}", rover);
-    Rover movingRover = new Rover(rover.direction(), rover.position());
+  Pair<Rover, CharGrid> boxMove(Rover next, CharGrid flo, Rover actualRover) {
+    log.debug("boxMove rover before: {}", next);
+    Rover movingRover = new Rover(next.direction(), next.position());
     List<Point> points = new ArrayList<>();
     do {
       points.add(movingRover.position().toPoint());
       movingRover = movingRover.move(FORWARD, true);
     } while (flo.isPositionInTheGrid(movingRover));
     log.debug("points: {}", points);
-
-    for (Point point : points) {
-      Character c = flo.get(point);
-      log.debug("c: {}", c);
-    }
 
     var nextWallIndex =
         IntStream.range(0, points.size())
@@ -136,26 +142,31 @@ public class Day15 extends TextDaySolver {
     log.debug("nextWallIndex: {}", nextWallIndex);
     log.debug("nextSpaceIndex: {}", nextSpaceIndex);
 
-    nextSpaceIndex.ifPresent(
-        i -> {
-          log.debug("nextSpaceIndex: {}", i);
-          if (i < nextWallIndex) {
-            for (int j = i; j >= 1; j--) {
-              log.debug("j: {}", j);
-              Point point = points.get(j);
-              char beforeValue = flo.get(points.get(j - 1));
-              flo.set(point, beforeValue);
-              log.debug("beforeValue: {}", beforeValue);
-              flo.printLines2();
-              log.debug("++++");
-            }
-            flo.set(points.get(0), SPACE);
-          }
-          log.debug("final grid print ");
-          flo.printLines2();
+    return Optional.of(nextSpaceIndex.orElse(10000))
+        .map(
+            i -> {
+              log.debug("nextSpaceIndex: {}", i);
+              if (i < nextWallIndex) {
+                for (int j = i; j >= 1; j--) {
+                  log.debug("j: {}", j);
+                  Point point = points.get(j);
+                  char beforeValue = flo.get(points.get(j - 1));
+                  flo.set(point, beforeValue);
+                  log.debug("beforeValue: {}", beforeValue);
+                }
+                Position actualPosition = actualRover.position();
+                flo.set(actualPosition, SPACE);
+                flo.set(next.position(), START);
+                return Pair.of(next, flo);
+              } else {
+                log.debug("wall before space");
+                return Pair.of(actualRover, flo);
+              }
+            })
+        .orElseGet(() -> {
+            log.debug("No space found");
+            return Pair.of(actualRover, flo);
         });
-
-    return Pair.of(rover, flo);
   }
 
   private Direction direction(char move) {

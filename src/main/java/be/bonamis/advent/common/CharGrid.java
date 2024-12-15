@@ -319,7 +319,7 @@ public class CharGrid {
   }
 
   public char get(Position position) {
-    return get(new Point((int) position.x(), (int) position.y()));
+    return get(position.toPoint());
   }
 
   public List<CharGrid> subGrids(int size) {
