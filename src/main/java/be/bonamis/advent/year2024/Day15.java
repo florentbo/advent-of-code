@@ -12,7 +12,6 @@ import java.awt.*;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.OptionalInt;
 import java.util.stream.IntStream;
 
 import lombok.Getter;
@@ -67,6 +66,7 @@ public class Day15 extends TextDaySolver {
   public long solvePart01() {
 
     Rover rover = new Rover(Direction.NORTH, this.input.start());
+    CharGrid grid = this.input.grid();
     char[] moves = this.input.moves();
     for (int i = 0; i < moves.length; i++) {
       char c = moves[i];
@@ -76,12 +76,13 @@ public class Day15 extends TextDaySolver {
       Rover futureRover = new Rover(direction, rover.position());
       var nextPosition = futureRover.move(FORWARD, true).position();
       log.debug("nextPosition: {}", nextPosition);
-      char value = this.input.grid().get(nextPosition);
-      Pair<Rover, CharGrid> moved = move(value, futureRover, this.input.grid());
+      char value = grid.get(nextPosition);
+      Pair<Rover, CharGrid> moved = move(value, futureRover, grid);
       log.debug("move: {}", moved);
       rover = moved.getLeft();
-      log.debug("rover after: {}", rover);
+      grid = moved.getRight();
     }
+    grid.printLines2();
 
     return 0;
   }
@@ -92,11 +93,19 @@ public class Day15 extends TextDaySolver {
 
   private Pair<Rover, CharGrid> move(char value, Rover rover, CharGrid grid) {
     switch (value) {
-      case SPACE -> rover = rover.move(FORWARD, true);
+      case SPACE -> spaceMove(rover, grid);
       case BOX -> boxMove(rover, grid);
     }
 
     log.debug("move rover after: {}", rover);
+    return Pair.of(rover, grid);
+  }
+
+  Pair<Rover, CharGrid> spaceMove(Rover rover, CharGrid grid) {
+    Position actualPosition = rover.position();
+    Position nextPosition = rover.move(FORWARD, true).position();
+    grid.set(actualPosition, SPACE);
+    grid.set(nextPosition, START);
     return Pair.of(rover, grid);
   }
 
