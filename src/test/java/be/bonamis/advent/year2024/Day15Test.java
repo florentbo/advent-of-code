@@ -4,6 +4,7 @@ import static be.bonamis.advent.utils.marsrover.Rover.Direction.*;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import be.bonamis.advent.common.CharGrid;
+import be.bonamis.advent.utils.FileHelper;
 import be.bonamis.advent.utils.marsrover.*;
 import be.bonamis.advent.utils.marsrover.Rover;
 
@@ -37,9 +38,10 @@ class Day15Test {
   }
 
   @Test
-  @Disabled
   void solvePart01() {
-    final String input =
+
+    String input = FileHelper.content("2024/15/2024_15.txt");
+    /*final String input =
         """
       ##########
       #..O..O.O#
@@ -62,7 +64,7 @@ class Day15Test {
       <><^^>^^^<><vvvvv^v<v<<>^v<v>v<<^><<><<><<<^^<<<^<<>><<><^^^>^^<>^>v<>
       ^^>vv<^v^v<vv>^<><v<^v>^^^>>>^^vvv^>vvv<>>>^<^>>>>>^<<^v>^vvv<>^<><<v>
       v^^>>><<^^<>>^v^<v^vv<>v^<<>^<^v^v><^<<<><<^<v><v<>vv>>v><v^<vv<>v^<<^
-      """;
+      """;*/
 
     Day15 day15 = new Day15(List.of(input.split("\n")));
     Position start = day15.getInput().start();
@@ -162,7 +164,8 @@ class Day15Test {
     Day15 day15 = new Day15(List.of(input.split("\n")));
     Position start = day15.getInput().start();
     assertThat(start).isEqualTo(new Position(2, 2));
-    day15.solvePart01();
+    long l = day15.solvePart01();
+    assertThat(l).isEqualTo(2028);
   }
 
   @Test
