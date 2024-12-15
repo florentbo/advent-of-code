@@ -83,10 +83,12 @@ public class Day15 extends TextDaySolver {
       log.debug("i: {}, c: {}", i, c);
       Direction direction = direction(c);
       log.debug("direction: {}", direction);
+
       Rover futureRover = new Rover(direction, rover.position());
       futureRover = futureRover.move(FORWARD, true);
       var nextPosition = futureRover.position();
       log.debug("nextPosition: {}", nextPosition);
+
       char value = grid.get(nextPosition);
       Pair<Rover, CharGrid> moved = move(value, futureRover, grid, rover);
       rover = moved.getLeft();
@@ -144,7 +146,10 @@ public class Day15 extends TextDaySolver {
     log.debug("nextWallIndex: {}", nextWallIndex);
     log.debug("nextSpaceIndex: {}", nextSpaceIndex);
 
-    return Optional.of(nextSpaceIndex.orElse(10000))
+    Optional<Integer> nextSpace =
+        nextSpaceIndex.isPresent() ? Optional.of(nextSpaceIndex.getAsInt()) : Optional.empty();
+
+    return nextSpace
         .map(
             i -> {
               log.debug("nextSpaceIndex: {}", i);
@@ -165,11 +170,7 @@ public class Day15 extends TextDaySolver {
                 return Pair.of(actualRover, flo);
               }
             })
-        .orElseGet(
-            () -> {
-              log.debug("No space found");
-              return Pair.of(actualRover, flo);
-            });
+        .orElse(Pair.of(actualRover, flo));
   }
 
   private Direction direction(char move) {
