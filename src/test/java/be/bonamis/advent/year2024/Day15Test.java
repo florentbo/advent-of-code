@@ -10,6 +10,8 @@ import be.bonamis.advent.utils.marsrover.Rover;
 
 import java.awt.*;
 import java.util.List;
+import java.util.Optional;
+
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.tuple.Pair;
 import org.junit.jupiter.api.*;
@@ -62,10 +64,14 @@ class Day15Test {
     Position next = new Position(3, 0);
 
     assertThat(start).isEqualTo(actual);
-    Pair<Rover, CharGrid> boxMoved =
-        day15.boxMove(new Rover(EAST, next), day15.getInput().grid(), new Rover(EAST, actual));
-    assertThat(line(boxMoved)).isEqualTo("#..@OO.#");
-    assertThat(boxMoved.getLeft().position()).isEqualTo(next);
+
+    assertThat(
+            day15.boxMove(new Rover(EAST, next), day15.getInput().grid(), new Rover(EAST, actual)))
+        .hasValueSatisfying(
+            result -> {
+              assertThat(line(result)).isEqualTo("#..@OO.#");
+              assertThat(result.getLeft().position()).isEqualTo(next);
+            });
   }
 
   @Test
@@ -83,10 +89,9 @@ class Day15Test {
     Position next = new Position(4, 0);
 
     assertThat(start).isEqualTo(actual);
-    Pair<Rover, CharGrid> boxMoved =
+    Optional<Pair<Rover, CharGrid>> boxMoved =
         day15.boxMove(new Rover(EAST, next), day15.getInput().grid(), new Rover(EAST, actual));
-    assertThat(line(boxMoved)).isEqualTo("#...@OO#");
-    assertThat(boxMoved.getLeft().position()).isEqualTo(next);
+    assertThat(boxMoved).isEmpty();
   }
 
   @Test
