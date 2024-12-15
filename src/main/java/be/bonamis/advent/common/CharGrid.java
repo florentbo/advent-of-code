@@ -112,18 +112,14 @@ public class CharGrid {
   }
 
   public void printLines() {
-    /*for (char[] datum : data) {
-      for (char c : datum) {
-        System.out.print(c);
-      }
-      System.out.println();
-    }*/
+    this.lines().forEach(line -> log.info(toLine(line)));
+  }
 
-    for (List<Point> row : rows()) {
-      for (Point p : row) {
-        System.out.print(get(p));
-      }
-      System.out.println();
+  public void printLines2() {
+    for (int i = 0; i < this.width; i++) {
+      List<Point> points = row2(i);
+      String line2 = toLine2(points);
+      log.debug("line2: {}", line2);
     }
   }
 
@@ -236,6 +232,14 @@ public class CharGrid {
 
   public List<Point> row(int h) {
     return IntStream.range(0, getWidth()).mapToObj(w -> new Point(w, h)).toList();
+  }
+
+  public List<List<Point>> rows2() {
+    return IntStream.range(0, getHeight()).mapToObj(this::row2).toList();
+  }
+
+  public List<Point> row2(int h) {
+    return IntStream.range(0, getHeight()).mapToObj(w -> new Point(h, w)).toList();
   }
 
   public List<List<Point>> columns() {
