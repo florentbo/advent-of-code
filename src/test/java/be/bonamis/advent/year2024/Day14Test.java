@@ -8,10 +8,7 @@ import be.bonamis.advent.utils.marsrover.Position;
 import be.bonamis.advent.year2024.Day14.Space.Quadrant;
 import org.junit.jupiter.api.*;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 class Day14Test {
 

@@ -112,9 +112,16 @@ public class CharGrid {
   }
 
   public void printLines() {
-    for (char[] datum : data) {
+    /*for (char[] datum : data) {
       for (char c : datum) {
         System.out.print(c);
+      }
+      System.out.println();
+    }*/
+
+    for (List<Point> row : rows()) {
+      for (Point p : row) {
+        System.out.print(get(p));
       }
       System.out.println();
     }
@@ -205,8 +212,6 @@ public class CharGrid {
     }
     return neighbours.stream().filter(isInTheGrid()).toList();
   }
-
-
 
   public Predicate<Point> isInTheGrid() {
     return p ->
@@ -320,7 +325,7 @@ public class CharGrid {
       for (int startY = 0; startY <= width - size; startY++) {
         char[][] subgrid = new char[size][size];
         for (int i = 0; i < size; i++) {
-            System.arraycopy(data[startX + i], startY, subgrid[i], 0, size);
+          System.arraycopy(data[startX + i], startY, subgrid[i], 0, size);
         }
         subGrids.add(new CharGrid(subgrid));
       }
