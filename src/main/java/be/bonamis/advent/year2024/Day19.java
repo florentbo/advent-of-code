@@ -28,17 +28,38 @@ public class Day19 extends TextDaySolver {
     log.debug("design: {}", design);
     for (String pattern : patterns) {
       log.debug("pattern: {}", pattern);
-      if (design.startsWith(pattern)) {
-        String newDesign = design.substring(pattern.length());
-        log.debug("newDesign: {}", newDesign);
-        if (!newDesign.isEmpty()) {
-          return canBeMade(newDesign, patterns);
-        } else {
-          return true;
-        }
+      boolean extracted = extracted(design, patterns, pattern);
+      if (extracted) {
+        return true;
       }
     }
     return false;
+  }
+
+  public boolean canBeMade2(String design, List<String> patterns) {
+    log.debug("design: {}", design);
+    for (String pattern : patterns) {
+      log.debug("pattern: {}", pattern);
+      boolean extracted = extracted(design, patterns, pattern);
+      if (extracted) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private boolean extracted(String design, List<String> patterns, String pattern) {
+    if (design.startsWith(pattern)) {
+      String newDesign = design.substring(pattern.length());
+      log.debug("newDesign: {}", newDesign);
+      if (!newDesign.isEmpty()) {
+        return canBeMade2(newDesign, patterns);
+      } else {
+        return true;
+      }
+    } else {
+      return false;
+    }
   }
 
   record Input(List<String> patterns, List<String> designs) {
@@ -65,8 +86,7 @@ public class Day19 extends TextDaySolver {
 
   @Override
   public long solvePart01() {
-
-    return 0;
+    return this.input.designs().stream().filter(d -> canBeMade(d, this.input.patterns())).count();
   }
 
   @Override
