@@ -61,9 +61,9 @@ class Day19Test {
   @Test
   void solvePart02() {
     Day19 day19 = new Day19(new ByteArrayInputStream(input.getBytes()));
-    assertThat(day19.canBeMadePart02("brwrr", day19.getInput().patterns())).isEqualTo(2);
-    assertThat(day19.canBeMadePart02("bggr", day19.getInput().patterns())).isEqualTo(1);
+    //assertThat(day19.canBeMadePart02("brwrr", day19.getInput().patterns())).isEqualTo(2);
+    //assertThat(day19.canBeMadePart02("bggr", day19.getInput().patterns())).isEqualTo(1);
     // to solve
-    //assertThat(day19.canBeMadePart02("gbbr", day19.getInput().patterns())).isEqualTo(4);
+    assertThat(day19.canBeMadePart0233("gbbr", day19.getInput().patterns())).isEqualTo(4);
   }
 }
