@@ -32,7 +32,6 @@ public class Day19 extends TextDaySolver {
     }
     log.debug("design: {}", design);
     for (String pattern : patterns) {
-
       log.debug("pattern: {}", pattern);
       if (design.startsWith(pattern)) {
         String newDesign = design.substring(pattern.length());
@@ -51,6 +50,33 @@ public class Day19 extends TextDaySolver {
       }
     }
     return false;
+  }
+
+  public long canBeMade2(String design, List<String> patterns) {
+    long count = 0;
+    if (memo.containsKey(design)) {
+      count = 1;
+    }
+    log.debug("design: {}", design);
+    for (String pattern : patterns) {
+      log.debug("pattern: {}", pattern);
+      if (design.startsWith(pattern)) {
+        String newDesign = design.substring(pattern.length());
+        log.debug("newDesign: {}", newDesign);
+        if (!newDesign.isEmpty()) {
+          if (canBeMade2(newDesign, patterns) > 0) {
+            memo.put(design, true);
+            count++;
+          } else {
+            memo.put(design, false);
+          }
+        } else {
+          memo.put(design, true);
+          count++;
+        }
+      }
+    }
+    return count;
   }
 
   record Input(List<String> patterns, List<String> designs) {
