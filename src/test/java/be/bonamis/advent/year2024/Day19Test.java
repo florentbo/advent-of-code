@@ -40,4 +40,19 @@ class Day19Test {
 
     assertThat(day19.solvePart01()).isEqualTo(6);
   }
+
+  @Test
+  void couldBeMadePatterns() {
+    final String input =
+        """
+              rrgbgg, gbgbgr, rrb
+
+              rugbgbwwbbgrwrbubgugrgbrrbgwrbbgbwurwgrbr
+              """;
+
+    Day19 day19 = new Day19(new ByteArrayInputStream(input.getBytes()));
+    Day19.Input day19Input = day19.getInput();
+    assertThat(day19.couldBeMadePatterns(day19Input.designs().get(0), day19Input.patterns()))
+        .containsExactly("rrb");
+  }
 }
