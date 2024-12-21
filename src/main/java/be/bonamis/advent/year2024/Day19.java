@@ -24,11 +24,7 @@ public class Day19 extends TextDaySolver {
     this.input = Input.of(this.puzzle);
   }
 
-  Stream<String> couldBeMadePatterns(String design, List<String> patterns) {
-    return patterns.stream().filter(design::contains);
-  }
-
-  private Map<String, Boolean> memo = new HashMap<>();
+  private final Map<String, Boolean> memo = new HashMap<>();
 
   public boolean canBeMade(String design, List<String> patterns) {
     if (memo.containsKey(design)) {
