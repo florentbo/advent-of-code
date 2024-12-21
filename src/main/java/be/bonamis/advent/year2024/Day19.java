@@ -79,7 +79,6 @@ public class Day19 extends TextDaySolver {
 
   private final Map<String, Long> memo2 = new HashMap<>();
 
-  // number of found is ok here
   public long canBeMadePart02(String original, String design, List<String> patterns, long count) {
 
     /*if (memo.containsKey(design)) {
