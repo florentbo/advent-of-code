@@ -8,7 +8,6 @@ import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
 
 import java.io.ByteArrayInputStream;
-import java.util.List;
 import java.util.stream.Stream;
 
 class Day19Test {
@@ -57,5 +56,14 @@ class Day19Test {
         Arguments.of("bwurrg", true),
         Arguments.of("brgr", true),
         Arguments.of("bbrgwb", false));
+  }
+
+  @Test
+  void solvePart02() {
+    Day19 day19 = new Day19(new ByteArrayInputStream(input.getBytes()));
+    assertThat(day19.canBeMadePart02("brwrr", day19.getInput().patterns())).isEqualTo(2);
+    assertThat(day19.canBeMadePart02("bggr", day19.getInput().patterns())).isEqualTo(1);
+    // to solve
+    //assertThat(day19.canBeMadePart02("gbbr", day19.getInput().patterns())).isEqualTo(4);
   }
 }

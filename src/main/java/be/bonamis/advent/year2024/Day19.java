@@ -79,6 +79,32 @@ public class Day19 extends TextDaySolver {
     return count;
   }
 
+  public long canBeMadePart02(String design, List<String> patterns) {
+    long count = 0;
+    if (memo.containsKey(design)) {
+      count = 1;
+    }
+    for (String pattern : patterns) {
+      if (design.startsWith(pattern)) {
+        String newDesign = design.substring(pattern.length());
+        if (!newDesign.isEmpty()) {
+          if (canBeMadePart02(newDesign, patterns) > 0) {
+            memo.put(design, true);
+            count++;
+            // return count;
+          } else {
+            memo.put(design, false);
+          }
+        } else {
+          memo.put(design, true);
+          count++;
+          // return count;
+        }
+      }
+    }
+    return count;
+  }
+
   record Input(List<String> patterns, List<String> designs) {
     public static Input of(List<String> puzzle) {
       Integer blank =
