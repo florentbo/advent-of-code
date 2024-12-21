@@ -24,11 +24,11 @@ public class Day19 extends TextDaySolver {
     this.input = Input.of(this.puzzle);
   }
 
-  private final Map<String, Boolean> memo = new HashMap<>();
+  private final Map<String, Long> memo = new HashMap<>();
 
   public boolean canBeMade(String design, List<String> patterns) {
     if (memo.containsKey(design)) {
-      return memo.get(design);
+      return memo.get(design) > 0;
     }
     log.debug("design: {}", design);
     for (String pattern : patterns) {
@@ -38,13 +38,25 @@ public class Day19 extends TextDaySolver {
         log.debug("newDesign: {}", newDesign);
         if (!newDesign.isEmpty()) {
           if (canBeMade(newDesign, patterns)) {
-            memo.put(design, true);
+            boolean b = memo.containsKey(design);
+            if (b) {
+              memo.put(design, memo.get(design) + 1);
+            } else {
+              memo.put(design, 1L);
+            }
             return true;
           } else {
-            memo.put(design, false);
+            memo.put(design, 0L);
           }
         } else {
-          memo.put(design, true);
+          boolean b = memo.containsKey(design);
+          if (b) {
+            memo.put(design, memo.get(design) + 1);
+          } else {
+            memo.put(design, 1L);
+          }
+          log.debug("found pattern: {}", pattern);
+          log.debug("memo: {}", memo);
           return true;
         }
       }
@@ -52,26 +64,32 @@ public class Day19 extends TextDaySolver {
     return false;
   }
 
-  public long canBeMade2(String design, List<String> patterns) {
+  public long canBeMadePart0222(String design, List<String> patterns) {
+    canBeMade22(design, patterns);
+    //log.debug("canBeMade: {}", canBeMade);
+    return memo.getOrDefault(design, 0L);
+  }
+
+  // number of found is ok here
+  public long canBeMadePart02(String design, List<String> patterns) {
     long count = 0;
-    if (memo.containsKey(design)) {
+    /*if (memo.containsKey(design)) {
+      log.debug("found");
       count = 1;
-    }
-    log.debug("design: {}", design);
+    }*/
     for (String pattern : patterns) {
-      log.debug("pattern: {}", pattern);
       if (design.startsWith(pattern)) {
         String newDesign = design.substring(pattern.length());
-        log.debug("newDesign: {}", newDesign);
         if (!newDesign.isEmpty()) {
-          if (canBeMade2(newDesign, patterns) > 0) {
-            memo.put(design, true);
-            count++;
+          if (canBeMadePart02(newDesign, patterns) > 0) {
+            //memo.put(design, true);
+            //count++;
           } else {
-            memo.put(design, false);
+            //memo.put(design, false);
           }
         } else {
-          memo.put(design, true);
+          log.debug("found");
+          //memo.put(design, true);
           count++;
         }
       }
@@ -79,30 +97,43 @@ public class Day19 extends TextDaySolver {
     return count;
   }
 
-  public long canBeMadePart02(String design, List<String> patterns) {
-    long count = 0;
-    if (memo.containsKey(design)) {
-      count = 1;
-    }
+
+  public void canBeMade22(String design, List<String> patterns) {
+    /*if (memo.containsKey(design)) {
+      return memo.get(design) > 0;
+    }*/
+    //log.debug("design: {}", design);
     for (String pattern : patterns) {
+      //log.debug("pattern: {}", pattern);
       if (design.startsWith(pattern)) {
         String newDesign = design.substring(pattern.length());
+        //log.debug("newDesign: {}", newDesign);
         if (!newDesign.isEmpty()) {
-          if (canBeMadePart02(newDesign, patterns) > 0) {
-            memo.put(design, true);
-            count++;
-            // return count;
+          if (canBeMade(newDesign, patterns)) {
+            boolean b = memo.containsKey(design);
+            if (b) {
+              memo.put(design, memo.get(design) + 1);
+            } else {
+              memo.put(design, 1L);
+            }
+       //     return true;
           } else {
-            memo.put(design, false);
+            memo.put(design, 0L);
           }
         } else {
-          memo.put(design, true);
-          count++;
-          // return count;
+          boolean b = memo.containsKey(design);
+          if (b) {
+            memo.put(design, memo.get(design) + 1);
+          } else {
+            memo.put(design, 1L);
+          }
+          log.debug("found pattern: {}", pattern);
+          log.debug("memo: {}", memo);
+         // return true;
         }
       }
     }
-    return count;
+    //return false;
   }
 
   record Input(List<String> patterns, List<String> designs) {
