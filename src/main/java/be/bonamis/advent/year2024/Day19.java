@@ -26,13 +26,15 @@ public class Day19 extends TextDaySolver {
 
   public boolean canBeMade(String design, List<String> patterns) {
     log.debug("design: {}", design);
-    for (String pattern : patterns) {
+    for (int i = 0; i < patterns.size(); i++) {
+      String pattern = patterns.get(i);
+      log.debug("pattern index {}: {}", i, pattern);
       log.debug("pattern: {}", pattern);
       if (design.startsWith(pattern)) {
         String newDesign = design.substring(pattern.length());
         log.debug("newDesign: {}", newDesign);
         if (!newDesign.isEmpty()) {
-          return canBeMade(newDesign, patterns);
+          if (canBeMade(newDesign, patterns)) return true;
         } else {
           return true;
         }
@@ -65,8 +67,14 @@ public class Day19 extends TextDaySolver {
 
   @Override
   public long solvePart01() {
-
-    return 0;
+    int size = this.input.designs().size();
+    return IntStream.range(0, size)
+        .filter(i -> {
+          log.info("design index {}: {} of  {}", i, this.input.designs().get(i), size);
+            return canBeMade(this.input.designs().get(i), this.input.patterns());
+        })
+        .count();
+    //return this.input.designs().stream().filter(d -> canBeMade(d, this.input.patterns())).count();
   }
 
   @Override
