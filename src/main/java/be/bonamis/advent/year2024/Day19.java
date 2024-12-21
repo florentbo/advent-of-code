@@ -2,9 +2,9 @@ package be.bonamis.advent.year2024;
 
 import be.bonamis.advent.TextDaySolver;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.IntStream;
+import java.util.*;
+import java.util.stream.*;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,42 +24,37 @@ public class Day19 extends TextDaySolver {
     this.input = Input.of(this.puzzle);
   }
 
+  Stream<String> couldBeMadePatterns(String design, List<String> patterns) {
+    return patterns.stream().filter(design::contains);
+  }
+
+  private Map<String, Boolean> memo = new HashMap<>();
+
   public boolean canBeMade(String design, List<String> patterns) {
+    if (memo.containsKey(design)) {
+      return memo.get(design);
+    }
     log.debug("design: {}", design);
     for (String pattern : patterns) {
+
       log.debug("pattern: {}", pattern);
-      boolean extracted = extracted(design, patterns, pattern);
-      if (extracted) {
-        return true;
+      if (design.startsWith(pattern)) {
+        String newDesign = design.substring(pattern.length());
+        log.debug("newDesign: {}", newDesign);
+        if (!newDesign.isEmpty()) {
+          if (canBeMade(newDesign, patterns)) {
+            memo.put(design, true);
+            return true;
+          } else {
+            memo.put(design, false);
+          }
+        } else {
+          memo.put(design, true);
+          return true;
+        }
       }
     }
     return false;
-  }
-
-  public boolean canBeMade2(String design, List<String> patterns) {
-    log.debug("design: {}", design);
-    for (String pattern : patterns) {
-      log.debug("pattern: {}", pattern);
-      boolean extracted = extracted(design, patterns, pattern);
-      if (extracted) {
-        return true;
-      }
-    }
-    return false;
-  }
-
-  private boolean extracted(String design, List<String> patterns, String pattern) {
-    if (design.startsWith(pattern)) {
-      String newDesign = design.substring(pattern.length());
-      log.debug("newDesign: {}", newDesign);
-      if (!newDesign.isEmpty()) {
-        return canBeMade2(newDesign, patterns);
-      } else {
-        return true;
-      }
-    } else {
-      return false;
-    }
   }
 
   record Input(List<String> patterns, List<String> designs) {
@@ -86,7 +81,14 @@ public class Day19 extends TextDaySolver {
 
   @Override
   public long solvePart01() {
-    return this.input.designs().stream().filter(d -> canBeMade(d, this.input.patterns())).count();
+    int size = this.input.designs().size();
+    return IntStream.range(0, size)
+        .filter(
+            i -> {
+              log.info("design index {}: {} of  {}", i, this.input.designs().get(i), size);
+              return canBeMade(this.input.designs().get(i), this.input.patterns());
+            })
+        .count();
   }
 
   @Override
