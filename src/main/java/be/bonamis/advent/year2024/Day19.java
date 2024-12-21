@@ -2,9 +2,9 @@ package be.bonamis.advent.year2024;
 
 import be.bonamis.advent.TextDaySolver;
 import java.io.InputStream;
-import java.util.Arrays;
-import java.util.List;
-import java.util.stream.IntStream;
+import java.util.*;
+import java.util.stream.*;
+
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -24,18 +24,32 @@ public class Day19 extends TextDaySolver {
     this.input = Input.of(this.puzzle);
   }
 
+  Stream<String> couldBeMadePatterns(String design, List<String> patterns) {
+    return patterns.stream().filter(design::contains);
+  }
+
+  private Map<String, Boolean> memo = new HashMap<>();
+
   public boolean canBeMade(String design, List<String> patterns) {
+    if (memo.containsKey(design)) {
+      return memo.get(design);
+    }
     log.debug("design: {}", design);
-    for (int i = 0; i < patterns.size(); i++) {
-      String pattern = patterns.get(i);
-      log.debug("pattern index {}: {}", i, pattern);
+    for (String pattern : patterns) {
+
       log.debug("pattern: {}", pattern);
       if (design.startsWith(pattern)) {
         String newDesign = design.substring(pattern.length());
         log.debug("newDesign: {}", newDesign);
         if (!newDesign.isEmpty()) {
-          if (canBeMade(newDesign, patterns)) return true;
+          if (canBeMade(newDesign, patterns)) {
+            memo.put(design, true);
+            return true;
+          } else {
+            memo.put(design, false);
+          }
         } else {
+          memo.put(design, true);
           return true;
         }
       }
@@ -69,12 +83,12 @@ public class Day19 extends TextDaySolver {
   public long solvePart01() {
     int size = this.input.designs().size();
     return IntStream.range(0, size)
-        .filter(i -> {
-          log.info("design index {}: {} of  {}", i, this.input.designs().get(i), size);
-            return canBeMade(this.input.designs().get(i), this.input.patterns());
-        })
+        .filter(
+            i -> {
+              log.info("design index {}: {} of  {}", i, this.input.designs().get(i), size);
+              return canBeMade(this.input.designs().get(i), this.input.patterns());
+            })
         .count();
-    //return this.input.designs().stream().filter(d -> canBeMade(d, this.input.patterns())).count();
   }
 
   @Override
