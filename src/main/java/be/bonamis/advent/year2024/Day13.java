@@ -9,6 +9,7 @@ import java.util.stream.IntStream;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.math3.linear.*;
 
 @Slf4j
 @Getter
@@ -62,7 +63,12 @@ public class Day13 extends TextDaySolver {
       LineEquation line1 = LineEquation.of(buttonA.x(), buttonB().x(), -prize.x());
       LineEquation line2 = LineEquation.of(buttonA.y(), buttonB().y(), -prize.y());
       LineEquation.Point point = line1.intersectionPoint(line2);
-      return point.x() > 100 || point.y() > 100 ? LineEquation.Point.of(0, 0) : point;
+      LineEquation.Point point1 =
+          point.x() > 100 || point.y() > 100 || point.x() < 0 || point.y() < 0
+              ? LineEquation.Point.of(0, 0)
+              : point;
+      log.info("point {} and point1 {}", point, point1);
+      return point1;
     }
   }
 
@@ -77,6 +83,15 @@ public class Day13 extends TextDaySolver {
     Point intersectionPoint(LineEquation line2) {
       log.debug("line1: x={}, y={}, c={}", x, y, c);
       log.debug("line2: x={}, y={}, c={}", line2.x(), line2.y(), line2.c());
+
+      RealMatrix coefficients =
+          new Array2DRowRealMatrix(new double[][] {{x, y}, {line2.x(), line2.y()}}, false);
+      DecompositionSolver solver = new LUDecomposition(coefficients).getSolver();
+
+      RealVector constants = new ArrayRealVector(new double[] { -c, -line2.c() });
+      RealVector solution = solver.solve(constants);
+      log.info("solution: {}", solution);
+
       double m1 = -x / y;
       double b1 = -c / y;
       double m2 = -line2.x / line2.y;
@@ -93,6 +108,11 @@ public class Day13 extends TextDaySolver {
     // y = m1x + b1
     // y = m2x + b2
     Optional<Point> calculateIntersectionPoint(double m1, double b1, double m2, double b2) {
+
+      /* RealMatrix coefficients =
+              new Array2DRowRealMatrix(new double[][] { { 2, 3, -2 }, { -1, 7, 6 }, { 4, -3, -5 } },
+                      false);
+      DecompositionSolver solver = new LUDecomposition(coefficients).getSolver();*/
 
       if (m1 == m2) {
         return Optional.empty();
@@ -122,13 +142,13 @@ public class Day13 extends TextDaySolver {
     public static Button of(String input) {
       Pattern pattern = Pattern.compile("Button ([AB]): X\\+(\\d+), Y\\+(\\d+)");
       Matcher matcher = pattern.matcher(input);
-      log.info("input={}", input);
-      log.info("matcher={}", matcher);
+      log.debug("input={}", input);
+      log.debug("matcher={}", matcher);
       if (matcher.find()) {
         String match = matcher.group(1);
         long x = Long.parseLong(matcher.group(2));
         long y = Long.parseLong(matcher.group(3));
-        log.info("match={}, x={}, y={}", match, x, y);
+        log.debug("match={}, x={}, y={}", match, x, y);
         return new Button(x, y);
       }
 
