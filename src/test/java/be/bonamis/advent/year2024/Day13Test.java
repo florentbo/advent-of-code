@@ -8,6 +8,14 @@ import org.junit.jupiter.api.*;
 
 class Day13Test {
 
+
+
+
+
+
+
+
+
   public static final String INPUT =
       """
           Button A: X+94, Y+34
@@ -48,6 +56,12 @@ class Day13Test {
     assertThat(prize).isNotNull();
     assertThat(prize.x()).isEqualTo(8400L);
     assertThat(prize.y()).isEqualTo(5400L);
+  }
+
+  @Test
+  void parseInputs() {
+    Day13 day13 = new Day13(INPUT);
+    assertThat(day13.getInputs().inputs().size()).isEqualTo(4);
   }
 
   @Test
