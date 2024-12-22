@@ -78,6 +78,13 @@ class Day13Test {
   }
 
   @Test
+  void intersectionPointValidation() {
+    Input input = new Day13(INPUT).getInputs().inputs().get(0);
+    Point point = Point.of(80, 40);
+    assertThat(input.isIntersectionValid(point)).isTrue();
+  }
+
+  @Test
   void inputHaNonIntersectionPoint() {
     Input input = new Day13(INPUT).getInputs().inputs().get(1);
     assertThat(input.intersectionPoint()).isEqualTo(Point.of(0, 0));
