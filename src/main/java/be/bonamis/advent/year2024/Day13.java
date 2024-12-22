@@ -11,6 +11,9 @@ import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.linear.*;
 
+import static be.bonamis.advent.year2024.Day13.LineEquation.*;
+import static be.bonamis.advent.year2024.Day13.LineEquation.Point.*;
+
 @Slf4j
 @Getter
 public class Day13 extends TextDaySolver {
@@ -59,16 +62,23 @@ public class Day13 extends TextDaySolver {
       return Input.of(Button.of(s), Button.of(s1), Prize.of(s2));
     }
 
-    LineEquation.Point intersectionPoint() {
+    Point intersectionPoint() {
       LineEquation line1 = LineEquation.of(buttonA.x(), buttonB().x(), -prize.x());
       LineEquation line2 = LineEquation.of(buttonA.y(), buttonB().y(), -prize.y());
-      LineEquation.Point point = line1.intersectionPoint(line2);
-      LineEquation.Point point1 =
-          point.x() > 100 || point.y() > 100 || point.x() < 0 || point.y() < 0
-              ? LineEquation.Point.of(0, 0)
-              : point;
-      log.info("point {} and point1 {}", point, point1);
+      Point point = line1.intersectionPoint(line2);
+      boolean limitValidation = point.x() < 100 || point.y() < 100;
+      log.debug("limitValidation={} and point={}", limitValidation, point);
+      boolean validation = limitValidation && isIntersectionValid(point);
+      log.debug("validation={} and point={}", validation, point);
+      Point point1 = validation ? point : Point.of(0, 0);
+      log.debug("point {} and point1 {}", point, point1);
       return point1;
+    }
+
+    boolean isIntersectionValid(Point point) {
+      boolean xValidation = (point.x() * buttonA.x() + point.y() * buttonB.x()) == prize.x();
+      boolean yValidation = (point.x() * buttonA.y() + point.y() * buttonB.y()) == prize.y();
+      return xValidation && yValidation;
     }
   }
 
@@ -88,15 +98,11 @@ public class Day13 extends TextDaySolver {
           new Array2DRowRealMatrix(new double[][] {{x, y}, {line2.x(), line2.y()}}, false);
       DecompositionSolver solver = new LUDecomposition(coefficients).getSolver();
 
-      RealVector constants = new ArrayRealVector(new double[] { -c, -line2.c() });
+      RealVector constants = new ArrayRealVector(new double[] {-c, -line2.c()});
       RealVector solution = solver.solve(constants);
       log.info("solution: {}", solution);
 
-      double m1 = -x / y;
-      double b1 = -c / y;
-      double m2 = -line2.x / line2.y;
-      double b2 = -line2.c / line2.y;
-      return calculateIntersectionPoint(m1, b1, m2, b2).orElse(Point.of(0, 0));
+      return Point.of(Math.round(solution.getEntry(0)), Math.round(solution.getEntry(1)));
     }
 
     record Point(long x, long y) {
