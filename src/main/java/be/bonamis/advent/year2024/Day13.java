@@ -56,7 +56,7 @@ public class Day13 extends TextDaySolver {
   public record Inputs(List<Input> inputs) {
     public static Inputs of(List<String> puzzle) {
       List<Input> list =
-          IntStream.range(0, puzzle.size() / 4)
+          IntStream.range(0, (puzzle.size() + 1) / 4)
               .mapToObj(
                   i -> Input.of(puzzle.get(i * 4), puzzle.get(i * 4 + 1), puzzle.get(i * 4 + 2)))
               .toList();
@@ -111,7 +111,7 @@ public class Day13 extends TextDaySolver {
 
       RealVector constants = new ArrayRealVector(new double[] {-c, -line2.c()});
       RealVector solution = solver.solve(constants);
-      log.info("solution: {}", solution);
+      log.debug("solution: {}", solution);
 
       return Point.of(Math.round(solution.getEntry(0)), Math.round(solution.getEntry(1)));
     }
@@ -120,25 +120,6 @@ public class Day13 extends TextDaySolver {
       static Point of(long x, long y) {
         return new Point(x, y);
       }
-    }
-
-    // y = m1x + b1
-    // y = m2x + b2
-    Optional<Point> calculateIntersectionPoint(double m1, double b1, double m2, double b2) {
-
-      /* RealMatrix coefficients =
-              new Array2DRowRealMatrix(new double[][] { { 2, 3, -2 }, { -1, 7, 6 }, { 4, -3, -5 } },
-                      false);
-      DecompositionSolver solver = new LUDecomposition(coefficients).getSolver();*/
-
-      if (m1 == m2) {
-        return Optional.empty();
-      }
-
-      double x = (b2 - b1) / (m1 - m2);
-      double y = m1 * x + b1;
-
-      return Optional.of(Point.of(Math.round(x), Math.round(y)));
     }
   }
 
