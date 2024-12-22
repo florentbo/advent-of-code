@@ -12,11 +12,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.math3.linear.*;
 
 import static be.bonamis.advent.year2024.Day13.LineEquation.*;
-import static be.bonamis.advent.year2024.Day13.LineEquation.Point.*;
 
 @Slf4j
 @Getter
 public class Day13 extends TextDaySolver {
+  private static final long PART2_OFFSET = 10_000_000_000_000L;
   private final Inputs inputs;
 
   public Day13(InputStream inputStream) {
@@ -31,15 +31,26 @@ public class Day13 extends TextDaySolver {
 
   @Override
   public long solvePart01() {
+    return solve(0, true);
+  }
+
+  private Long solve(long offset, boolean applyHundredLimitation) {
     return this.inputs.inputs().stream()
-        .map(Input::intersectionPoint)
+        .map(input -> risePrize(input, offset))
+        .map(input1 -> input1.intersectionPoint(applyHundredLimitation))
         .map(point -> point.x() * 3 + point.y())
         .reduce(0L, Long::sum);
   }
 
+  private Input risePrize(Input input, long offset) {
+    Prize prize = input.prize();
+    Prize newPrize = Prize.of(prize.x() + offset, prize.y() + offset);
+    return Input.of(input.buttonA(), input.buttonB(), newPrize);
+  }
+
   @Override
   public long solvePart02() {
-    return 0;
+    return solve(PART2_OFFSET, false);
   }
 
   public record Inputs(List<Input> inputs) {
@@ -62,11 +73,11 @@ public class Day13 extends TextDaySolver {
       return Input.of(Button.of(s), Button.of(s1), Prize.of(s2));
     }
 
-    Point intersectionPoint() {
+    Point intersectionPoint(boolean applyHundredLimitation) {
       LineEquation line1 = LineEquation.of(buttonA.x(), buttonB().x(), -prize.x());
       LineEquation line2 = LineEquation.of(buttonA.y(), buttonB().y(), -prize.y());
       Point point = line1.intersectionPoint(line2);
-      boolean limitValidation = point.x() < 100 || point.y() < 100;
+      boolean limitValidation = !applyHundredLimitation || point.x() < 100 || point.y() < 100;
       log.debug("limitValidation={} and point={}", limitValidation, point);
       boolean validation = limitValidation && isIntersectionValid(point);
       log.debug("validation={} and point={}", validation, point);
@@ -141,6 +152,10 @@ public class Day13 extends TextDaySolver {
         return new Prize(x, y);
       }
       return null;
+    }
+
+    static Prize of(long x, long y) {
+      return new Prize(x, y);
     }
   }
 
