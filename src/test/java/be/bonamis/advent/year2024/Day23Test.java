@@ -52,7 +52,7 @@ class Day23Test {
     Day23 day23 = new Day23(INPUT);
     Input input = day23.getInput();
     assertThat(input.computerPairs()).hasSize(32);
-    assertThat(input.interConnectedComputers()).hasSize(20);
+    assertThat(input.interConnectedComputers()).hasSize(9);
   }
 
   @Test
@@ -65,12 +65,13 @@ class Day23Test {
         vc-aq
         tb-ka
         wh-tc
+        aq-cg
         yn-cg
         """;
 
     Day23 day23 = new Day23(sample);
     Input input = day23.getInput();
-    assertThat(input.computerPairs()).hasSize(7);
-    assertThat(input.interConnectedComputers()).hasSize(2);
+    assertThat(input.computerPairs()).hasSize(8);
+    assertThat(input.interConnectedComputers()).hasSize(1);
   }
 }
