@@ -52,7 +52,7 @@ class Day23Test {
     Day23 day23 = new Day23(INPUT);
     Input input = day23.getInput();
     assertThat(input.computerPairs()).hasSize(32);
-    assertThat(input.interConnectedComputers()).hasSize(9);
+    assertThat(input.interConnectedComputers()).hasSize(12);
   }
 
   @Test
