@@ -5,6 +5,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import org.junit.jupiter.api.*;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
 class Day23Test {
   public static final String INPUT =
       """
@@ -52,7 +57,44 @@ class Day23Test {
     Day23 day23 = new Day23(INPUT);
     Input input = day23.getInput();
     assertThat(input.computerPairs()).hasSize(32);
-    assertThat(input.interConnectedComputers()).hasSize(12);
+
+    String expected =
+        """
+                aq,cg,yn
+                aq,vc,wq
+                co,de,ka
+                co,de,ta
+                co,ka,ta
+                de,ka,ta
+                kh,qp,ub
+                qp,td,wh
+                tb,vc,wq
+                tc,td,wh
+                td,wh,yn
+                ub,vc,wq
+                """;
+
+    Set<Set<String>> expectedSet =
+        expected.lines().map(s -> Set.of(s.split(","))).collect(Collectors.toSet());
+
+    List<String> list =
+        expectedSet.stream()
+            .map(s -> List.of(s.stream().sorted().toList()).toString())
+            .sorted()
+            .toList();
+
+    Set<Set<String>> actual = input.interConnectedComputers();
+    List<String> actualList =
+        actual.stream()
+            .map(
+                s -> {
+                  return List.of(s.stream().sorted().toList()).toString();
+                })
+            .sorted()
+            .toList();
+    assertThat(actualList).isEqualTo(list);
+
+    // missing  "[[co, de, ka]]",
   }
 
   @Test
