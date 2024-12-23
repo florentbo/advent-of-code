@@ -83,8 +83,13 @@ public class Day23 extends TextDaySolver {
                 this.computerPairs().stream()
                     .filter(
                         pair1 ->
-                            pair1.getLeft().equals(resultPair.getLeft())
-                                && pair1.getRight().equals(resultPair.getRight()))
+                        {
+                          boolean b = (pair1.getLeft().equals(resultPair.getLeft())
+                                  && pair1.getRight().equals(resultPair.getRight()))
+                                  || (pair1.getLeft().equals(resultPair.getRight())
+                                  && pair1.getRight().equals(resultPair.getLeft()));
+                          return b;
+                        })
                     .findFirst();
 
             List<String> set =
