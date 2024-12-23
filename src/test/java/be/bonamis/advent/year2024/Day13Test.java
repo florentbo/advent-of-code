@@ -8,14 +8,6 @@ import org.junit.jupiter.api.*;
 
 class Day13Test {
 
-
-
-
-
-
-
-
-
   public static final String INPUT =
       """
           Button A: X+94, Y+34
