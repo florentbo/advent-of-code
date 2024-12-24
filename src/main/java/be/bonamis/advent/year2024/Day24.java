@@ -87,44 +87,55 @@ public class Day24 extends TextDaySolver {
     }
   }
 
-
-
-  private String outputBit(Input.Gate gate, Map<String, Integer> wireValues) {
+  private int outputBit(Input.Gate gate, Map<String, Integer> wireValues) {
     Integer input01 = wireValues.get(gate.input1());
     Integer input02 = wireValues.get(gate.input2());
     return switch (gate.type()) {
-      case XOR -> String.valueOf(input01 ^ input02);
-      case AND -> String.valueOf(input01 & input02);
-      case OR -> String.valueOf(input01 | input02);
+      case XOR -> input01 ^ input02;
+      case AND -> input01 & input02;
+      case OR -> input01 | input02;
     };
   }
 
   @Override
   public long solvePart01() {
-    List<Input.Gate> zValues = this.input.gates().zValues();
-
+    Input.Gates gates = this.input.gates();
+    var zValues = gates.zValues();
 
     log.debug("zValues: {}", zValues);
 
-
-    var zValuesInputs = zValues.stream().flatMap(gate -> Stream.of(gate.input1, gate.input2)).toList();
+    var zValuesInputs =
+        zValues.stream().flatMap(gate -> Stream.of(gate.input1, gate.input2)).toList();
     log.debug("zValuesInputs: {}", zValuesInputs);
     var wireValues = this.input.wireValues().wires;
     boolean allZValuesHaveWireValue = allZValuesHaveWireValue(zValuesInputs, wireValues);
     log.debug("allZValuesHaveWireValue: {}", allZValuesHaveWireValue);
-
-    String joined = zValues.stream().map(gate -> outputBit(gate, wireValues)).collect(Collectors.joining());
+    var wireValuesCopy = new HashMap<>(wireValues);
+    while (!allZValuesHaveWireValue) {
+      for (Input.Gate gate : gates.gates()) {
+        log.debug("gate in the test loop: {}", gate);
+        if (!wireValuesCopy.containsKey(gate.output)
+            && (wireValuesCopy.containsKey(gate.input1)
+                && wireValuesCopy.containsKey(gate.input2))) {
+          int s = outputBit(gate, wireValuesCopy);
+          wireValuesCopy.put(gate.output, s);
+          log.debug("wireValuesCopy put: {} value: {}", gate.output, s);
+        }
+      }
+      allZValuesHaveWireValue = allZValuesHaveWireValue(zValuesInputs, wireValuesCopy);
+      log.debug("allZValuesHaveWireValue after loop: {}", allZValuesHaveWireValue);
+    }
+    String joined =
+        zValues.stream()
+            .map(gate -> String.valueOf(outputBit(gate, wireValuesCopy)))
+            .collect(Collectors.joining());
     log.debug("joined: {}", joined);
 
     long result = Long.parseLong(joined, 2);
     log.debug("result: {}", result);
 
-
-
     return result;
   }
-
-
 
   boolean allZValuesHaveWireValue(List<String> zValuesInputs, Map<String, Integer> wireValues) {
     return zValuesInputs.stream().allMatch(wireValues::containsKey);

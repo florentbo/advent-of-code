@@ -82,6 +82,6 @@ class Day24Test {
 
   @Test
   void solvePart01() {
-    assertThat(new Day24(INPUT).solvePart01()).isEqualTo(0);
+    assertThat(new Day24(INPUT).solvePart01()).isEqualTo(2024);
   }
 }
