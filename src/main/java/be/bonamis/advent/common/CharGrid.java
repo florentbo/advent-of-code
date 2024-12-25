@@ -234,12 +234,12 @@ public class CharGrid {
     return IntStream.range(0, getWidth()).mapToObj(w -> new Point(w, h)).toList();
   }
 
-  public List<List<Point>> rows2() {
-    return IntStream.range(0, getHeight()).mapToObj(this::row2).toList();
-  }
-
   public List<Point> row2(int h) {
     return IntStream.range(0, getHeight()).mapToObj(w -> new Point(h, w)).toList();
+  }
+
+  public List<Point> columns2(int w) {
+    return IntStream.range(0, getWidth()).mapToObj(h-> new Point(h, w)).toList();
   }
 
   public List<List<Point>> columns() {
