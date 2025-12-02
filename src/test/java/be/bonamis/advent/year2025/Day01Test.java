@@ -20,14 +20,6 @@ R14
 L82
 """;
 
-  /*@Test
-  void inputLineOf() {
-  	Day01 day01 = new Day01(sampleInput);
-  	Day01.Input input = day01.getInput();
-  	assertThat(input.lines().size()).isEqualTo(10);
-  	assertThat(input.zeroCount()).isEqualTo(3);
-  }*/
-
   @Test
   void solvePart01() {
     Day01 day01 = new Day01(sampleInput);
