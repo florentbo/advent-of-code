@@ -4,7 +4,16 @@
             <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{35} - %msg%n</pattern>
         </encoder>
     </appender>
+    <!--<appender name="GELF" class="de.siegmar.logbackgelf.GelfUdpAppender">
+        <graylogHost>109.136.97.1</graylogHost>
+        <graylogPort>12201</graylogPort>
+        <encoder class="de.siegmar.logbackgelf.GelfEncoder">
+            <includeLevelName>true</includeLevelName>
+        </encoder>
+    </appender>-->
+
     <root level="DEBUG">
         <appender-ref ref="CONSOLE"/>
+        <!--<appender-ref ref="GELF"/>-->
     </root>
 </configuration>
