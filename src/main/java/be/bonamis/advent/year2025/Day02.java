@@ -3,8 +3,7 @@ package be.bonamis.advent.year2025;
 import be.bonamis.advent.TextDaySolver;
 import java.io.InputStream;
 import java.util.*;
-import java.util.stream.IntStream;
-import java.util.stream.LongStream;
+import java.util.stream.*;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
@@ -39,6 +38,11 @@ public class Day02 extends TextDaySolver {
         return all.stream().filter(this::isInValid).toList();
       }
 
+      public List<Long> seqInvalids() {
+        List<Long> all = LongStream.rangeClosed(start, end).boxed().toList();
+        return all.stream().filter(this::sequencesOfSameDigit).toList();
+      }
+
       private boolean isInValid(Long id) {
         String s = id.toString();
         int len = s.length();
@@ -48,6 +52,24 @@ public class Day02 extends TextDaySolver {
           return left.equals(right);
         }
         return false;
+      }
+
+      private String getString(int seqLen, int len, String s) {
+        String seq = s.substring(0, seqLen);
+        int repeatCount = len / seqLen;
+        return seq.repeat(repeatCount);
+      }
+
+      private boolean sequencesOfSameDigit(Long id) {
+        // example: 824824824 -> 824 repeated 3 times
+
+        String s = id.toString();
+        int len = s.length();
+
+        return IntStream.rangeClosed(1, len / 2)
+            .filter(seqLen -> len % seqLen == 0)
+            .mapToObj(i -> getString(i, len, s))
+            .anyMatch(rep -> rep.equals(s));
       }
     }
 
@@ -68,6 +90,9 @@ public class Day02 extends TextDaySolver {
 
   @Override
   public long solvePart02() {
-    return 100;
+    return this.getInput().ranges().stream()
+        .flatMap(range -> range.seqInvalids().stream())
+        .mapToLong(Long::longValue)
+        .sum();
   }
 }
