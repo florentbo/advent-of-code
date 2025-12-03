@@ -20,9 +20,22 @@ class Day02Test {
   }
 
   @Test
+  void solvePart02() {
+    Day02 day02 = new Day02(sampleInput);
+    assertThat(day02.solvePart02()).isEqualTo(4174379265L);
+  }
+
+  @Test
   void invalids() {
     Day02.Input.Range range = new Day02.Input.Range(11, 22);
     assertThat(range.invalids()).containsExactly(11L, 22L);
+  }
+
+  @Test
+  void seqInvalids() {
+    Day02.Input.Range range = new Day02.Input.Range(824824821, 824824827);
+    assertThat(range.invalids()).isEmpty();
+    assertThat(range.seqInvalids()).containsExactly(824824824L);
   }
 
   @Test
