@@ -31,29 +31,42 @@ public class Day03 extends TextDaySolver {
         return new Bank(batteries);
       }
 
-      int largestJoltage() {
-        int largest =
-            batteries.stream()
-                .limit(batteries.size() - 1)
-                .mapToInt(Integer::intValue)
-                .max()
-                .orElseThrow();
-        List<Integer> largestIndexes =
-            IntStream.range(0, batteries.size())
-                .filter(i -> batteries.get(i) == largest)
-                .boxed()
-                .toList();
+      long findLargestN(int n) {
+        List<Integer> result = new ArrayList<>();
+        int currentPosition = -1;
 
-        List<Integer> list =
-            largestIndexes.stream()
-                .map(
-                    i -> {
-                      List<Integer> integers = batteries.subList(i + 1, batteries.size());
-                      return integers.stream().mapToInt(Integer::intValue).max().orElse(0);
-                    })
-                .toList();
-        int max = list.stream().mapToInt(Integer::intValue).max().orElseThrow();
-        return Integer.parseInt(largest + "" + max);
+        for (int i = 0; i < n; i++) {
+          int remainingNeeded = n - i - 1;
+
+          int searchStart = currentPosition + 1;
+          int searchEnd = batteries.size() - remainingNeeded - 1;
+
+          int largest =
+              batteries.subList(searchStart, searchEnd + 1).stream()
+                  .mapToInt(Integer::intValue)
+                  .max()
+                  .orElseThrow();
+
+          int largestIndex =
+              IntStream.range(searchStart, searchEnd + 1)
+                  .filter(ii -> batteries.get(ii) == largest)
+                  .findFirst()
+                  .orElseThrow();
+
+          result.add(largest);
+          currentPosition = largestIndex;
+        }
+
+        String resultStr = result.stream().map(String::valueOf).collect(Collectors.joining());
+        return Long.parseLong(resultStr);
+      }
+
+      int largestJoltage() {
+        return (int) findLargestN(2);
+      }
+
+	  long largestJoltagePart2() {
+        return findLargestN(12);
       }
     }
 
@@ -72,6 +85,8 @@ public class Day03 extends TextDaySolver {
 
   @Override
   public long solvePart02() {
-    return 101L;
+	  Stream<Long> integerStream =
+			  this.getInput().banks().stream().map(Input.Bank::largestJoltagePart2);
+	  return integerStream.mapToLong(Long::longValue).sum();
   }
 }
