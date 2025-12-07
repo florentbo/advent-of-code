@@ -46,6 +46,24 @@ public class Day04 extends TextDaySolver {
 
   @Override
   public long solvePart02() {
-    return 1011L;
+    var rolls = this.grid.stream().filter(point -> isRollOfPaper(this.grid.get(point))).toList();
+	var accessibleRolls = rolls.stream().filter(this::isAccessible).toList();
+	long count = accessibleRolls.size();
+	log.debug("Initially {} accessible rolls of paper", count);
+	int totalRolls = (int) count;
+	while (count > 0) {
+		accessibleRolls.forEach(point -> this.grid.set(point, CharGrid.DOT));
+		var rolls2 = this.grid.stream().filter(point -> isRollOfPaper(this.grid.get(point))).toList();
+		var accessibleRolls2 = rolls2.stream().filter(this::isAccessible).toList();
+
+		log.debug("Still {} accessible rolls of paper", accessibleRolls2.size());
+		count = accessibleRolls2.size();
+		accessibleRolls = accessibleRolls2;
+		log.debug("count = {}", count);
+		totalRolls+= (int) count;
+		log.debug("Total {} accessible rolls of paper", totalRolls);
+	}
+
+    return totalRolls;
   }
 }
