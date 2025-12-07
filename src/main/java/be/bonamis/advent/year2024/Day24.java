@@ -110,24 +110,23 @@ public class Day24 extends TextDaySolver {
     var wireValues = this.input.wireValues().wires;
     boolean allZValuesHaveWireValue = allZValuesHaveWireValue(zValuesInputs, wireValues);
     log.debug("allZValuesHaveWireValue: {}", allZValuesHaveWireValue);
-    var wireValuesCopy = new HashMap<>(wireValues);
     while (!allZValuesHaveWireValue) {
       for (Input.Gate gate : gates.gates()) {
         log.debug("gate in the test loop: {}", gate);
-        if (!wireValuesCopy.containsKey(gate.output)
-            && (wireValuesCopy.containsKey(gate.input1)
-                && wireValuesCopy.containsKey(gate.input2))) {
-          int s = outputBit(gate, wireValuesCopy);
-          wireValuesCopy.put(gate.output, s);
+        if (!wireValues.containsKey(gate.output)
+            && (wireValues.containsKey(gate.input1)
+                && wireValues.containsKey(gate.input2))) {
+          int s = outputBit(gate, wireValues);
+          wireValues.put(gate.output, s);
           log.debug("wireValuesCopy put: {} value: {}", gate.output, s);
         }
       }
-      allZValuesHaveWireValue = allZValuesHaveWireValue(zValuesInputs, wireValuesCopy);
+      allZValuesHaveWireValue = allZValuesHaveWireValue(zValuesInputs, wireValues);
       log.debug("allZValuesHaveWireValue after loop: {}", allZValuesHaveWireValue);
     }
     String joined =
         zValues.stream()
-            .map(gate -> String.valueOf(outputBit(gate, wireValuesCopy)))
+            .map(gate -> String.valueOf(outputBit(gate, wireValues)))
             .collect(Collectors.joining());
     log.debug("joined: {}", joined);
 
