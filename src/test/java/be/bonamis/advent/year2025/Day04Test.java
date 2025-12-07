@@ -13,7 +13,7 @@ import be.bonamis.advent.common.CharGrid;
 class Day04Test {
 
   @Test
-  void name() {
+  void solvePart01() {
     final String INPUT =
 """
 ..@@.@@@@.
@@ -48,7 +48,30 @@ class Day04Test {
     assertThat(day04.solvePart01()).isEqualTo(13);
   }
 
-  boolean isAccessible(CharGrid grid, Point point) {
+  @Test
+  void name() {
+final String INPUT =
+"""
+..@@.@@@@.
+@@@.@.@.@@
+@@@@@.@.@@
+@.@@@@..@.
+@@.@@@@.@@
+.@@@@@@@.@
+.@.@.@.@@@
+@.@@@.@@@@
+.@@@@@@@@.
+@.@.@@@.@.
+""";
+
+	  final List<String> LIST = List.of(INPUT.split("\n"));
+
+	  Day04 day04 = new Day04(LIST);
+	  assertThat(day04.solvePart02()).isEqualTo(43);
+
+  }
+
+	boolean isAccessible(CharGrid grid, Point point) {
     List<Point> neighbours = grid.neighbours(point, true);
     long count = neighbours.stream().filter(point1 -> isRollOfPaper(grid.get(point1))).count();
     return count < 4;
