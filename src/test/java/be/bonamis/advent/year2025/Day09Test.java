@@ -9,20 +9,21 @@ import be.bonamis.advent.year2025.Day09.Input.Coordinate;
 
 class Day09Test {
 
+  private static final String INPUT =
+      """
+			7,1
+			11,1
+			11,7
+			9,7
+			9,5
+			2,5
+			2,3
+			7,3
+			""";
+  private final Day09 day09 = new Day09(INPUT);
+
   @Test
   void solvePart01() {
-    String input =
-        """
-				7,1
-				11,1
-				11,7
-				9,7
-				9,5
-				2,5
-				2,3
-				7,3
-				""";
-    Day09 day09 = new Day09(input);
     assertThat(day09.solvePart01()).isEqualTo(50);
   }
 
@@ -35,5 +36,7 @@ class Day09Test {
   }
 
   @Test
-  void solvePart02() {}
+  void solvePart02() {
+	  assertThat(day09.solvePart02()).isEqualTo(24);
+  }
 }
