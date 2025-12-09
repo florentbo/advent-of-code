@@ -158,7 +158,11 @@ public class CharGrid {
   }
 
   public Character get2(Point p) {
-    return data[p.y][p.x];
+    try {
+      return data[p.y][p.x];
+    } catch (Exception e) {
+      return ' ';
+    }
   }
 
   public Long number(Point p) {

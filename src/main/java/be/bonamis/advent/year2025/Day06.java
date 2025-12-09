@@ -8,6 +8,7 @@ import java.util.stream.IntStream;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 
+import be.bonamis.advent.common.CharGrid;
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -16,15 +17,18 @@ import lombok.extern.slf4j.Slf4j;
 public class Day06 extends TextDaySolver {
 
   private final Input input;
+  private final CharGrid grid;
 
   public Day06(InputStream inputStream) {
     super(inputStream);
     this.input = Input.of(this.puzzle);
+    this.grid = new CharGrid(this.puzzle.stream().map(String::toCharArray).toArray(char[][]::new));
   }
 
   public Day06(String input) {
     super(input);
     this.input = Input.of(this.puzzle);
+    this.grid = new CharGrid(this.puzzle.stream().map(String::toCharArray).toArray(char[][]::new));
   }
 
   record Input(NumberLines numberLines, Operands operands) {
@@ -72,12 +76,6 @@ public class Day06 extends TextDaySolver {
       Operands operands = Operands.of(puzzle.get(size - 1));
       List<Numbers> list =
           IntStream.range(0, size - 1).mapToObj(i -> Numbers.of(puzzle.get(i))).toList();
-      log.debug("Line: {}", size);
-      for (String s : puzzle) {
-        log.debug(
-            "+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++++");
-        log.debug("Line: {}", s);
-      }
       return new Input(new NumberLines(list), operands);
     }
   }
@@ -96,24 +94,61 @@ public class Day06 extends TextDaySolver {
       Input.Operand operand = this.input.operands().operands().get(i);
       final LongStream columns =
           this.input.numberLines().lines().stream().mapToLong(numbers -> numbers.numbers().get(i));
-      switch (operand) {
-        case ADD -> {
-          long sum = columns.sum();
-          log.debug("Sum for column {}: {}", i, sum);
-          return sum;
-        }
-        case MULTIPLY -> {
-          long product = columns.reduce(1L, (a, b) -> a * b);
-          log.debug("Product for column {}: {}", i, product);
-          return product;
-        }
-        default -> throw new IllegalArgumentException("Unknown operand: " + operand);
-      }
+      return executeOperand(operand, columns);
     };
+  }
+
+  private long executeOperand(Input.Operand operand, LongStream columns) {
+    switch (operand) {
+      case ADD -> {
+        return columns.sum();
+      }
+      case MULTIPLY -> {
+        return columns.reduce(1L, (a, b) -> a * b);
+      }
+      default -> throw new IllegalArgumentException("Unknown operand: " + operand);
+    }
   }
 
   @Override
   public long solvePart02() {
-    return 1000;
+    CharGrid flo = new CharGrid(this.puzzle.subList(0, this.puzzle.size() - 1));
+    List<String> columns = flo.rowsAsLines2();
+    log.debug("Columns: {}", columns);
+    List<Integer> emptyColumns =
+        IntStream.range(0, columns.size())
+            .filter(i -> columns.get(i).trim().isEmpty())
+            .boxed()
+            .toList();
+    log.debug("Empty columns at indices: {}", emptyColumns);
+    List<List<String>> splitColumns = splitBySeparators(columns, emptyColumns);
+    log.debug("Split columns: {}", splitColumns);
+    Input.Operands operands = this.input.operands();
+    log.debug("Operands: {}", operands);
+
+    var list =
+        IntStream.range(0, operands.operands().size())
+            .mapToObj(
+                i -> {
+                  Input.Operand operand = operands.operands().get(i);
+                  var column = splitColumns.get(i);
+                  LongStream longStream = column.stream().mapToLong(s -> Long.parseLong(s.trim()));
+                  log.debug("Processing operand {} for column {}", operand, column);
+                  return executeOperand(operand, longStream);
+                });
+    log.debug("List: {}", list);
+
+    return list.mapToLong(s -> s).sum();
+  }
+
+  private static <T> List<List<T>> splitBySeparators(List<T> list, List<Integer> separators) {
+    List<List<T>> parts = new ArrayList<>();
+    int start = 0;
+    for (int sep : separators) {
+      parts.add(list.subList(start, sep));
+      start = sep + 1;
+    }
+    parts.add(list.subList(start, list.size()));
+    return parts;
   }
 }
