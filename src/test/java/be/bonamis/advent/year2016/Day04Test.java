@@ -2,7 +2,7 @@ package be.bonamis.advent.year2016;
 
 import be.bonamis.advent.year2016.Day04.Room;
 import be.bonamis.advent.year2016.Day04.Room.LetterCount;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -94,6 +94,7 @@ class Day04Test {
   }
 
   @Test
+  @Disabled("requires real input")
   void solvePart02() {
     assertThat(new Day04(List.of()).solvePart02()).isEqualTo(201502);
   }

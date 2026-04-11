@@ -7,9 +7,9 @@ import be.bonamis.advent.TextDaySolver;
 import be.bonamis.advent.common.CharGrid;
 import be.bonamis.advent.utils.marsrover.*;
 
-import java.awt.*;
+import java.awt.Point;
 import java.io.InputStream;
-import java.util.List;
+import java.util.*;
 
 import lombok.*;
 import lombok.extern.slf4j.Slf4j;
@@ -35,7 +35,7 @@ public class Day02 extends TextDaySolver {
   }
 
   @Override
-  public String solvePart02String() {
+  public Optional<String> solvePart02String() {
     String text =
         """
           ##1##
@@ -45,7 +45,7 @@ public class Day02 extends TextDaySolver {
           ##D##
           """;
     CharGrid grid = new CharGrid(text);
-    return lineMoves(this.puzzle, grid, Position.of(0, 2));
+    return Optional.of(lineMoves(this.puzzle, grid, Position.of(0, 2)));
   }
 
   String lineMoves(List<String> moves, CharGrid grid, Position position) {

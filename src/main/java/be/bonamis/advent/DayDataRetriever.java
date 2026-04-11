@@ -3,95 +3,83 @@ package be.bonamis.advent;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.*;
-import java.lang.reflect.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
-
+import java.lang.reflect.Constructor;
+import java.net.*;
 import java.nio.file.*;
-import java.text.*;
 
 @Slf4j
 public class DayDataRetriever {
 
+  private static final Path CACHE_DIR =
+      Path.of(System.getProperty("user.home"), "personal-dev", "advent-inputs");
+
+  public record PuzzleId(int year, int day) {
+    public String inputUrl() {
+      return "https://adventofcode.com/" + year + "/day/" + day + "/input";
+    }
+
+    public String inputFileName() {
+      return String.format("input-%02d-%02d.txt", year, day);
+    }
+
+    public String solverClassName() {
+      return String.format("be.bonamis.advent.year%d.Day%02d", year, day);
+    }
+  }
+
   public static void main(String[] args) {
-    runCode(System.getenv("YEAR"), System.getenv("DAY"));
+    PuzzleId id = new PuzzleId(
+        Integer.parseInt(System.getenv("YEAR")),
+        Integer.parseInt(System.getenv("DAY")));
+    runCode(id);
   }
 
-  private static InputStream downloadInput(int year, int dayNumber) {
-    String puzzleInputUrl = dayUrl(year, dayNumber) + "/input";
-    log.info("downloading input from: {}", puzzleInputUrl);
-    try {
-      HttpURLConnection con = (HttpURLConnection) new URL(puzzleInputUrl).openConnection();
-      con.addRequestProperty("Cookie", "session=" + System.getenv("ADVENT_SESSION"));
-      return con.getInputStream();
-    } catch (IOException e) {
-      throw new IllegalArgumentException(e);
+  static byte[] loadInput(PuzzleId id) throws IOException {
+    Files.createDirectories(CACHE_DIR);
+    Path cached = CACHE_DIR.resolve(id.inputFileName());
+    log.info("Looking for input file: {}", cached);
+    if (Files.exists(cached)) {
+      log.info("Reading existing input from file: {}", cached);
+      return Files.readAllBytes(cached);
+    }
+    log.info("No input file found: {}", cached);
+    byte[] fetched = downloadInput(id);
+    Files.write(cached, fetched);
+    log.info("Writing input to file: {}", cached);
+    return fetched;
+  }
+
+  private static byte[] downloadInput(PuzzleId id) throws IOException {
+    log.info("downloading input from: {}", id.inputUrl());
+    HttpURLConnection con = (HttpURLConnection) new URL(id.inputUrl()).openConnection();
+    con.addRequestProperty("Cookie", "session=" + System.getenv("ADVENT_SESSION"));
+    try (InputStream in = con.getInputStream()) {
+      return in.readAllBytes();
     }
   }
 
-  static InputStream inputFile(int year, int dayNumber) {
-    try {
-      Path homeDir = Path.of(System.getProperty("user.home") + "/personal-dev/advent-inputs");
-      String inputFileName = String.format("input-%02d-%02d.txt", year, dayNumber);
-      File inputFile = new File(homeDir + "/" + inputFileName);
-      log.info("Looking for input file: {}", inputFile);
-
-      if (inputFile.exists()) {
-        log.info("Reading existing input from file: {}", inputFile.getPath());
-        return Files.newInputStream(inputFile.toPath());
-      } else {
-        log.info("No input file found: {}", inputFile.getPath());
-        InputStream inputStream = downloadInput(year, dayNumber);
-        Path path = Paths.get(inputFile.getPath());
-        Files.copy(inputStream, path);
-        log.info("Writing input to file: {}", path);
-        return Files.newInputStream(path);
-      }
-    } catch (Exception e) {
-      log.error("Error reading input file", e);
-      throw new RuntimeException(e);
-    }
-  }
-
-  private static String dayUrl(int year, int day) {
-    return "https://adventofcode.com/" + year + "/day/" + day;
-  }
-
-  public static void runCode(String inputYear, String inputDay) {
-    log.info("runCode input from day: {} and year: {}", inputDay, inputYear);
+  public static void runCode(PuzzleId id) {
+    log.info("runCode input from day: {} and year: {}", id.day(), id.year());
     long startTime = System.nanoTime();
-
     try {
-      int year = Integer.parseInt(inputYear);
-      int dayNumber = Integer.parseInt(inputDay);
+      byte[] input = loadInput(id);
+      Day<?> solver = instantiateSolver(id, input);
 
-      InputStream inputStream = inputFile(year, dayNumber);
+      log.info("Part 1: {}", solver.solvePart01());
+      log.info("Execution time: {} ms", (System.nanoTime() - startTime) / 1_000_000);
+      log.info("Part 2: {}", solver.solvePart02());
+      log.info("Execution time: {} ms", (System.nanoTime() - startTime) / 1_000_000);
+      solver.solvePart02String().ifPresent(s -> log.info("Part 3: {}", s));
 
-      NumberFormat formatter = new DecimalFormat("00");
-      Class<?> clazz =
-          Class.forName(
-              "be.bonamis.advent.year" + year + "." + "Day" + formatter.format(dayNumber));
-      Constructor<?> constructor = clazz.getConstructor(InputStream.class);
-
-      Object instance = constructor.newInstance(inputStream);
-
-      Method solvePart01Method = clazz.getMethod("solvePart01");
-      Method solvePart02Method = clazz.getMethod("solvePart02");
-      Method solvePart02StringMethod = clazz.getMethod("solvePart02String");
-
-      Object resultPart01 = solvePart01Method.invoke(instance);
-      log.info("Execution time: {} ms", (System.nanoTime() - startTime) / 1000000);
-      Object resultPart02 = solvePart02Method.invoke(instance);
-      log.info("Execution time: {} ms", (System.nanoTime() - startTime) / 1000000);
-      Object resultPart03 = solvePart02StringMethod.invoke(instance);
-
-      log.info("Part 1: {}", resultPart01);
-      log.info("Part 2: {}", resultPart02);
-      log.info("Part 3: {}", resultPart03);
-      log.info("Done Execution time: {} ms", (System.nanoTime() - startTime) / 1000000);
-
+      log.info("Done Execution time: {} ms", (System.nanoTime() - startTime) / 1_000_000);
     } catch (Exception e) {
-      throw new IllegalArgumentException(e);
+      throw new IllegalStateException("failed to run " + id, e);
     }
+  }
+
+  private static Day<?> instantiateSolver(PuzzleId id, byte[] input) throws ReflectiveOperationException {
+    Class<?> clazz = Class.forName(id.solverClassName());
+    Constructor<?> constructor = clazz.getConstructor(InputStream.class);
+    return (Day<?>) constructor.newInstance(new ByteArrayInputStream(input));
   }
 }

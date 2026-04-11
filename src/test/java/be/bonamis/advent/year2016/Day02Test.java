@@ -55,7 +55,7 @@ class Day02Test {
   @ParameterizedTest
   @MethodSource("part02TestCases")
   void lineMoves2(String input, String expected) {
-    assertThat(new Day02(inputStream(input)).solvePart02String()).isEqualTo(expected);
+    assertThat(new Day02(inputStream(input)).solvePart02String()).contains(expected);
   }
 
   private static Stream<Arguments> part02TestCases() {
